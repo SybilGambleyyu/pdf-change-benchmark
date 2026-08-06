@@ -17,6 +17,10 @@ commit 6abbae3480cfdfe656acca42c33091f6738605dd through its clean installed
 command-line executable: 16 of 16 pairs passed. The two new pairs exercise
 optional-content topology and SetOCGState action reporting without putting
 fixture payloads in the public truth contract.
+The benchmark wheel was then installed in a fresh Python 3.12 environment,
+passed dependency checking, verified all 16 packaged pairs, and again scored
+the PDFFence candidate 16 of 16. Two isolated builds with a fixed source
+timestamp produced byte-identical wheel and source archive files.
 
 ## Initial integration evidence
 
