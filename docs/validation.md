@@ -13,7 +13,7 @@ benchmark failures.
 
 On 2026-08-06, the 0.3.0 fixture candidate rebuilt and verified all 17 fixture
 pairs with pypdf 6.15.0. It scored the PDFFence 0.3.0 candidate at commit
-8e5af67c551f39a92c7d34f47d1faf0827300cf0 through its command-line
+8e5af679b1cc9c36f6488b61b8a3995eeea526c0 through its command-line
 executable: 17 of 17 pairs passed.
 
 The new Associated Files pair holds an embedded stream and file specification
