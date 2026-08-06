@@ -20,16 +20,18 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.3 contains 40 fixture pairs spanning active content, embedded
+Version 1.4 contains 48 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure, metadata, encryption, and revision-chain evidence.
-It adds a document-open named-GoTo rebind regression, plus paired negative
-cases that change only its target page state or an unrelated name-tree entry.
-Together they distinguish a changed executable navigation target from a broad
-recursive hash of page state or a whole destination tree. It also retains the
-same three-case coverage for local GoTo successors, reordered JavaScript action
-successors, action-subtype order changes with no selected payload rewrite, and
-same-subtype GoTo successors that exchange distinct real-page destinations.
+It adds direct-navigation regressions for a document-open destination, Link
+annotation, and outline item. Each rebind retains its stored navigation root
+while changing only the selected target; paired negative cases isolate target
+page state and unrelated legacy mappings. Together they distinguish a changed
+navigation target from a broad recursive hash of page state or a whole mapping
+dictionary. It also retains the same three-case coverage for document-open and
+successor local GoTo actions, reordered JavaScript action successors,
+action-subtype order changes with no selected payload rewrite, and same-subtype
+GoTo successors that exchange distinct real-page destinations.
 
 ## Install
 

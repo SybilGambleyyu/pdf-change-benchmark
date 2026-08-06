@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "A Link annotation's named local destination page state changes while its stored annotation and mapping remain fixed.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.link_named_destination_target_page_rotated",
+  "schema_version": 1
+}

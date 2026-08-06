@@ -1,0 +1,13 @@
+{
+  "category": "active_content",
+  "description": "A document-open explicit destination moves to a different page without adding an action dictionary.",
+  "expected_change_kinds": [
+    "active_content_payload_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP001"
+  ],
+  "id": "active.open_destination_rebound",
+  "schema_version": 1
+}

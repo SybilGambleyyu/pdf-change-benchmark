@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.0 (unreleased)
+
+- Add eight direct-navigation regressions for an actionless document-open
+  destination, a Link Dest entry, and an outline Dest entry. The three rebind
+  pairs retain the stored root and public inventory while moving only the
+  selected target, requiring generic active_content_payload_changed and
+  PFP001.
+- Add target-page-state and unrelated-legacy-mapping negatives for the Link
+  and outline roots, plus a target-page-state negative for document open. They
+  require only stored_pdf_bytes_changed, preventing broad page or map hashes
+  from passing the rebind cases.
+
 ## 1.3.0 (unreleased)
 
 - Add a document-open named local-GoTo rebind pair. Its stored action and

@@ -164,6 +164,103 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.link_named_destination_rebound",
+        "active_content",
+        (
+            "A Link annotation's named local destination is rebound to a "
+            "different page while its stored annotation remains fixed."
+        ),
+        "link_named_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.link_named_destination_target_page_rotated",
+        "active_content",
+        (
+            "A Link annotation's named local destination page state changes "
+            "while its stored annotation and mapping remain fixed."
+        ),
+        "link_named_destination_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.link_named_destination_unrelated_mapping_rewritten",
+        "active_content",
+        (
+            "An unrelated legacy destination mapping changes while a Link "
+            "annotation's named target remains fixed."
+        ),
+        "link_named_destination_unrelated_mapping_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.open_destination_rebound",
+        "active_content",
+        (
+            "A document-open explicit destination moves to a different page "
+            "without adding an action dictionary."
+        ),
+        "open_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.open_destination_target_page_rotated",
+        "active_content",
+        (
+            "A document-open explicit destination page state changes while "
+            "the stored destination remains fixed."
+        ),
+        "open_destination_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.outline_named_destination_rebound",
+        "active_content",
+        (
+            "An outline item's named local destination is rebound to a "
+            "different page while its stored outline item remains fixed."
+        ),
+        "outline_named_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.outline_named_destination_target_page_rotated",
+        "active_content",
+        (
+            "An outline item's named local destination page state changes "
+            "while its stored outline item and mapping remain fixed."
+        ),
+        "outline_named_destination_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.outline_named_destination_unrelated_mapping_rewritten",
+        "active_content",
+        (
+            "An unrelated legacy destination mapping changes while an outline "
+            "item's named target remains fixed."
+        ),
+        "outline_named_destination_unrelated_mapping_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.goto_3d_view_to_document_part",
         "active_content",
         (
@@ -669,6 +766,96 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
         )
         _write(
             _catalog_named_destination_root_goto_writer(
+                destination=0,
+                unrelated_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "link_named_destination_rebound":
+        _write(
+            _catalog_named_destination_link_writer(destination=0),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_link_writer(destination=1),
+            candidate,
+        )
+    elif mutation == "link_named_destination_target_page_rotated":
+        _write(
+            _catalog_named_destination_link_writer(
+                destination=0,
+                page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_link_writer(
+                destination=0,
+                page_rotation=90,
+            ),
+            candidate,
+        )
+    elif mutation == "link_named_destination_unrelated_mapping_rewritten":
+        _write(
+            _catalog_named_destination_link_writer(
+                destination=0,
+                unrelated_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_link_writer(
+                destination=0,
+                unrelated_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "open_destination_rebound":
+        _write(_catalog_open_destination_writer(destination=0), baseline)
+        _write(_catalog_open_destination_writer(destination=1), candidate)
+    elif mutation == "open_destination_target_page_rotated":
+        _write(
+            _catalog_open_destination_writer(destination=0, page_rotation=0),
+            baseline,
+        )
+        _write(
+            _catalog_open_destination_writer(destination=0, page_rotation=90),
+            candidate,
+        )
+    elif mutation == "outline_named_destination_rebound":
+        _write(
+            _catalog_named_destination_outline_writer(destination=0),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_outline_writer(destination=1),
+            candidate,
+        )
+    elif mutation == "outline_named_destination_target_page_rotated":
+        _write(
+            _catalog_named_destination_outline_writer(
+                destination=0,
+                page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_outline_writer(
+                destination=0,
+                page_rotation=90,
+            ),
+            candidate,
+        )
+    elif mutation == "outline_named_destination_unrelated_mapping_rewritten":
+        _write(
+            _catalog_named_destination_outline_writer(
+                destination=0,
+                unrelated_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_outline_writer(
                 destination=0,
                 unrelated_destination=1,
             ),
@@ -1413,6 +1600,127 @@ def _catalog_named_destination_root_goto_writer(
             }
         )
     )
+    return writer
+
+
+def _catalog_open_destination_writer(
+    *,
+    destination: int,
+    page_rotation: int = 0,
+) -> PdfWriter:
+    """Build a document-open explicit destination without an action dictionary."""
+
+    writer = _writer()
+    first_page = writer.pages[0]
+    first_page[NameObject("/Rotate")] = NumberObject(page_rotation)
+    second_page = writer.add_blank_page(width=72, height=72)
+    pages = (first_page, second_page)
+    writer._root_object[NameObject("/OpenAction")] = ArrayObject(
+        [pages[destination].indirect_reference, NameObject("/Fit")]
+    )
+    return writer
+
+
+def _catalog_named_destination_link_writer(
+    *,
+    destination: int,
+    page_rotation: int = 0,
+    unrelated_destination: int | None = None,
+) -> PdfWriter:
+    """Build a Link Dest name resolved through the legacy catalog map."""
+
+    writer = _writer()
+    first_page = writer.pages[0]
+    first_page[NameObject("/Rotate")] = NumberObject(page_rotation)
+    second_page = writer.add_blank_page(width=72, height=72)
+    pages = (first_page, second_page)
+
+    def explicit_destination(page: int) -> IndirectObject:
+        return writer._add_object(
+            ArrayObject([pages[page].indirect_reference, NameObject("/Fit")])
+        )
+
+    destination_name = NameObject(f"/{_MARKER_B}")
+    destinations = DictionaryObject(
+        {destination_name: explicit_destination(destination)}
+    )
+    if unrelated_destination is not None:
+        destinations[NameObject(f"/{_MARKER_C}")] = explicit_destination(
+            unrelated_destination
+        )
+    writer._root_object[NameObject("/Dests")] = destinations
+    annotation = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Annot"),
+                NameObject("/Subtype"): NameObject("/Link"),
+                NameObject("/Rect"): ArrayObject(
+                    [
+                        NumberObject(0),
+                        NumberObject(0),
+                        NumberObject(12),
+                        NumberObject(12),
+                    ]
+                ),
+                NameObject("/Border"): ArrayObject(
+                    [NumberObject(0), NumberObject(0), NumberObject(0)]
+                ),
+                NameObject("/Dest"): destination_name,
+            }
+        )
+    )
+    first_page[NameObject("/Annots")] = ArrayObject([annotation])
+    return writer
+
+
+def _catalog_named_destination_outline_writer(
+    *,
+    destination: int,
+    page_rotation: int = 0,
+    unrelated_destination: int | None = None,
+) -> PdfWriter:
+    """Build an outline Dest name resolved through the legacy catalog map."""
+
+    writer = _writer()
+    first_page = writer.pages[0]
+    first_page[NameObject("/Rotate")] = NumberObject(page_rotation)
+    second_page = writer.add_blank_page(width=72, height=72)
+    pages = (first_page, second_page)
+
+    def explicit_destination(page: int) -> IndirectObject:
+        return writer._add_object(
+            ArrayObject([pages[page].indirect_reference, NameObject("/Fit")])
+        )
+
+    destination_name = NameObject(f"/{_MARKER_B}")
+    destinations = DictionaryObject(
+        {destination_name: explicit_destination(destination)}
+    )
+    if unrelated_destination is not None:
+        destinations[NameObject(f"/{_MARKER_C}")] = explicit_destination(
+            unrelated_destination
+        )
+    writer._root_object[NameObject("/Dests")] = destinations
+    outlines = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Outlines"),
+                NameObject("/Count"): NumberObject(1),
+            }
+        )
+    )
+    item = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Title"): TextStringObject(_MARKER_A),
+                NameObject("/Parent"): outlines,
+                NameObject("/Dest"): destination_name,
+            }
+        )
+    )
+    outlines.get_object()[NameObject("/First")] = item
+    outlines.get_object()[NameObject("/Last")] = item
+    writer._root_object[NameObject("/Outlines")] = outlines
     return writer
 
 

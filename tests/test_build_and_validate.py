@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 from pypdf import PdfReader
-from pypdf.generic import NameObject
+from pypdf.generic import ArrayObject, NameObject
 
 from pdfcab.build import FIXTURE_SPECS, build_fixture_tree
 from pdfcab.errors import FixtureError
@@ -478,6 +478,151 @@ def test_root_named_destination_pair_changes_only_an_unrelated_mapping(tmp_path)
     assert candidate_pairs[3].get_object()[0] == candidate.pages[1].indirect_reference
 
 
+def test_open_destination_pairs_keep_the_catalog_action_entry_direct(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    rebound = generated / "active.open_destination_rebound"
+    rotated = generated / "active.open_destination_target_page_rotated"
+
+    before = PdfReader(rebound / "baseline.pdf", strict=True)
+    after = PdfReader(rebound / "candidate.pdf", strict=True)
+    before_open = before.root_object["/OpenAction"]
+    after_open = after.root_object["/OpenAction"]
+
+    assert isinstance(before_open, ArrayObject)
+    assert isinstance(after_open, ArrayObject)
+    assert len(before_open) == len(after_open) == 2
+    assert str(before_open[1]) == str(after_open[1]) == "/Fit"
+    assert before_open[0] == before.pages[0].indirect_reference
+    assert after_open[0] == after.pages[1].indirect_reference
+
+    before = PdfReader(rotated / "baseline.pdf", strict=True)
+    after = PdfReader(rotated / "candidate.pdf", strict=True)
+    assert before.root_object["/OpenAction"][0] == before.pages[0].indirect_reference
+    assert after.root_object["/OpenAction"][0] == after.pages[0].indirect_reference
+    assert int(before.pages[0]["/Rotate"]) == 0
+    assert int(after.pages[0]["/Rotate"]) == 90
+
+
+def test_named_link_destination_pairs_keep_the_link_and_mapping_fixed(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    rebound = generated / "active.link_named_destination_rebound"
+    rotated = generated / "active.link_named_destination_target_page_rotated"
+    unrelated = (
+        generated / "active.link_named_destination_unrelated_mapping_rewritten"
+    )
+
+    before = PdfReader(rebound / "baseline.pdf", strict=True)
+    after = PdfReader(rebound / "candidate.pdf", strict=True)
+    before_link = before.pages[0]["/Annots"][0].get_object()
+    after_link = after.pages[0]["/Annots"][0].get_object()
+    assert str(before_link["/Subtype"]) == str(after_link["/Subtype"]) == "/Link"
+    assert "/A" not in before_link
+    assert "/A" not in after_link
+    assert before_link["/Dest"] == after_link["/Dest"]
+    assert _legacy_destination(before, before_link["/Dest"])[0] == before.pages[
+        0
+    ].indirect_reference
+    assert _legacy_destination(after, after_link["/Dest"])[0] == after.pages[
+        1
+    ].indirect_reference
+
+    before = PdfReader(rotated / "baseline.pdf", strict=True)
+    after = PdfReader(rotated / "candidate.pdf", strict=True)
+    before_link = before.pages[0]["/Annots"][0].get_object()
+    after_link = after.pages[0]["/Annots"][0].get_object()
+    assert before_link["/Dest"] == after_link["/Dest"]
+    assert _legacy_destination(before, before_link["/Dest"])[0] == before.pages[
+        0
+    ].indirect_reference
+    assert _legacy_destination(after, after_link["/Dest"])[0] == after.pages[
+        0
+    ].indirect_reference
+    assert int(before.pages[0]["/Rotate"]) == 0
+    assert int(after.pages[0]["/Rotate"]) == 90
+
+    before = PdfReader(unrelated / "baseline.pdf", strict=True)
+    after = PdfReader(unrelated / "candidate.pdf", strict=True)
+    before_link = before.pages[0]["/Annots"][0].get_object()
+    after_link = after.pages[0]["/Annots"][0].get_object()
+    assert before_link["/Dest"] == after_link["/Dest"]
+    assert _legacy_destination(before, before_link["/Dest"])[0] == before.pages[
+        0
+    ].indirect_reference
+    assert _legacy_destination(after, after_link["/Dest"])[0] == after.pages[
+        0
+    ].indirect_reference
+    before_unrelated = _unrelated_legacy_destination(before, before_link["/Dest"])
+    after_unrelated = _unrelated_legacy_destination(after, after_link["/Dest"])
+    assert before_unrelated[0] == before.pages[
+        0
+    ].indirect_reference
+    assert after_unrelated[0] == after.pages[
+        1
+    ].indirect_reference
+
+
+def test_named_outline_destination_pairs_keep_the_item_and_mapping_fixed(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    rebound = generated / "active.outline_named_destination_rebound"
+    rotated = generated / "active.outline_named_destination_target_page_rotated"
+    unrelated = (
+        generated / "active.outline_named_destination_unrelated_mapping_rewritten"
+    )
+
+    before = PdfReader(rebound / "baseline.pdf", strict=True)
+    after = PdfReader(rebound / "candidate.pdf", strict=True)
+    before_item = before.root_object["/Outlines"]["/First"].get_object()
+    after_item = after.root_object["/Outlines"]["/First"].get_object()
+    assert before_item["/Dest"] == after_item["/Dest"]
+    assert "/A" not in before_item
+    assert "/A" not in after_item
+    assert _legacy_destination(before, before_item["/Dest"])[0] == before.pages[
+        0
+    ].indirect_reference
+    assert _legacy_destination(after, after_item["/Dest"])[0] == after.pages[
+        1
+    ].indirect_reference
+
+    before = PdfReader(rotated / "baseline.pdf", strict=True)
+    after = PdfReader(rotated / "candidate.pdf", strict=True)
+    before_item = before.root_object["/Outlines"]["/First"].get_object()
+    after_item = after.root_object["/Outlines"]["/First"].get_object()
+    assert before_item["/Dest"] == after_item["/Dest"]
+    assert _legacy_destination(before, before_item["/Dest"])[0] == before.pages[
+        0
+    ].indirect_reference
+    assert _legacy_destination(after, after_item["/Dest"])[0] == after.pages[
+        0
+    ].indirect_reference
+    assert int(before.pages[0]["/Rotate"]) == 0
+    assert int(after.pages[0]["/Rotate"]) == 90
+
+    before = PdfReader(unrelated / "baseline.pdf", strict=True)
+    after = PdfReader(unrelated / "candidate.pdf", strict=True)
+    before_item = before.root_object["/Outlines"]["/First"].get_object()
+    after_item = after.root_object["/Outlines"]["/First"].get_object()
+    assert before_item["/Dest"] == after_item["/Dest"]
+    assert _legacy_destination(before, before_item["/Dest"])[0] == before.pages[
+        0
+    ].indirect_reference
+    assert _legacy_destination(after, after_item["/Dest"])[0] == after.pages[
+        0
+    ].indirect_reference
+    before_unrelated = _unrelated_legacy_destination(before, before_item["/Dest"])
+    after_unrelated = _unrelated_legacy_destination(after, after_item["/Dest"])
+    assert before_unrelated[0] == before.pages[
+        0
+    ].indirect_reference
+    assert after_unrelated[0] == after.pages[
+        1
+    ].indirect_reference
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)
@@ -542,6 +687,16 @@ def _tree_bytes(root: Path) -> dict[str, bytes]:
         for path in sorted(root.rglob("*"))
         if path.is_file()
     }
+
+
+def _legacy_destination(reader: PdfReader, name: object):
+    return reader.root_object["/Dests"][name].get_object()
+
+
+def _unrelated_legacy_destination(reader: PdfReader, selected_name: object):
+    destinations = reader.root_object["/Dests"]
+    name = next(name for name in destinations if name != selected_name)
+    return destinations[name].get_object()
 
 
 def _destination_name_tree_pairs(reader: PdfReader):

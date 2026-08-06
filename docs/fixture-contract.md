@@ -100,6 +100,19 @@ therefore require only the stored-byte change. Together they distinguish root
 action target evidence from ordinary action-chain evidence without publishing
 a name, target, mapping, trigger, or digest.
 
+The direct-navigation fixtures cover three standard roots that do not require a
+GoTo action dictionary: a catalog OpenAction explicit destination, a Link
+annotation's Dest entry, and an outline item's Dest entry. The Link and outline
+rebind pairs keep their stored root and legacy catalog destination name fixed
+while moving only that mapping to another real page. The document-open rebind
+keeps its actionless explicit destination shape while changing its referenced
+page. All three rebinds require the generic active-content payload change and
+PFP001. Their paired negatives retain the selected target while changing only
+the target page's Rotate state or an unrelated legacy mapping, requiring only
+the stored-byte change. They prevent a compatibility adapter from passing by
+hashing a target page or the whole destination dictionary, and they never
+publish a root, target, mapping, position, or digest.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

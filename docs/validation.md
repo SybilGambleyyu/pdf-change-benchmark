@@ -9,6 +9,20 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.4.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.4.0 fixture candidate rebuilt and verified all 48 fixture
+pairs with pypdf 6.15.0. Its 34 tests and Ruff checks passed. It scored the
+PDFFence 1.4.0 source candidate through its process-bound command-line
+executable: 48 of 48 pairs passed.
+
+The three rebinds keep their actionless document-open destination, Link
+annotation, or outline item fixed while moving only the selected target. The
+held PDFFence 1.3.0 source candidate scores 45 of 48: it misses only those
+three rebinds, reporting just the stored-byte change. The paired negatives
+confirm that target-page rotation and an unrelated legacy destination mapping
+remain stored-byte-only changes.
+
 ## 1.3.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.3.0 fixture candidate rebuilt and verified all 40 fixture

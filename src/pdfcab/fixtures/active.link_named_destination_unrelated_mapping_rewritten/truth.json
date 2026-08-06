@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "An unrelated legacy destination mapping changes while a Link annotation's named target remains fixed.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.link_named_destination_unrelated_mapping_rewritten",
+  "schema_version": 1
+}
