@@ -72,6 +72,12 @@ indirect successor array. Their public truth requires only the generic
 active-content action-sequence change and PFP001; it contains no destination,
 action value, position, trigger, or private signature.
 
+The destination-page-state fixture keeps a single GoTo successor and its page
+reference fixed while changing only the referenced page's /Rotate value. Its
+truth requires only the stored-byte change. This prevents an adapter from
+mistaking recursive inspection of an action target's page representation for a
+rewrite of the action itself.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

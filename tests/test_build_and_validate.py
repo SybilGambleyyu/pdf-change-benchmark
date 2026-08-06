@@ -314,6 +314,30 @@ def test_action_chain_same_type_pair_exchanges_real_page_destinations(
         ) == candidate_piece.raw_get(NameObject("/Shared"))
 
 
+def test_action_chain_destination_page_rotation_keeps_action_data_fixed(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.action_chain_destination_page_rotated"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_primary = baseline.root_object["/OpenAction"].get_object()
+    candidate_primary = candidate.root_object["/OpenAction"].get_object()
+    baseline_successor = baseline_primary["/Next"][0].get_object()
+    candidate_successor = candidate_primary["/Next"][0].get_object()
+
+    assert str(baseline_successor["/S"]) == "/GoTo"
+    assert str(candidate_successor["/S"]) == "/GoTo"
+    assert baseline_successor["/D"][0] == baseline.pages[0].indirect_reference
+    assert candidate_successor["/D"][0] == candidate.pages[0].indirect_reference
+    assert str(baseline_successor["/D"][1]) == "/Fit"
+    assert str(candidate_successor["/D"][1]) == "/Fit"
+    assert int(baseline.pages[0]["/Rotate"]) == 0
+    assert int(candidate.pages[0]["/Rotate"]) == 90
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

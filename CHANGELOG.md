@@ -7,6 +7,10 @@
   public action inventory, selected payload evidence, and subtype-order
   evidence remain fixed. They require the generic
   active_content_action_sequence_changed signal plus PFP001.
+- Add a destination-page-state regression that changes only the referenced
+  page's rotation. It requires only the stored-byte signal, preventing an
+  adapter from misattributing a target page's own representation to a fixed
+  action-chain member.
 
 ## 1.0.0 (unreleased)
 

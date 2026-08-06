@@ -262,6 +262,17 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.action_chain_destination_page_rotated",
+        "active_content",
+        (
+            "A destination page state changes while its stored action chain "
+            "remains fixed."
+        ),
+        "action_chain_destination_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.javascript_stream_filter_rewritten",
         "active_content",
         (
@@ -670,6 +681,15 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
                 second_destination=0,
                 previsit_successors=True,
             ),
+            candidate,
+        )
+    elif mutation == "action_chain_destination_page_rotated":
+        _write(
+            _catalog_destination_page_rotation_writer(page_rotation=0),
+            baseline,
+        )
+        _write(
+            _catalog_destination_page_rotation_writer(page_rotation=90),
             candidate,
         )
     elif mutation == "javascript_stream_filter_rewritten":
@@ -1093,6 +1113,37 @@ def _catalog_same_type_action_chain_writer(
         primary.get_object()[NameObject("/Next")] = shared_successors
     else:
         primary.get_object()[NameObject("/Next")] = successors
+    writer._root_object[NameObject("/OpenAction")] = primary
+    return writer
+
+
+def _catalog_destination_page_rotation_writer(*, page_rotation: int) -> PdfWriter:
+    """Build a GoTo successor whose referenced page has fixed action data."""
+
+    writer = _writer()
+    page = writer.pages[0]
+    page[NameObject("/Rotate")] = NumberObject(page_rotation)
+    primary = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+            }
+        )
+    )
+    successor = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/GoTo"),
+                NameObject("/D"): ArrayObject(
+                    [page.indirect_reference, NameObject("/Fit")]
+                ),
+            }
+        )
+    )
+    primary.get_object()[NameObject("/Next")] = ArrayObject([successor])
     writer._root_object[NameObject("/OpenAction")] = primary
     return writer
 

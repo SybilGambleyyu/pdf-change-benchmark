@@ -11,23 +11,28 @@ benchmark failures.
 
 ## 1.1.0 source-candidate integration evidence
 
-On 2026-08-06, the 1.1.0 fixture candidate rebuilt and verified all 33 fixture
+On 2026-08-06, the 1.1.0 fixture candidate rebuilt and verified all 34 fixture
 pairs with pypdf 6.15.0. It scored the PDFFence 1.1.0 source candidate through
-its process-bound command-line executable: 33 of 33 pairs passed.
+its process-bound command-line executable: 34 of 34 pairs passed.
 
 The two added same-subtype order pairs retain two GoTo successors with distinct
 valid real-page destinations of intentionally identical stored geometry while
 exchanging their array positions. One has ordinary stored successors; the
 other exposes the same indirect array through unrelated stored structure before
 its document-open trigger. The held
-PDFFence 1.0.0 artifact scores 31 of 33: both pairs yield only the stored-byte
+PDFFence 1.0.0 artifact scores 32 of 34: both pairs yield only the stored-byte
 change and no PFP001.
+
+The destination-page-state pair changes the referenced page's rotation without
+changing a stored action member. It expects only stored_pdf_bytes_changed, so
+it guards against action-member fingerprints that recurse into the target page
+and create a false active-content finding.
 
 Two fixed-timestamp builds produced byte-identical wheel and source archive
 files, and all artifacts passed metadata checks. Fresh wheel installs on
 Python 3.11 from a local offline wheelhouse, 3.12, and 3.13, plus a clean
 Python 3.12 source-archive install, verified the packaged fixture bytes and
-scored all 33 pairs through the public PDFFence CLI.
+scored all 34 pairs through the public PDFFence CLI.
 
 ## 1.0.0 source-candidate integration evidence
 
