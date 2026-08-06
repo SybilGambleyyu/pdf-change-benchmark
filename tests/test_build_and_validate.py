@@ -123,6 +123,30 @@ def test_uri_payload_rewrite_pair_keeps_the_action_inventory_fixed(tmp_path):
     assert str(baseline_action["/URI"]) != str(candidate_action["/URI"])
 
 
+def test_javascript_trigger_rebound_pair_exchanges_trigger_bindings(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.javascript_trigger_rebound"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_open = baseline.root_object["/OpenAction"].get_object()
+    candidate_open = candidate.root_object["/OpenAction"].get_object()
+    baseline_will_close = baseline.root_object["/AA"]["/WC"].get_object()
+    candidate_will_close = candidate.root_object["/AA"]["/WC"].get_object()
+
+    for action in (
+        baseline_open,
+        candidate_open,
+        baseline_will_close,
+        candidate_will_close,
+    ):
+        assert str(action["/S"]) == "/JavaScript"
+    assert str(baseline_open["/JS"]) == str(candidate_will_close["/JS"])
+    assert str(baseline_will_close["/JS"]) == str(candidate_open["/JS"])
+    assert str(baseline_open["/JS"]) != str(baseline_will_close["/JS"])
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

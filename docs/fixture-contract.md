@@ -43,6 +43,12 @@ syntactically valid JavaScript stream with different decoded material. Their
 truth records require a generic active-content payload-change signal and the
 existing active-content policy ID, never a source value or digest.
 
+The JavaScript trigger-rebinding fixture retains the same two inert script
+values and action inventory while exchanging their document-open and
+catalog-will-close bindings. Its generic truth distinguishes evidence of
+execution-context reassignment from an ordinary payload rewrite without
+identifying either script or a private digest.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

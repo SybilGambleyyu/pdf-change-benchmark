@@ -163,6 +163,20 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.javascript_trigger_rebound",
+        "active_content",
+        (
+            "Two JavaScript payloads exchange document-open and document-close "
+            "bindings while their public action inventory is fixed."
+        ),
+        "javascript_trigger_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_stream_filter_rewritten",
         "active_content",
         (
@@ -462,6 +476,21 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "javascript_payload_rewritten":
         _write(_writer(javascript=_MARKER_A), baseline)
         _write(_writer(javascript=_MARKER_B), candidate)
+    elif mutation == "javascript_trigger_rebound":
+        _write(
+            _catalog_javascript_trigger_writer(
+                open_payload=_MARKER_A,
+                will_close_payload=_MARKER_B,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_javascript_trigger_writer(
+                open_payload=_MARKER_B,
+                will_close_payload=_MARKER_A,
+            ),
+            candidate,
+        )
     elif mutation == "javascript_stream_filter_rewritten":
         _write(
             _writer(
@@ -687,6 +716,33 @@ def _writer(
 def _write(writer: PdfWriter, path: Path) -> None:
     with path.open("wb") as stream:
         writer.write(stream)
+
+
+def _catalog_javascript_trigger_writer(
+    *,
+    open_payload: str,
+    will_close_payload: str,
+) -> PdfWriter:
+    """Build a catalog with distinct document-open and will-close scripts."""
+
+    writer = _writer()
+
+    def javascript_action(payload: str) -> IndirectObject:
+        return writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Action"),
+                    NameObject("/S"): NameObject("/JavaScript"),
+                    NameObject("/JS"): TextStringObject(payload),
+                }
+            )
+        )
+
+    writer._root_object[NameObject("/OpenAction")] = javascript_action(open_payload)
+    writer._root_object[NameObject("/AA")] = DictionaryObject(
+        {NameObject("/WC"): javascript_action(will_close_payload)}
+    )
+    return writer
 
 
 def _increment(source: Path, destination: Path) -> None:

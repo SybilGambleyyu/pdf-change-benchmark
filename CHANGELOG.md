@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 (unreleased)
+
+- Add a fixed-inventory JavaScript trigger-rebinding pair. The pair exchanges
+  document-open and document-close script bindings and requires the generic
+  active-content payload-change signal and PFP001 without exposing a script or
+  digest in fixture truth.
+
 ## 0.7.0 (unreleased)
 
 - Add fixed-inventory target-rewrite pairs for Launch, remote and embedded
