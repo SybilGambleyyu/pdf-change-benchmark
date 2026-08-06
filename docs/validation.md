@@ -22,6 +22,12 @@ same indirect array through unrelated stored structure before its document-open
 trigger. The held PDFFence 0.9.0 artifact scores 29 of 31: both pairs yield
 only the stored-byte change and no PFP001.
 
+Two fixed-timestamp builds produced byte-identical wheel and source archive
+files, and all artifacts passed metadata checks. Fresh wheel installs on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13, plus a clean
+Python 3.12 source-archive install, verified the packaged fixture bytes and
+scored all 31 pairs through the public PDFFence CLI.
+
 ## 0.9.0 source-candidate integration evidence
 
 On 2026-08-06, the 0.9.0 fixture candidate rebuilt and verified all 29 fixture
