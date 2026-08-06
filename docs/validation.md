@@ -9,6 +9,30 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.2.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.2.0 fixture candidate rebuilt and verified all 37 fixture
+pairs with pypdf 6.15.0. Its 28 tests and Ruff checks passed. It scored the
+PDFFence 1.2.0 source candidate through its process-bound command-line
+executable: 37 of 37 pairs passed.
+
+The named-destination rebind pair retains the JavaScript root and GoTo
+successor while moving the matching catalog name-tree mapping from one
+identically sized real page to another. The held PDFFence 1.1.0 source
+candidate scores 36 of 37: it misses only that rebind, reporting just the
+stored-byte change. The two accompanying negative pairs confirm that target
+page rotation and an unrelated name-tree mapping rewrite each remain a
+stored-byte-only change.
+
+Two fixed-timestamp builds produced byte-identical wheel and source archive
+files, and all four artifacts passed metadata checks. Fresh wheel installs
+passed pip check, fixture verification, and the complete 37-pair score on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13; a clean Python
+3.12 source-archive install passed the same checks. Dependency auditing found
+no known vulnerabilities after the disposable validation environment's
+bootstrap installer was upgraded; the unpublished local distributions were
+correctly skipped because they are not on PyPI.
+
 ## 1.1.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.1.0 fixture candidate rebuilt and verified all 34 fixture

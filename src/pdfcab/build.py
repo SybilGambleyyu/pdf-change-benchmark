@@ -273,6 +273,42 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.named_destination_rebound",
+        "active_content",
+        (
+            "A named local GoTo target is rebound to a different page while "
+            "the stored action chain remains fixed."
+        ),
+        "named_destination_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.named_destination_target_page_rotated",
+        "active_content",
+        (
+            "A named local GoTo target page state changes while its name-tree "
+            "mapping and stored action chain remain fixed."
+        ),
+        "named_destination_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.named_destination_unrelated_mapping_rewritten",
+        "active_content",
+        (
+            "An unrelated destination name-tree mapping changes while the "
+            "stored GoTo target remains fixed."
+        ),
+        "named_destination_unrelated_mapping_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.javascript_stream_filter_rewritten",
         "active_content",
         (
@@ -690,6 +726,45 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
         )
         _write(
             _catalog_destination_page_rotation_writer(page_rotation=90),
+            candidate,
+        )
+    elif mutation == "named_destination_rebound":
+        _write(
+            _catalog_named_destination_writer(destination=0),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_writer(destination=1),
+            candidate,
+        )
+    elif mutation == "named_destination_target_page_rotated":
+        _write(
+            _catalog_named_destination_writer(
+                destination=0,
+                page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_writer(
+                destination=0,
+                page_rotation=90,
+            ),
+            candidate,
+        )
+    elif mutation == "named_destination_unrelated_mapping_rewritten":
+        _write(
+            _catalog_named_destination_writer(
+                destination=0,
+                unrelated_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_writer(
+                destination=0,
+                unrelated_destination=1,
+            ),
             candidate,
         )
     elif mutation == "javascript_stream_filter_rewritten":
@@ -1140,6 +1215,68 @@ def _catalog_destination_page_rotation_writer(*, page_rotation: int) -> PdfWrite
                 NameObject("/D"): ArrayObject(
                     [page.indirect_reference, NameObject("/Fit")]
                 ),
+            }
+        )
+    )
+    primary.get_object()[NameObject("/Next")] = ArrayObject([successor])
+    writer._root_object[NameObject("/OpenAction")] = primary
+    return writer
+
+
+def _catalog_named_destination_writer(
+    *,
+    destination: int,
+    page_rotation: int = 0,
+    unrelated_destination: int | None = None,
+) -> PdfWriter:
+    """Build a GoTo successor that resolves through a Dests name tree."""
+
+    writer = _writer()
+    first_page = writer.pages[0]
+    first_page[NameObject("/Rotate")] = NumberObject(page_rotation)
+    second_page = writer.add_blank_page(width=72, height=72)
+    pages = (first_page, second_page)
+
+    def explicit_destination(page: int) -> IndirectObject:
+        return writer._add_object(
+            ArrayObject([pages[page].indirect_reference, NameObject("/Fit")])
+        )
+
+    entries = ArrayObject(
+        [TextStringObject(_MARKER_B), explicit_destination(destination)]
+    )
+    if unrelated_destination is not None:
+        entries.extend(
+            [
+                TextStringObject(_MARKER_C),
+                explicit_destination(unrelated_destination),
+            ]
+        )
+    leaf = writer._add_object(
+        DictionaryObject({NameObject("/Names"): entries})
+    )
+    tree = writer._add_object(
+        DictionaryObject({NameObject("/Kids"): ArrayObject([leaf])})
+    )
+    writer._root_object[NameObject("/Names")] = DictionaryObject(
+        {NameObject("/Dests"): tree}
+    )
+
+    primary = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+            }
+        )
+    )
+    successor = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/GoTo"),
+                NameObject("/D"): TextStringObject(_MARKER_B),
             }
         )
     )

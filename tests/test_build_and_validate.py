@@ -338,6 +338,76 @@ def test_action_chain_destination_page_rotation_keeps_action_data_fixed(
     assert int(candidate.pages[0]["/Rotate"]) == 90
 
 
+def test_named_destination_rebind_pair_keeps_the_action_chain_fixed(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.named_destination_rebound"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_primary = baseline.root_object["/OpenAction"].get_object()
+    candidate_primary = candidate.root_object["/OpenAction"].get_object()
+    baseline_successor = baseline_primary["/Next"][0].get_object()
+    candidate_successor = candidate_primary["/Next"][0].get_object()
+    baseline_pairs = _destination_name_tree_pairs(baseline)
+    candidate_pairs = _destination_name_tree_pairs(candidate)
+
+    assert list(baseline.root_object).index(NameObject("/Names")) < list(
+        baseline.root_object
+    ).index(NameObject("/OpenAction"))
+    assert str(baseline_successor["/S"]) == str(candidate_successor["/S"]) == "/GoTo"
+    assert str(baseline_successor["/D"]) == str(candidate_successor["/D"])
+    assert baseline_pairs[0] == baseline_successor["/D"]
+    assert candidate_pairs[0] == candidate_successor["/D"]
+    assert baseline_pairs[1].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[1].get_object()[0] == candidate.pages[1].indirect_reference
+
+
+def test_named_destination_target_page_rotation_keeps_mapping_fixed(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.named_destination_target_page_rotated"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_primary = baseline.root_object["/OpenAction"].get_object()
+    candidate_primary = candidate.root_object["/OpenAction"].get_object()
+    baseline_successor = baseline_primary["/Next"][0].get_object()
+    candidate_successor = candidate_primary["/Next"][0].get_object()
+    baseline_pairs = _destination_name_tree_pairs(baseline)
+    candidate_pairs = _destination_name_tree_pairs(candidate)
+
+    assert str(baseline_successor["/D"]) == str(candidate_successor["/D"])
+    assert baseline_pairs[1].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[1].get_object()[0] == candidate.pages[0].indirect_reference
+    assert int(baseline.pages[0]["/Rotate"]) == 0
+    assert int(candidate.pages[0]["/Rotate"]) == 90
+
+
+def test_named_destination_pair_changes_only_an_unrelated_mapping(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.named_destination_unrelated_mapping_rewritten"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_primary = baseline.root_object["/OpenAction"].get_object()
+    candidate_primary = candidate.root_object["/OpenAction"].get_object()
+    baseline_successor = baseline_primary["/Next"][0].get_object()
+    candidate_successor = candidate_primary["/Next"][0].get_object()
+    baseline_pairs = _destination_name_tree_pairs(baseline)
+    candidate_pairs = _destination_name_tree_pairs(candidate)
+
+    assert str(baseline_successor["/D"]) == str(candidate_successor["/D"])
+    assert baseline_pairs[0] == baseline_successor["/D"]
+    assert candidate_pairs[0] == candidate_successor["/D"]
+    assert baseline_pairs[1].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[1].get_object()[0] == candidate.pages[0].indirect_reference
+    assert baseline_pairs[2] == candidate_pairs[2]
+    assert baseline_pairs[3].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[3].get_object()[0] == candidate.pages[1].indirect_reference
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)
@@ -402,3 +472,10 @@ def _tree_bytes(root: Path) -> dict[str, bytes]:
         for path in sorted(root.rglob("*"))
         if path.is_file()
     }
+
+
+def _destination_name_tree_pairs(reader: PdfReader):
+    """Return the one leaf's alternating name/destination entries."""
+
+    tree = reader.root_object["/Names"]["/Dests"]
+    return tree["/Kids"][0].get_object()["/Names"]

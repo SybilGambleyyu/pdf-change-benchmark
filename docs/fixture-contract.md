@@ -78,6 +78,19 @@ truth requires only the stored-byte change. This prevents an adapter from
 mistaking recursive inspection of an action target's page representation for a
 rewrite of the action itself.
 
+The named-destination rebind fixture keeps a document-open JavaScript root and
+one local GoTo successor fixed. The successor's D value is a stored string;
+the catalog's Names/Dests name tree is inserted before the execution trigger
+and maps that same string to a different real page in the candidate. Its truth
+requires the generic active-content action-sequence change and PFP001, without
+publishing the name, destination, mapping, page, position, or digest.
+
+The two paired named-destination negatives hold that action and its matching
+mapping fixed. One changes only the resolved target page's /Rotate value; the
+other changes only a different entry in the same destination name tree. Both
+require only the stored-byte change. They prevent a compatibility adapter from
+mistaking page state or the full shared name tree for the selected GoTo target.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

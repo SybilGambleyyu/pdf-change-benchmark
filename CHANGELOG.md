@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0 (unreleased)
+
+- Add a named local-GoTo destination rebind pair. The action's stored D value,
+  public action inventory, selected payload evidence, and successor order all
+  remain fixed while its catalog name-tree mapping moves to another real page.
+  It requires the generic active_content_action_sequence_changed signal and
+  PFP001 without disclosing a destination name or target.
+- Add two selectivity regressions: a changed target page rotation and a changed
+  unrelated name-tree mapping. Both require only stored_pdf_bytes_changed, so
+  an adapter cannot pass by recursively hashing target pages or the entire
+  destination name tree.
+
 ## 1.1.0 (unreleased)
 
 - Add normal and shared-array same-subtype action-chain order pairs. Their two
