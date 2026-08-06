@@ -22,6 +22,7 @@ _KNOWN_CHANGE_KINDS: Final = frozenset(
         "inspection_state_changed",
         "interactive_feature_inventory_changed",
         "metadata_inventory_changed",
+        "optional_content_inventory_changed",
         "page_count_changed",
         "reachable_object_count_changed",
         "revision_chain_changed",
@@ -30,7 +31,16 @@ _KNOWN_CHANGE_KINDS: Final = frozenset(
     }
 )
 _KNOWN_POLICY_RULE_IDS: Final = frozenset(
-    {"PFP001", "PFP002", "PFP003", "PFP004", "PFP005", "PFP006"}
+    {
+        "PFP001",
+        "PFP002",
+        "PFP003",
+        "PFP004",
+        "PFP005",
+        "PFP006",
+        "PFP007",
+        "PFP008",
+    }
 )
 
 

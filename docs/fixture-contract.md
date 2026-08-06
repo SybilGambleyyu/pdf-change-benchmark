@@ -18,3 +18,7 @@ An adapter must compare the exact set of PDFFence change kinds for every
 fixture. This is a product-specific compatibility contract, not an assertion
 that another tool should expose the same result or that an uncatalogued PDF
 surface is safe.
+
+The optional-content fixture covers only catalog-declared groups and
+configuration topology. It does not claim that a viewer displays a particular
+layer state or that page content uses the declared groups.

@@ -21,6 +21,8 @@ _RULE_NAMES: Final = {
     "PFP004": "no_signature_structure_changes",
     "PFP005": "require_unencrypted",
     "PFP006": "require_single_revision",
+    "PFP007": "require_no_optional_content",
+    "PFP008": "no_optional_content_changes",
 }
 _COMMAND_TIMEOUT_SECONDS: Final = 30
 

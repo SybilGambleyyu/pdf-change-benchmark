@@ -9,6 +9,15 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 0.2.0 candidate integration evidence
+
+On 2026-08-06, the 0.2.0 fixture candidate rebuilt and verified all 16 fixture
+pairs with pypdf 6.15.0. It scored the PDFFence 0.2.0 release candidate at
+commit 6abbae3480cfdfe656acca42c33091f6738605dd through its clean installed
+command-line executable: 16 of 16 pairs passed. The two new pairs exercise
+optional-content topology and SetOCGState action reporting without putting
+fixture payloads in the public truth contract.
+
 ## Initial integration evidence
 
 On 2026-08-06, PDFCAB 0.1 scored the public PDFFence source candidate at

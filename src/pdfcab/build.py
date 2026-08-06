@@ -88,6 +88,18 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.set_ocg_state_action_added",
+        "active_content",
+        "A stored SetOCGState action is added at the document catalog.",
+        "set_ocg_state_action_added",
+        (
+            "active_content_inventory_changed",
+            "reachable_object_count_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_payload_rewritten",
         "active_content",
         "A JavaScript payload changes while its public action inventory is fixed.",
@@ -146,6 +158,18 @@ FIXTURE_SPECS = (
         "collection_added",
         ("interactive_feature_inventory_changed", "stored_pdf_bytes_changed"),
         ("PFP003",),
+    ),
+    FixtureSpec(
+        "review.optional_content_added",
+        "optional_content",
+        "Catalog optional-content group and configuration topology is added.",
+        "optional_content_added",
+        (
+            "optional_content_inventory_changed",
+            "reachable_object_count_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP007", "PFP008"),
     ),
     FixtureSpec(
         "signature.structure_added",
@@ -261,6 +285,9 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "launch_action_added":
         _write(_writer(), baseline)
         _write(_writer(action="/Launch"), candidate)
+    elif mutation == "set_ocg_state_action_added":
+        _write(_writer(), baseline)
+        _write(_writer(action="/SetOCGState"), candidate)
     elif mutation == "javascript_payload_rewritten":
         _write(_writer(javascript=_MARKER_A), baseline)
         _write(_writer(javascript=_MARKER_B), candidate)
@@ -279,6 +306,9 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "collection_added":
         _write(_writer(), baseline)
         _write(_writer(collection=True), candidate)
+    elif mutation == "optional_content_added":
+        _write(_writer(), baseline)
+        _write(_writer(optional_content=True), candidate)
     elif mutation == "signature_added":
         _write(_writer(), baseline)
         _write(_writer(signature=True), candidate)
@@ -310,6 +340,7 @@ def _writer(
     collection: bool = False,
     signature: bool = False,
     xmp: bool = False,
+    optional_content: bool = False,
     encrypted: bool = False,
 ) -> PdfWriter:
     writer = PdfWriter()
@@ -338,6 +369,8 @@ def _writer(
         metadata[NameObject("/Type")] = NameObject("/Metadata")
         metadata.set_data(_MARKER_A.encode("utf-8"))
         writer._root_object[NameObject("/Metadata")] = writer._add_object(metadata)
+    if optional_content:
+        _add_optional_content(writer)
     if encrypted:
         writer.encrypt(_PASSWORD)
     return writer
@@ -366,6 +399,8 @@ def _action(kind: str) -> DictionaryObject:
         action[NameObject("/URI")] = TextStringObject(_URI)
     elif kind == "/Launch":
         action[NameObject("/F")] = TextStringObject(_MARKER_A)
+    elif kind == "/SetOCGState":
+        action[NameObject("/State")] = ArrayObject()
     return action
 
 
@@ -459,3 +494,35 @@ def _add_link_annotation(writer: PdfWriter) -> None:
         )
     )
     writer.pages[0][NameObject("/Annots")] = ArrayObject([annotation])
+
+
+def _add_optional_content(writer: PdfWriter) -> None:
+    on_group = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/OCG"),
+                NameObject("/Name"): TextStringObject(_MARKER_A),
+            }
+        )
+    )
+    off_group = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/OCG"),
+                NameObject("/Name"): TextStringObject(_MARKER_B),
+            }
+        )
+    )
+    configuration = DictionaryObject(
+        {
+            NameObject("/ON"): ArrayObject([on_group]),
+            NameObject("/OFF"): ArrayObject([off_group]),
+            NameObject("/BaseState"): NameObject("/Unchanged"),
+        }
+    )
+    writer._root_object[NameObject("/OCProperties")] = DictionaryObject(
+        {
+            NameObject("/OCGs"): ArrayObject([on_group, off_group]),
+            NameObject("/D"): configuration,
+        }
+    )

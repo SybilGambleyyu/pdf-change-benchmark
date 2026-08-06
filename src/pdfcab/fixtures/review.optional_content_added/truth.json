@@ -1,0 +1,15 @@
+{
+  "category": "optional_content",
+  "description": "Catalog optional-content group and configuration topology is added.",
+  "expected_change_kinds": [
+    "optional_content_inventory_changed",
+    "reachable_object_count_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP007",
+    "PFP008"
+  ],
+  "id": "review.optional_content_added",
+  "schema_version": 1
+}

@@ -1,0 +1,14 @@
+{
+  "category": "active_content",
+  "description": "A stored SetOCGState action is added at the document catalog.",
+  "expected_change_kinds": [
+    "active_content_inventory_changed",
+    "reachable_object_count_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP001"
+  ],
+  "id": "active.set_ocg_state_action_added",
+  "schema_version": 1
+}
