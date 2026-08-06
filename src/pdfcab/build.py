@@ -101,6 +101,17 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.goto_to_embedded_goto",
+        "active_content",
+        "A local GoTo action is replaced with an embedded-document GoTo action.",
+        "goto_to_embedded_goto",
+        (
+            "active_content_inventory_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_payload_rewritten",
         "active_content",
         "A JavaScript payload changes while its public action inventory is fixed.",
@@ -303,6 +314,9 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "set_ocg_state_action_added":
         _write(_writer(), baseline)
         _write(_writer(action="/SetOCGState"), candidate)
+    elif mutation == "goto_to_embedded_goto":
+        _write(_writer(action="/GoTo"), baseline)
+        _write(_writer(action="/GoToE"), candidate)
     elif mutation == "javascript_payload_rewritten":
         _write(_writer(javascript=_MARKER_A), baseline)
         _write(_writer(javascript=_MARKER_B), candidate)

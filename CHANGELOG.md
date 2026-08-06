@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0 (unreleased)
+
+- Add an action-subtype swap pair: an ordinary GoTo action is replaced by an
+  embedded-document GoTo action while the action dictionary count remains
+  fixed.
+
 ## 0.3.0 (unreleased)
 
 - Add an association-only Associated Files pair that holds the embedded stream

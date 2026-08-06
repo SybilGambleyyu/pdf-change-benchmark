@@ -9,6 +9,18 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 0.4.0 candidate integration evidence
+
+On 2026-08-06, the 0.4.0 fixture candidate rebuilt and verified all 18 fixture
+pairs with pypdf 6.15.0. It scored the PDFFence 0.4.0 candidate through its
+installed command-line executable: 18 of 18 pairs passed.
+
+The new action-subtype pair keeps the action dictionary count fixed while
+replacing an ordinary GoTo action with an embedded-document GoTo action.
+PDFFence 0.3.0 scores 17 of 18 on this suite. Its only miss reports the
+stored-byte change but neither the active-content inventory change nor PFP001,
+which proves that the pair isolates the collapsed action-type regression.
+
 ## 0.3.0 candidate integration evidence
 
 On 2026-08-06, the 0.3.0 fixture candidate rebuilt and verified all 17 fixture

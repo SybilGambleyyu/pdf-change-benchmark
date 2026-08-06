@@ -23,6 +23,10 @@ The optional-content fixture covers only catalog-declared groups and
 configuration topology. It does not claim that a viewer displays a particular
 layer state or that page content uses the declared groups.
 
+The GoTo-to-embedded-GoTo fixture keeps the action dictionary count fixed
+while changing only its fixed action type. It tests that an action inventory
+does not collapse ordinary navigation and navigation into embedded documents.
+
 The Associated Files fixture holds the embedded stream and file specification
 constant, then adds a document-level association. It tests association topology
 without exposing the file name, payload, or relationship value in public truth.
