@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.3.0 (unreleased)
+
+- Add a document-open named local-GoTo rebind pair. Its stored action and
+  public action inventory remain fixed while the matching catalog name-tree
+  value moves to a different real page. It requires the generic
+  active_content_payload_changed signal and PFP001 without exposing a target.
+- Add root-action target-page-state and unrelated-name-tree negatives. Both
+  require only stored_pdf_bytes_changed, preventing broad recursive target or
+  whole-tree fingerprints from passing the rebind case.
+
 ## 1.2.0 (unreleased)
 
 - Add a named local-GoTo destination rebind pair. The action's stored D value,

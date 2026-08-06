@@ -91,6 +91,15 @@ other changes only a different entry in the same destination name tree. Both
 require only the stored-byte change. They prevent a compatibility adapter from
 mistaking page state or the full shared name tree for the selected GoTo target.
 
+The document-open named-destination fixtures use the same stored name-tree
+structure but place the local GoTo action directly in the catalog OpenAction
+entry, with no /Next member. The rebind pair requires the generic
+active-content payload change and PFP001. Its two paired negatives change only
+the resolved target page's /Rotate value or another name-tree mapping, and
+therefore require only the stored-byte change. Together they distinguish root
+action target evidence from ordinary action-chain evidence without publishing
+a name, target, mapping, trigger, or digest.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

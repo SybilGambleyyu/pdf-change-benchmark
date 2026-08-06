@@ -9,6 +9,20 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.3.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.3.0 fixture candidate rebuilt and verified all 40 fixture
+pairs with pypdf 6.15.0. Its 31 tests and Ruff checks passed. It scored the
+PDFFence 1.3.0 source candidate through its process-bound command-line
+executable: 40 of 40 pairs passed.
+
+The document-open named-GoTo rebind retains its stored catalog action and
+matching name key while moving only the corresponding mapping from one real
+page to another. The held PDFFence 1.2.0 source candidate scores 39 of 40: it
+misses only that rebind, reporting just the stored-byte change. The paired
+root-action negatives confirm that target page rotation and an unrelated
+name-tree mapping each remain stored-byte-only changes.
+
 ## 1.2.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.2.0 fixture candidate rebuilt and verified all 37 fixture

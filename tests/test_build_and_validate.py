@@ -408,6 +408,76 @@ def test_named_destination_pair_changes_only_an_unrelated_mapping(tmp_path):
     assert candidate_pairs[3].get_object()[0] == candidate.pages[1].indirect_reference
 
 
+def test_root_named_destination_rebind_pair_keeps_the_action_fixed(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.goto_root_named_destination_rebound"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+    baseline_pairs = _destination_name_tree_pairs(baseline)
+    candidate_pairs = _destination_name_tree_pairs(candidate)
+
+    assert list(baseline.root_object).index(NameObject("/Names")) < list(
+        baseline.root_object
+    ).index(NameObject("/OpenAction"))
+    assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/GoTo"
+    assert "/Next" not in baseline_action
+    assert "/Next" not in candidate_action
+    assert str(baseline_action["/D"]) == str(candidate_action["/D"])
+    assert baseline_pairs[0] == baseline_action["/D"]
+    assert candidate_pairs[0] == candidate_action["/D"]
+    assert baseline_pairs[1].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[1].get_object()[0] == candidate.pages[1].indirect_reference
+
+
+def test_root_named_destination_target_page_rotation_keeps_mapping_fixed(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.goto_root_named_destination_target_page_rotated"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+    baseline_pairs = _destination_name_tree_pairs(baseline)
+    candidate_pairs = _destination_name_tree_pairs(candidate)
+
+    assert str(baseline_action["/D"]) == str(candidate_action["/D"])
+    assert baseline_pairs[1].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[1].get_object()[0] == candidate.pages[0].indirect_reference
+    assert int(baseline.pages[0]["/Rotate"]) == 0
+    assert int(candidate.pages[0]["/Rotate"]) == 90
+
+
+def test_root_named_destination_pair_changes_only_an_unrelated_mapping(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = (
+        generated / "active.goto_root_named_destination_unrelated_mapping_rewritten"
+    )
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+    baseline_pairs = _destination_name_tree_pairs(baseline)
+    candidate_pairs = _destination_name_tree_pairs(candidate)
+
+    assert str(baseline_action["/D"]) == str(candidate_action["/D"])
+    assert baseline_pairs[0] == baseline_action["/D"]
+    assert candidate_pairs[0] == candidate_action["/D"]
+    assert baseline_pairs[1].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[1].get_object()[0] == candidate.pages[0].indirect_reference
+    assert baseline_pairs[2] == candidate_pairs[2]
+    assert baseline_pairs[3].get_object()[0] == baseline.pages[0].indirect_reference
+    assert candidate_pairs[3].get_object()[0] == candidate.pages[1].indirect_reference
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

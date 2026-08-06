@@ -128,6 +128,42 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.goto_root_named_destination_rebound",
+        "active_content",
+        (
+            "A document-open named local GoTo target is rebound to a different "
+            "page while the stored action remains fixed."
+        ),
+        "goto_root_named_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.goto_root_named_destination_target_page_rotated",
+        "active_content",
+        (
+            "A document-open named local GoTo target page state changes while "
+            "its name-tree mapping and stored action remain fixed."
+        ),
+        "goto_root_named_destination_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.goto_root_named_destination_unrelated_mapping_rewritten",
+        "active_content",
+        (
+            "An unrelated destination name-tree mapping changes while a "
+            "document-open GoTo target remains fixed."
+        ),
+        "goto_root_named_destination_unrelated_mapping_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.goto_3d_view_to_document_part",
         "active_content",
         (
@@ -596,6 +632,45 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             _writer(
                 action="/GoToE",
                 embedded_child_document=True,
+            ),
+            candidate,
+        )
+    elif mutation == "goto_root_named_destination_rebound":
+        _write(
+            _catalog_named_destination_root_goto_writer(destination=0),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_root_goto_writer(destination=1),
+            candidate,
+        )
+    elif mutation == "goto_root_named_destination_target_page_rotated":
+        _write(
+            _catalog_named_destination_root_goto_writer(
+                destination=0,
+                page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_root_goto_writer(
+                destination=0,
+                page_rotation=90,
+            ),
+            candidate,
+        )
+    elif mutation == "goto_root_named_destination_unrelated_mapping_rewritten":
+        _write(
+            _catalog_named_destination_root_goto_writer(
+                destination=0,
+                unrelated_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_destination_root_goto_writer(
+                destination=0,
+                unrelated_destination=1,
             ),
             candidate,
         )
@@ -1282,6 +1357,62 @@ def _catalog_named_destination_writer(
     )
     primary.get_object()[NameObject("/Next")] = ArrayObject([successor])
     writer._root_object[NameObject("/OpenAction")] = primary
+    return writer
+
+
+def _catalog_named_destination_root_goto_writer(
+    *,
+    destination: int,
+    page_rotation: int = 0,
+    unrelated_destination: int | None = None,
+) -> PdfWriter:
+    """Build a document-open GoTo action resolved through a Dests name tree."""
+
+    writer = _writer()
+    first_page = writer.pages[0]
+    first_page[NameObject("/Rotate")] = NumberObject(page_rotation)
+    second_page = writer.add_blank_page(width=72, height=72)
+    pages = (first_page, second_page)
+
+    def explicit_destination(page: int) -> IndirectObject:
+        return writer._add_object(
+            ArrayObject([pages[page].indirect_reference, NameObject("/Fit")])
+        )
+
+    chapter_destination = explicit_destination(destination)
+    writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
+        {
+            NameObject("/PDFCAB"): DictionaryObject(
+                {NameObject("/ReservedDestination"): chapter_destination}
+            )
+        }
+    )
+    entries = ArrayObject([TextStringObject(_MARKER_B), chapter_destination])
+    if unrelated_destination is not None:
+        entries.extend(
+            [
+                TextStringObject(_MARKER_C),
+                explicit_destination(unrelated_destination),
+            ]
+        )
+    leaf = writer._add_object(
+        DictionaryObject({NameObject("/Names"): entries})
+    )
+    tree = writer._add_object(
+        DictionaryObject({NameObject("/Kids"): ArrayObject([leaf])})
+    )
+    writer._root_object[NameObject("/Names")] = DictionaryObject(
+        {NameObject("/Dests"): tree}
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/GoTo"),
+                NameObject("/D"): TextStringObject(_MARKER_B),
+            }
+        )
+    )
     return writer
 
 
