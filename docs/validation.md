@@ -23,6 +23,15 @@ three rebinds, reporting just the stored-byte change. The paired negatives
 confirm that target-page rotation and an unrelated legacy destination mapping
 remain stored-byte-only changes.
 
+Two fixed-timestamp builds produced byte-identical wheel and source archive
+files, and all four artifacts passed metadata checks. Fresh wheel installs
+passed pip check, fixture verification, and the complete 48-pair score on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13; a clean Python
+3.12 source-archive install passed the same checks. Dependency auditing found
+no known vulnerabilities after the disposable validation environment's
+bootstrap installer was upgraded; the unpublished local distributions were
+correctly skipped because they are not on PyPI.
+
 ## 1.3.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.3.0 fixture candidate rebuilt and verified all 40 fixture
