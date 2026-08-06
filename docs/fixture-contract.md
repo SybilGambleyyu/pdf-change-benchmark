@@ -22,3 +22,7 @@ surface is safe.
 The optional-content fixture covers only catalog-declared groups and
 configuration topology. It does not claim that a viewer displays a particular
 layer state or that page content uses the declared groups.
+
+The Associated Files fixture holds the embedded stream and file specification
+constant, then adds a document-level association. It tests association topology
+without exposing the file name, payload, or relationship value in public truth.

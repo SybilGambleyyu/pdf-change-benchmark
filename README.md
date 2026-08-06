@@ -4,7 +4,7 @@ PDF Change Assurance Benchmark, or PDFCAB, is a reproducible set of paired,
 synthetic PDFs for evaluating static change-assurance tools. Every pair changes
 one declared stored surface: actions, embedded files, forms, annotations, XFA,
 portfolio structure, optional-content topology, signature dictionaries,
-metadata presence, encryption, or incremental revisions.
+Associated Files, metadata presence, encryption, or incremental revisions.
 
 The fixtures are not real documents. They contain blank pages and inert,
 synthetic marker material. Public truth files disclose only a fixture ID,
@@ -20,9 +20,9 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 0.2 contains 16 fixture pairs spanning active content, embedded
-content, interactive features, optional-content topology, signature structure,
-metadata, encryption, and revision-chain evidence.
+Version 0.3 contains 17 fixture pairs spanning active content, embedded
+content, interactive features, optional-content topology, Associated Files,
+signature structure, metadata, encryption, and revision-chain evidence.
 
 ## Install
 

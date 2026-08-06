@@ -11,6 +11,7 @@ from pypdf.generic import (
     ArrayObject,
     DecodedStreamObject,
     DictionaryObject,
+    IndirectObject,
     NameObject,
     NumberObject,
     TextStringObject,
@@ -115,6 +116,20 @@ FIXTURE_SPECS = (
         (
             "embedded_content_inventory_changed",
             "reachable_object_count_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP002",),
+    ),
+    FixtureSpec(
+        "embedded.associated_file_association_added",
+        "embedded_content",
+        (
+            "A document-level Associated Files link is added for an existing "
+            "embedded file."
+        ),
+        "associated_file_association_added",
+        (
+            "embedded_content_inventory_changed",
             "stored_pdf_bytes_changed",
         ),
         ("PFP002",),
@@ -294,6 +309,15 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "embedded_file_added":
         _write(_writer(), baseline)
         _write(_writer(embedded_file=True), candidate)
+    elif mutation == "associated_file_association_added":
+        _write(_writer(associated_file=True), baseline)
+        _write(
+            _writer(
+                associated_file=True,
+                associate_embedded_file=True,
+            ),
+            candidate,
+        )
     elif mutation == "form_field_added":
         _write(_writer(), baseline)
         _write(_writer(form_field=True), candidate)
@@ -341,6 +365,8 @@ def _writer(
     signature: bool = False,
     xmp: bool = False,
     optional_content: bool = False,
+    associated_file: bool = False,
+    associate_embedded_file: bool = False,
     encrypted: bool = False,
 ) -> PdfWriter:
     writer = PdfWriter()
@@ -371,6 +397,12 @@ def _writer(
         writer._root_object[NameObject("/Metadata")] = writer._add_object(metadata)
     if optional_content:
         _add_optional_content(writer)
+    if associated_file:
+        associated_file_reference = _add_associated_file(writer)
+        if associate_embedded_file:
+            writer._root_object[NameObject("/AF")] = ArrayObject(
+                [associated_file_reference]
+            )
     if encrypted:
         writer.encrypt(_PASSWORD)
     return writer
@@ -526,3 +558,36 @@ def _add_optional_content(writer: PdfWriter) -> None:
             NameObject("/D"): configuration,
         }
     )
+
+
+def _add_associated_file(writer: PdfWriter) -> IndirectObject:
+    embedded_file = DecodedStreamObject()
+    embedded_file[NameObject("/Type")] = NameObject("/EmbeddedFile")
+    embedded_file.set_data(_MARKER_A.encode("utf-8"))
+    embedded_file_reference = writer._add_object(embedded_file)
+    file_specification = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Filespec"),
+            NameObject("/F"): TextStringObject(_MARKER_A),
+            NameObject("/EF"): DictionaryObject(
+                {NameObject("/F"): embedded_file_reference}
+            ),
+            NameObject("/AFRelationship"): NameObject("/Data"),
+        }
+    )
+    file_specification_reference = writer._add_object(file_specification)
+    writer._root_object[NameObject("/Names")] = DictionaryObject(
+        {
+            NameObject("/EmbeddedFiles"): DictionaryObject(
+                {
+                    NameObject("/Names"): ArrayObject(
+                        [
+                            TextStringObject("PDFCABAssociated"),
+                            file_specification_reference,
+                        ]
+                    )
+                }
+            )
+        }
+    )
+    return file_specification_reference

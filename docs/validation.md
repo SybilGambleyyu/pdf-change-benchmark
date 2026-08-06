@@ -9,6 +9,18 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 0.3.0 candidate integration evidence
+
+On 2026-08-06, the 0.3.0 fixture candidate rebuilt and verified all 17 fixture
+pairs with pypdf 6.15.0. It scored the PDFFence 0.3.0 candidate at commit
+8e5af67c551f39a92c7d34f47d1faf0827300cf0 through its command-line
+executable: 17 of 17 pairs passed.
+
+The new Associated Files pair holds an embedded stream and file specification
+constant while adding only the document-level association. PDFFence 0.2
+therefore scores 16 of 17 on this suite, proving that the new fixture detects
+association topology rather than generic attachment counting.
+
 ## 0.2.0 candidate integration evidence
 
 On 2026-08-06, the 0.2.0 fixture candidate rebuilt and verified all 16 fixture
