@@ -24,6 +24,7 @@ from pdfcab.models import FixtureTruth
 FIXTURE_SCHEMA_VERSION = 1
 _MARKER_A = "PDFCAB_INERT_A"
 _MARKER_B = "PDFCAB_INERT_B"
+_MARKER_C = "PDFCAB_INERT_C"
 _URI = "https://example.invalid/pdfcab"
 _URI_B = "https://example.invalid/pdfcab-b"
 _JAVASCRIPT_STREAM_RAW = b"41>0"
@@ -170,6 +171,34 @@ FIXTURE_SPECS = (
             "bindings while their public action inventory is fixed."
         ),
         "javascript_trigger_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.javascript_action_chain_reordered",
+        "active_content",
+        (
+            "Two JavaScript actions exchange positions in a stored action chain "
+            "while their public action inventory is fixed."
+        ),
+        "javascript_action_chain_reordered",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.javascript_action_chain_reordered_shared_array",
+        "active_content",
+        (
+            "JavaScript actions exchange positions in a shared stored action "
+            "chain that is also reachable outside the execution trigger."
+        ),
+        "javascript_action_chain_reordered_shared_array",
         (
             "active_content_payload_changed",
             "stored_pdf_bytes_changed",
@@ -491,6 +520,38 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "javascript_action_chain_reordered":
+        _write(
+            _catalog_javascript_action_chain_writer(
+                first_next_payload=_MARKER_B,
+                second_next_payload=_MARKER_C,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_javascript_action_chain_writer(
+                first_next_payload=_MARKER_C,
+                second_next_payload=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "javascript_action_chain_reordered_shared_array":
+        _write(
+            _catalog_javascript_action_chain_writer(
+                first_next_payload=_MARKER_B,
+                second_next_payload=_MARKER_C,
+                previsit_successors=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_javascript_action_chain_writer(
+                first_next_payload=_MARKER_C,
+                second_next_payload=_MARKER_B,
+                previsit_successors=True,
+            ),
+            candidate,
+        )
     elif mutation == "javascript_stream_filter_rewritten":
         _write(
             _writer(
@@ -742,6 +803,50 @@ def _catalog_javascript_trigger_writer(
     writer._root_object[NameObject("/AA")] = DictionaryObject(
         {NameObject("/WC"): javascript_action(will_close_payload)}
     )
+    return writer
+
+
+def _catalog_javascript_action_chain_writer(
+    *,
+    first_next_payload: str,
+    second_next_payload: str,
+    previsit_successors: bool = False,
+) -> PdfWriter:
+    """Build a document-open script with an ordered two-action successor list."""
+
+    writer = _writer()
+
+    def javascript_action(payload: str) -> IndirectObject:
+        return writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Action"),
+                    NameObject("/S"): NameObject("/JavaScript"),
+                    NameObject("/JS"): TextStringObject(payload),
+                }
+            )
+        )
+
+    primary = javascript_action(_MARKER_A)
+    successors = ArrayObject(
+        [
+            javascript_action(first_next_payload),
+            javascript_action(second_next_payload),
+        ]
+    )
+    if previsit_successors:
+        shared_successors = writer._add_object(successors)
+        writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
+            {
+                NameObject("/PDFCAB"): DictionaryObject(
+                    {NameObject("/Shared"): shared_successors}
+                )
+            }
+        )
+        primary.get_object()[NameObject("/Next")] = shared_successors
+    else:
+        primary.get_object()[NameObject("/Next")] = successors
+    writer._root_object[NameObject("/OpenAction")] = primary
     return writer
 
 

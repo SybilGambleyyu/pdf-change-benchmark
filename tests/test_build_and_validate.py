@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pytest
 from pypdf import PdfReader
+from pypdf.generic import NameObject
 
 from pdfcab.build import FIXTURE_SPECS, build_fixture_tree
 from pdfcab.errors import FixtureError
@@ -145,6 +146,60 @@ def test_javascript_trigger_rebound_pair_exchanges_trigger_bindings(tmp_path):
     assert str(baseline_open["/JS"]) == str(candidate_will_close["/JS"])
     assert str(baseline_will_close["/JS"]) == str(candidate_open["/JS"])
     assert str(baseline_open["/JS"]) != str(baseline_will_close["/JS"])
+
+
+def test_javascript_action_chain_pair_exchanges_successor_order(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.javascript_action_chain_reordered"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_primary = baseline.root_object["/OpenAction"].get_object()
+    candidate_primary = candidate.root_object["/OpenAction"].get_object()
+    baseline_next = [
+        action.get_object() for action in baseline_primary["/Next"]
+    ]
+    candidate_next = [
+        action.get_object() for action in candidate_primary["/Next"]
+    ]
+
+    assert str(baseline_primary["/S"]) == "/JavaScript"
+    assert str(candidate_primary["/S"]) == "/JavaScript"
+    assert len(baseline_next) == len(candidate_next) == 2
+    assert all(str(action["/S"]) == "/JavaScript" for action in baseline_next)
+    assert all(str(action["/S"]) == "/JavaScript" for action in candidate_next)
+    assert str(baseline_next[0]["/JS"]) == str(candidate_next[1]["/JS"])
+    assert str(baseline_next[1]["/JS"]) == str(candidate_next[0]["/JS"])
+    assert str(baseline_next[0]["/JS"]) != str(baseline_next[1]["/JS"])
+
+
+def test_javascript_action_chain_shared_array_pair_is_previsited(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.javascript_action_chain_reordered_shared_array"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_primary = baseline.root_object["/OpenAction"].get_object()
+    candidate_primary = candidate.root_object["/OpenAction"].get_object()
+    baseline_piece = baseline.root_object["/PieceInfo"]["/PDFCAB"]
+    candidate_piece = candidate.root_object["/PieceInfo"]["/PDFCAB"]
+
+    assert baseline_primary.raw_get(NameObject("/Next")) == baseline_piece.raw_get(
+        NameObject("/Shared")
+    )
+    assert candidate_primary.raw_get(NameObject("/Next")) == candidate_piece.raw_get(
+        NameObject("/Shared")
+    )
+    baseline_next = [
+        action.get_object() for action in baseline_primary["/Next"]
+    ]
+    candidate_next = [
+        action.get_object() for action in candidate_primary["/Next"]
+    ]
+    assert str(baseline_next[0]["/JS"]) == str(candidate_next[1]["/JS"])
+    assert str(baseline_next[1]["/JS"]) == str(candidate_next[0]["/JS"])
 
 
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):

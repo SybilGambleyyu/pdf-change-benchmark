@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0 (unreleased)
+
+- Add normal and shared-array JavaScript action-chain reorder pairs. Both keep
+  their public action inventory fixed while switching successor positions and
+  require the generic private active-content signal plus PFP001.
+
 ## 0.8.0 (unreleased)
 
 - Add a fixed-inventory JavaScript trigger-rebinding pair. The pair exchanges

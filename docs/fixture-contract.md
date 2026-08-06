@@ -49,6 +49,12 @@ catalog-will-close bindings. Its generic truth distinguishes evidence of
 execution-context reassignment from an ordinary payload rewrite without
 identifying either script or a private digest.
 
+The JavaScript action-chain fixtures retain a document-open JavaScript action
+and exchange the positions of two successor actions in its stored /Next array.
+The shared-array variant also retains a non-executing stored reference to that
+same indirect array. Both fixtures require a generic private payload-change
+signal and PFP001, without publishing a script, sequence position, or digest.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec
