@@ -9,6 +9,25 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.1.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.1.0 fixture candidate rebuilt and verified all 33 fixture
+pairs with pypdf 6.15.0. It scored the PDFFence 1.1.0 source candidate through
+its process-bound command-line executable: 33 of 33 pairs passed.
+
+The two added same-subtype order pairs retain two GoTo successors with distinct
+valid real-page destinations while exchanging their array positions. One has
+ordinary stored successors; the other exposes the same indirect array through
+unrelated stored structure before its document-open trigger. The held
+PDFFence 1.0.0 artifact scores 31 of 33: both pairs yield only the stored-byte
+change and no PFP001.
+
+Two fixed-timestamp builds produced byte-identical wheel and source archive
+files, and all artifacts passed metadata checks. Fresh wheel installs on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13, plus a clean
+Python 3.12 source-archive install, verified the packaged fixture bytes and
+scored all 33 pairs through the public PDFFence CLI.
+
 ## 1.0.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.0.0 fixture candidate rebuilt and verified all 31 fixture
