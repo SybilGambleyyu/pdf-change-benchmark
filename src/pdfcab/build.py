@@ -234,6 +234,34 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.action_chain_same_type_reordered",
+        "active_content",
+        (
+            "Two same-type action successors exchange positions in a stored "
+            "action chain while their public action inventory is fixed."
+        ),
+        "action_chain_same_type_reordered",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_same_type_reordered_shared_array",
+        "active_content",
+        (
+            "Same-type action successors exchange positions in a shared stored "
+            "action chain that is also reachable outside the execution trigger."
+        ),
+        "action_chain_same_type_reordered_shared_array",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_stream_filter_rewritten",
         "active_content",
         (
@@ -612,6 +640,38 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "action_chain_same_type_reordered":
+        _write(
+            _catalog_same_type_action_chain_writer(
+                first_destination=0,
+                second_destination=1,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_same_type_action_chain_writer(
+                first_destination=1,
+                second_destination=0,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_same_type_reordered_shared_array":
+        _write(
+            _catalog_same_type_action_chain_writer(
+                first_destination=0,
+                second_destination=1,
+                previsit_successors=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_same_type_action_chain_writer(
+                first_destination=1,
+                second_destination=0,
+                previsit_successors=True,
+            ),
+            candidate,
+        )
     elif mutation == "javascript_stream_filter_rewritten":
         _write(
             _writer(
@@ -964,6 +1024,62 @@ def _catalog_action_type_chain_writer(
     )
     successors = ArrayObject(
         [successor(first_successor), successor(second_successor)]
+    )
+    if previsit_successors:
+        shared_successors = writer._add_object(successors)
+        writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
+            {
+                NameObject("/PDFCAB"): DictionaryObject(
+                    {NameObject("/Shared"): shared_successors}
+                )
+            }
+        )
+        primary.get_object()[NameObject("/Next")] = shared_successors
+    else:
+        primary.get_object()[NameObject("/Next")] = successors
+    writer._root_object[NameObject("/OpenAction")] = primary
+    return writer
+
+
+def _catalog_same_type_action_chain_writer(
+    *,
+    first_destination: int,
+    second_destination: int,
+    previsit_successors: bool = False,
+) -> PdfWriter:
+    """Build a document-open action with two GoTo successors for real pages."""
+
+    writer = _writer()
+    second_page = writer.add_blank_page(width=144, height=72)
+    destinations = (
+        writer.pages[0].indirect_reference,
+        second_page.indirect_reference,
+    )
+    primary = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+            }
+        )
+    )
+
+    def successor(destination: int) -> IndirectObject:
+        return writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Action"),
+                    NameObject("/S"): NameObject("/GoTo"),
+                    NameObject("/D"): ArrayObject(
+                        [destinations[destination], NameObject("/Fit")]
+                    ),
+                }
+            )
+        )
+
+    successors = ArrayObject(
+        [successor(first_destination), successor(second_destination)]
     )
     if previsit_successors:
         shared_successors = writer._add_object(successors)

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0 (unreleased)
+
+- Add normal and shared-array same-subtype action-chain order pairs. Their two
+  GoTo successors point at distinct real pages and exchange positions while
+  public action inventory, selected payload evidence, and subtype-order
+  evidence remain fixed. They require the generic
+  active_content_action_sequence_changed signal plus PFP001.
+
 ## 1.0.0 (unreleased)
 
 - Add normal and shared-array action-subtype order pairs. They exchange GoTo

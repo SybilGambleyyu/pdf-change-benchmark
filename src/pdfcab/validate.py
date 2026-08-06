@@ -15,6 +15,7 @@ _MAX_TRUTH_BYTES: Final = 16 * 1024
 _MAX_MANIFEST_BYTES: Final = 128 * 1024
 _KNOWN_CHANGE_KINDS: Final = frozenset(
     {
+        "active_content_action_sequence_changed",
         "active_content_inventory_changed",
         "active_content_execution_order_changed",
         "active_content_payload_changed",
