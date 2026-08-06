@@ -114,6 +114,20 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.goto_3d_view_to_document_part",
+        "active_content",
+        (
+            "A GoTo3DView action is replaced with a PDF 2.0 document-part "
+            "GoTo action while both target structures remain present."
+        ),
+        "goto_3d_view_to_document_part",
+        (
+            "active_content_inventory_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_payload_rewritten",
         "active_content",
         "A JavaScript payload changes while its public action inventory is fixed.",
@@ -331,6 +345,9 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "goto_3d_view_to_document_part":
+        _write(_writer(action="/GoTo3DView"), baseline)
+        _write(_writer(action="/GoToDp"), candidate)
     elif mutation == "javascript_payload_rewritten":
         _write(_writer(javascript=_MARKER_A), baseline)
         _write(_writer(javascript=_MARKER_B), candidate)
@@ -404,7 +421,17 @@ def _writer(
     if javascript is not None:
         _add_javascript(writer, javascript)
     if action is not None:
-        action_reference = writer._add_object(_action(action))
+        three_d_annotation: IndirectObject | None = None
+        document_part: IndirectObject | None = None
+        if action in {"/GoTo3DView", "/GoToDp"}:
+            three_d_annotation, document_part = _add_navigation_targets(writer)
+        action_reference = writer._add_object(
+            _action(
+                action,
+                three_d_annotation=three_d_annotation,
+                document_part=document_part,
+            )
+        )
         writer._root_object[NameObject("/OpenAction")] = action_reference
     if embedded_file:
         writer.add_attachment(f"{_MARKER_A}.txt", _MARKER_A.encode("utf-8"))
@@ -451,7 +478,12 @@ def _increment(source: Path, destination: Path) -> None:
     _write(writer, destination)
 
 
-def _action(kind: str) -> DictionaryObject:
+def _action(
+    kind: str,
+    *,
+    three_d_annotation: IndirectObject | None = None,
+    document_part: IndirectObject | None = None,
+) -> DictionaryObject:
     action = DictionaryObject(
         {
             NameObject("/Type"): NameObject("/Action"),
@@ -474,7 +506,70 @@ def _action(kind: str) -> DictionaryObject:
                 NameObject("/N"): TextStringObject(_CHILD_DOCUMENT_NAME),
             }
         )
+    elif kind == "/GoTo3DView":
+        if three_d_annotation is None:
+            raise FixtureError("GoTo3DView action requires a target annotation")
+        action[NameObject("/TA")] = three_d_annotation
+        action[NameObject("/V")] = NameObject("/D")
+    elif kind == "/GoToDp":
+        if document_part is None:
+            raise FixtureError("GoToDp action requires a document-part target")
+        action[NameObject("/Dp")] = document_part
     return action
+
+
+def _add_navigation_targets(writer: PdfWriter) -> tuple[IndirectObject, IndirectObject]:
+    """Add reachable 3D and document-part targets for paired navigation actions."""
+
+    page = writer.pages[0]
+    page_reference = page.indirect_reference
+    if page_reference is None:
+        raise FixtureError("fixture page cannot be referenced")
+
+    three_d_stream = DecodedStreamObject()
+    three_d_stream[NameObject("/Type")] = NameObject("/3D")
+    three_d_stream[NameObject("/Subtype")] = NameObject("/U3D")
+    three_d_stream.set_data(b"")
+    three_d_stream_reference = writer._add_object(three_d_stream)
+    three_d_annotation = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Annot"),
+                NameObject("/Subtype"): NameObject("/3D"),
+                NameObject("/Rect"): ArrayObject(
+                    [
+                        NumberObject(0),
+                        NumberObject(0),
+                        NumberObject(10),
+                        NumberObject(10),
+                    ]
+                ),
+                NameObject("/3DD"): three_d_stream_reference,
+            }
+        )
+    )
+    page[NameObject("/Annots")] = ArrayObject([three_d_annotation])
+
+    document_part = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/DPart"),
+                NameObject("/Start"): page_reference,
+            }
+        )
+    )
+    document_part_root = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/DPartRoot"),
+                NameObject("/DPartRootNode"): document_part,
+            }
+        )
+    )
+    document_part.get_object()[NameObject("/Parent")] = document_part_root
+    page[NameObject("/DPart")] = document_part
+    writer._root_object[NameObject("/DPartRoot")] = document_part_root
+    return three_d_annotation, document_part
 
 
 def _child_document_bytes() -> bytes:

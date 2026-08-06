@@ -1,0 +1,93 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+/Title (PDFCAB\137INERT\137A)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 1
+/Kids [ 4 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/DPartRoot 8 0 R
+/OpenAction 9 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 72 72 ]
+/Parent 2 0 R
+/Annots [ 6 0 R ]
+/DPart 7 0 R
+>>
+endobj
+5 0 obj
+<<
+/Type /3D
+/Subtype /U3D
+/Length 0
+>>
+stream
+
+endstream
+endobj
+6 0 obj
+<<
+/Type /Annot
+/Subtype /3D
+/Rect [ 0 0 10 10 ]
+/3DD 5 0 R
+>>
+endobj
+7 0 obj
+<<
+/Type /DPart
+/Start 4 0 R
+/Parent 8 0 R
+>>
+endobj
+8 0 obj
+<<
+/Type /DPartRoot
+/DPartRootNode 7 0 R
+>>
+endobj
+9 0 obj
+<<
+/Type /Action
+/S /GoToDp
+/Dp 7 0 R
+>>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000084 00000 n 
+0000000143 00000 n 
+0000000227 00000 n 
+0000000350 00000 n 
+0000000423 00000 n 
+0000000501 00000 n 
+0000000562 00000 n 
+0000000621 00000 n 
+trailer
+<<
+/Size 10
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+677
+%%EOF

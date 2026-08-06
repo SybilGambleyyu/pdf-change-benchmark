@@ -29,6 +29,12 @@ structurally shaped target for that child while changing the fixed action type.
 It tests that an action inventory does not collapse ordinary navigation and
 navigation into embedded documents.
 
+The GoTo3DView-to-GoToDp fixture keeps a page-attached 3D annotation and a
+catalog document-part hierarchy on both sides. The baseline action references
+the 3D annotation; the candidate action references the document part. It tests
+that an inventory does not collapse those two standard action types while
+keeping their surrounding targets reachable and unchanged.
+
 The Associated Files fixture holds the embedded stream and file specification
 constant, then adds a document-level association. It tests association topology
 without exposing the file name, payload, or relationship value in public truth.

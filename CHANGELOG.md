@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0 (unreleased)
+
+- Add a paired GoTo3DView-to-GoToDp regression fixture. Both sides retain a
+  reachable 3D annotation and document-part hierarchy so it isolates the
+  action-type substitution.
+
 ## 0.4.0 (unreleased)
 
 - Add an action-subtype swap pair: an ordinary GoTo action is replaced by an

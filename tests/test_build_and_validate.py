@@ -79,6 +79,35 @@ def test_action_subtype_pair_retains_an_embedded_child_target(tmp_path):
     assert str(target["/N"]) == "PDFCAB_CHILD.pdf"
 
 
+def test_action_subtype_pair_retains_3d_and_document_part_targets(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.goto_3d_view_to_document_part"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+
+    for reader in (baseline, candidate):
+        page = reader.pages[0]
+        document_part = page["/DPart"].get_object()
+        document_part_root = reader.root_object["/DPartRoot"].get_object()
+        annotations = page["/Annots"]
+
+        assert str(document_part["/Type"]) == "/DPart"
+        assert document_part["/Parent"] == reader.root_object["/DPartRoot"]
+        assert document_part_root["/DPartRootNode"] == page["/DPart"]
+        assert len(annotations) == 1
+        assert str(annotations[0].get_object()["/Subtype"]) == "/3D"
+
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+
+    assert str(baseline_action["/S"]) == "/GoTo3DView"
+    assert str(baseline_action["/TA"].get_object()["/Subtype"]) == "/3D"
+    assert str(candidate_action["/S"]) == "/GoToDp"
+    assert str(candidate_action["/Dp"].get_object()["/Type"]) == "/DPart"
+
+
 def _tree_bytes(root: Path) -> dict[str, bytes]:
     return {
         str(path.relative_to(root)): path.read_bytes()
