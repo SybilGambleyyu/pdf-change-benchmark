@@ -23,6 +23,12 @@ unrelated stored reference before the document-open action. The held PDFFence
 and no PFP001, isolating order-sensitive action-chain evidence from generic
 object-graph traversal.
 
+Two fixed-timestamp builds produced byte-identical wheel and source archive
+files, and all artifacts passed metadata checks. Fresh wheel installs on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13, plus a clean
+Python 3.12 source-archive install, verified the packaged fixture bytes and
+scored all 29 pairs through the public PDFFence CLI.
+
 ## 0.8.0 candidate integration evidence
 
 On 2026-08-06, the 0.8.0 fixture candidate rebuilt and verified all 27 fixture
