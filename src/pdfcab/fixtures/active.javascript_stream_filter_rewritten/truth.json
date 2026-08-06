@@ -1,6 +1,6 @@
 {
   "category": "active_content",
-  "description": "A JavaScript payload changes while its public action inventory is fixed.",
+  "description": "A JavaScript stream decoding configuration changes while its raw stored bytes and public action inventory remain fixed.",
   "expected_change_kinds": [
     "active_content_payload_changed",
     "stored_pdf_bytes_changed"
@@ -8,6 +8,6 @@
   "expected_policy_rule_ids": [
     "PFP001"
   ],
-  "id": "active.javascript_payload_rewritten",
+  "id": "active.javascript_stream_filter_rewritten",
   "schema_version": 1
 }

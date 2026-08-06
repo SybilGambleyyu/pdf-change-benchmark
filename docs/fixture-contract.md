@@ -35,6 +35,14 @@ the 3D annotation; the candidate action references the document part. It tests
 that an inventory does not collapse those two standard action types while
 keeping their surrounding targets reachable and unchanged.
 
+The JavaScript and URI payload-rewrite fixtures keep their respective action
+types and public inventory fixed while changing only inert stored payload
+material. The JavaScript stream pair retains exactly the same raw stream bytes
+while changing its ASCII-hex decoding configuration; each side remains a
+syntactically valid JavaScript stream with different decoded material. Their
+truth records require a generic active-content payload-change signal and the
+existing active-content policy ID, never a source value or digest.
+
 The Associated Files fixture holds the embedded stream and file specification
 constant, then adds a document-level association. It tests association topology
 without exposing the file name, payload, or relationship value in public truth.

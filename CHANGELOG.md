@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0 (unreleased)
+
+- Add URI, JavaScript text, and JavaScript stream-decoding-configuration
+  rewrite pairs. Each requires a generic active-content payload change plus
+  PFP001 while keeping public action inventory fixed.
+
 ## 0.5.0 (unreleased)
 
 - Add a paired GoTo3DView-to-GoToDp regression fixture. Both sides retain a

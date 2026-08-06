@@ -108,6 +108,42 @@ def test_action_subtype_pair_retains_3d_and_document_part_targets(tmp_path):
     assert str(candidate_action["/Dp"].get_object()["/Type"]) == "/DPart"
 
 
+def test_uri_payload_rewrite_pair_keeps_the_action_inventory_fixed(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.uri_payload_rewritten"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+
+    assert str(baseline_action["/S"]) == "/URI"
+    assert str(candidate_action["/S"]) == "/URI"
+    assert str(baseline_action["/URI"]) != str(candidate_action["/URI"])
+
+
+def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.javascript_stream_filter_rewritten"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+    baseline_stream = baseline_action["/JS"].get_object()
+    candidate_stream = candidate_action["/JS"].get_object()
+
+    assert str(baseline_action["/S"]) == "/JavaScript"
+    assert str(candidate_action["/S"]) == "/JavaScript"
+    assert baseline_stream._data == candidate_stream._data == b"41>0"
+    assert "/Filter" not in baseline_stream
+    assert str(candidate_stream["/Filter"]) == "/ASCIIHexDecode"
+    assert baseline_stream.get_data() == b"41>0"
+    assert candidate_stream.get_data() == b"A"
+
+
 def _tree_bytes(root: Path) -> dict[str, bytes]:
     return {
         str(path.relative_to(root)): path.read_bytes()

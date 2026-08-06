@@ -16,6 +16,7 @@ _MAX_MANIFEST_BYTES: Final = 128 * 1024
 _KNOWN_CHANGE_KINDS: Final = frozenset(
     {
         "active_content_inventory_changed",
+        "active_content_payload_changed",
         "embedded_content_inventory_changed",
         "encryption_state_changed",
         "format_version_changed",

@@ -25,6 +25,9 @@ FIXTURE_SCHEMA_VERSION = 1
 _MARKER_A = "PDFCAB_INERT_A"
 _MARKER_B = "PDFCAB_INERT_B"
 _URI = "https://example.invalid/pdfcab"
+_URI_B = "https://example.invalid/pdfcab-b"
+_JAVASCRIPT_STREAM_RAW = b"41>0"
+_JAVASCRIPT_STREAM_FILTER = "/ASCIIHexDecode"
 _PASSWORD = "pdfcab-inert-password"
 _CHILD_DOCUMENT_NAME = "PDFCAB_CHILD.pdf"
 
@@ -128,12 +131,40 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.uri_payload_rewritten",
+        "active_content",
+        "A URI action payload changes while its public action inventory is fixed.",
+        "uri_payload_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_payload_rewritten",
         "active_content",
         "A JavaScript payload changes while its public action inventory is fixed.",
         "javascript_payload_rewritten",
-        ("stored_pdf_bytes_changed",),
-        (),
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.javascript_stream_filter_rewritten",
+        "active_content",
+        (
+            "A JavaScript stream decoding configuration changes while its raw "
+            "stored bytes and public action inventory remain fixed."
+        ),
+        "javascript_stream_filter_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
     ),
     FixtureSpec(
         "embedded.file_added",
@@ -348,9 +379,28 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "goto_3d_view_to_document_part":
         _write(_writer(action="/GoTo3DView"), baseline)
         _write(_writer(action="/GoToDp"), candidate)
+    elif mutation == "uri_payload_rewritten":
+        _write(_writer(action="/URI", uri=_URI), baseline)
+        _write(_writer(action="/URI", uri=_URI_B), candidate)
     elif mutation == "javascript_payload_rewritten":
         _write(_writer(javascript=_MARKER_A), baseline)
         _write(_writer(javascript=_MARKER_B), candidate)
+    elif mutation == "javascript_stream_filter_rewritten":
+        _write(
+            _writer(
+                action="/JavaScript",
+                javascript_stream_payload=_JAVASCRIPT_STREAM_RAW,
+            ),
+            baseline,
+        )
+        _write(
+            _writer(
+                action="/JavaScript",
+                javascript_stream_payload=_JAVASCRIPT_STREAM_RAW,
+                javascript_stream_filter=_JAVASCRIPT_STREAM_FILTER,
+            ),
+            candidate,
+        )
     elif mutation == "embedded_file_added":
         _write(_writer(), baseline)
         _write(_writer(embedded_file=True), candidate)
@@ -402,6 +452,9 @@ def _writer(
     title: str = _MARKER_A,
     javascript: str | None = None,
     action: str | None = None,
+    uri: str = _URI,
+    javascript_stream_payload: bytes | None = None,
+    javascript_stream_filter: str | None = None,
     embedded_file: bool = False,
     embedded_child_document: bool = False,
     form_field: bool = False,
@@ -423,13 +476,26 @@ def _writer(
     if action is not None:
         three_d_annotation: IndirectObject | None = None
         document_part: IndirectObject | None = None
+        javascript_stream: IndirectObject | None = None
         if action in {"/GoTo3DView", "/GoToDp"}:
             three_d_annotation, document_part = _add_navigation_targets(writer)
+        if javascript_stream_payload is not None:
+            if action != "/JavaScript":
+                raise FixtureError("JavaScript stream requires a JavaScript action")
+            stream = DecodedStreamObject()
+            stream.set_data(javascript_stream_payload)
+            if javascript_stream_filter is not None:
+                stream[NameObject("/Filter")] = NameObject(javascript_stream_filter)
+            javascript_stream = writer._add_object(stream)
+        elif javascript_stream_filter is not None:
+            raise FixtureError("JavaScript stream filter requires stream bytes")
         action_reference = writer._add_object(
             _action(
                 action,
                 three_d_annotation=three_d_annotation,
                 document_part=document_part,
+                uri=uri,
+                javascript_stream=javascript_stream,
             )
         )
         writer._root_object[NameObject("/OpenAction")] = action_reference
@@ -483,6 +549,8 @@ def _action(
     *,
     three_d_annotation: IndirectObject | None = None,
     document_part: IndirectObject | None = None,
+    uri: str = _URI,
+    javascript_stream: IndirectObject | None = None,
 ) -> DictionaryObject:
     action = DictionaryObject(
         {
@@ -491,7 +559,11 @@ def _action(
         }
     )
     if kind == "/URI":
-        action[NameObject("/URI")] = TextStringObject(_URI)
+        action[NameObject("/URI")] = TextStringObject(uri)
+    elif kind == "/JavaScript":
+        if javascript_stream is None:
+            raise FixtureError("JavaScript action requires a stream")
+        action[NameObject("/JS")] = javascript_stream
     elif kind == "/Launch":
         action[NameObject("/F")] = TextStringObject(_MARKER_A)
     elif kind == "/SetOCGState":
