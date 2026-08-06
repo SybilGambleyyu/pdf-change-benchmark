@@ -64,7 +64,9 @@ position, trigger, or private signature.
 
 The same-subtype chain fixtures retain the same JavaScript root, two GoTo
 successors, and public action inventory while exchanging distinct valid page
-destinations. The second page is physically present in both PDFs, and the
+destinations. Both pages deliberately use the same stored geometry, so an
+adapter must retain private page identity rather than infer it from page
+contents. The second page is physically present in both PDFs, and the
 shared-array variant also retains a non-executing stored reference to the same
 indirect successor array. Their public truth requires only the generic
 active-content action-sequence change and PFP001; it contains no destination,

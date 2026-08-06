@@ -1050,7 +1050,7 @@ def _catalog_same_type_action_chain_writer(
     """Build a document-open action with two GoTo successors for real pages."""
 
     writer = _writer()
-    second_page = writer.add_blank_page(width=144, height=72)
+    second_page = writer.add_blank_page(width=72, height=72)
     destinations = (
         writer.pages[0].indirect_reference,
         second_page.indirect_reference,

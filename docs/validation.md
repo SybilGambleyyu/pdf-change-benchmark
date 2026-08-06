@@ -16,9 +16,10 @@ pairs with pypdf 6.15.0. It scored the PDFFence 1.1.0 source candidate through
 its process-bound command-line executable: 33 of 33 pairs passed.
 
 The two added same-subtype order pairs retain two GoTo successors with distinct
-valid real-page destinations while exchanging their array positions. One has
-ordinary stored successors; the other exposes the same indirect array through
-unrelated stored structure before its document-open trigger. The held
+valid real-page destinations of intentionally identical stored geometry while
+exchanging their array positions. One has ordinary stored successors; the
+other exposes the same indirect array through unrelated stored structure before
+its document-open trigger. The held
 PDFFence 1.0.0 artifact scores 31 of 33: both pairs yield only the stored-byte
 change and no PFP001.
 
