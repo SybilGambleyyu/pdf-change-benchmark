@@ -9,6 +9,24 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 0.8.0 candidate integration evidence
+
+On 2026-08-06, the 0.8.0 fixture candidate rebuilt and verified all 27 fixture
+pairs with pypdf 6.15.0. It scored the PDFFence 0.8.0 candidate through its
+process-bound command-line executable: 27 of 27 pairs passed.
+
+The added JavaScript trigger-rebinding pair holds two inert script values and
+the public action inventory fixed while exchanging document-open and
+catalog-will-close bindings. PDFFence 0.7.0 scores 26 of 27 on this suite. Its
+only miss reports the stored-byte change but neither the generic
+active-content payload change nor PFP001, which isolates the
+trigger-context-evidence regression.
+
+Two fixed-timestamp builds produced byte-identical wheel and source archive
+files, and metadata checks passed. Fresh wheel installs on Python 3.11 (from a
+local offline wheelhouse), 3.12, and 3.13, plus a clean Python 3.12 source
+archive install, verified the packaged fixture bytes and scored all 27 pairs.
+
 ## 0.7.0 candidate integration evidence
 
 On 2026-08-06, the 0.7.0 fixture candidate rebuilt and verified all 26 fixture
