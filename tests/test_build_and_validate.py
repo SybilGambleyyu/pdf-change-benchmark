@@ -202,6 +202,67 @@ def test_javascript_action_chain_shared_array_pair_is_previsited(tmp_path):
     assert str(baseline_next[1]["/JS"]) == str(candidate_next[0]["/JS"])
 
 
+@pytest.mark.parametrize(
+    ("fixture_id", "shared"),
+    (
+        ("active.action_chain_action_types_reordered", False),
+        ("active.action_chain_action_types_reordered_shared_array", True),
+    ),
+)
+def test_action_chain_type_pair_exchanges_successor_order(
+    tmp_path,
+    fixture_id,
+    shared,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / fixture_id
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_primary = baseline.root_object["/OpenAction"].get_object()
+    candidate_primary = candidate.root_object["/OpenAction"].get_object()
+    baseline_next = [
+        action.get_object() for action in baseline_primary["/Next"]
+    ]
+    candidate_next = [
+        action.get_object() for action in candidate_primary["/Next"]
+    ]
+
+    assert str(baseline_primary["/S"]) == "/JavaScript"
+    assert str(candidate_primary["/S"]) == "/JavaScript"
+    assert [str(action["/S"]) for action in baseline_next] == [
+        "/SetOCGState",
+        "/GoTo",
+    ]
+    assert [str(action["/S"]) for action in candidate_next] == [
+        "/GoTo",
+        "/SetOCGState",
+    ]
+    for reader, actions in (
+        (baseline, baseline_next),
+        (candidate, candidate_next),
+    ):
+        group = reader.root_object["/OCProperties"]["/OCGs"][0]
+        set_state = next(
+            action for action in actions if str(action["/S"]) == "/SetOCGState"
+        )
+        goto = next(action for action in actions if str(action["/S"]) == "/GoTo")
+        assert str(set_state["/State"][0]) == "/ON"
+        assert set_state["/State"][1] == group
+        assert goto["/D"][0] == reader.pages[0].indirect_reference
+        assert str(goto["/D"][1]) == "/Fit"
+    if shared:
+        baseline_piece = baseline.root_object["/PieceInfo"]["/PDFCAB"]
+        candidate_piece = candidate.root_object["/PieceInfo"]["/PDFCAB"]
+        assert baseline_primary.raw_get(
+            NameObject("/Next")
+        ) == baseline_piece.raw_get(NameObject("/Shared"))
+        assert candidate_primary.raw_get(
+            NameObject("/Next")
+        ) == candidate_piece.raw_get(NameObject("/Shared"))
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

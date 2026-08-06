@@ -1,0 +1,93 @@
+%PDF-1.3
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+/Title (PDFCAB\137INERT\137A)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 1
+/Kids [ 4 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/OCProperties <<
+/OCGs [ 5 0 R ]
+/D <<
+>>
+>>
+/PieceInfo <<
+/PDFCAB <<
+/Shared 9 0 R
+>>
+>>
+/OpenAction 6 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 72 72 ]
+/Parent 2 0 R
+>>
+endobj
+5 0 obj
+<<
+/Type /OCG
+/Name (PDFCAB\137INERT\137A)
+>>
+endobj
+6 0 obj
+<<
+/Type /Action
+/S /JavaScript
+/JS (PDFCAB\137INERT\137A)
+/Next 9 0 R
+>>
+endobj
+7 0 obj
+<<
+/Type /Action
+/S /SetOCGState
+/State [ /ON 5 0 R ]
+>>
+endobj
+8 0 obj
+<<
+/Type /Action
+/S /GoTo
+/D [ 4 0 R /Fit ]
+>>
+endobj
+9 0 obj
+[ 7 0 R 8 0 R ]
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000084 00000 n 
+0000000143 00000 n 
+0000000300 00000 n 
+0000000392 00000 n 
+0000000453 00000 n 
+0000000542 00000 n 
+0000000614 00000 n 
+0000000676 00000 n 
+trailer
+<<
+/Size 10
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+707
+%%EOF

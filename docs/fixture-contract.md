@@ -55,6 +55,13 @@ The shared-array variant also retains a non-executing stored reference to that
 same indirect array. Both fixtures require a generic private payload-change
 signal and PFP001, without publishing a script, sequence position, or digest.
 
+The action-subtype chain fixtures retain the same JavaScript root and
+aggregate action inventory while exchanging GoTo and SetOCGState successors.
+The shared-array variant also retains a non-executing stored reference to the
+same indirect successor array. Their public truth requires only the generic
+active-content execution-order change and PFP001; it contains no action type,
+position, trigger, or private signature.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

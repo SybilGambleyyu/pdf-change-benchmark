@@ -9,6 +9,19 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.0.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.0.0 fixture candidate rebuilt and verified all 31 fixture
+pairs with pypdf 6.15.0. It scored the PDFFence 1.0.0 source candidate through
+its process-bound command-line executable: 31 of 31 pairs passed.
+
+The two added action-subtype order pairs exchange GoTo and SetOCGState
+successors while holding aggregate action inventory and selected payload
+evidence fixed. One uses an ordinary successor array and the other exposes the
+same indirect array through unrelated stored structure before its document-open
+trigger. The held PDFFence 0.9.0 artifact scores 29 of 31: both pairs yield
+only the stored-byte change and no PFP001.
+
 ## 0.9.0 source-candidate integration evidence
 
 On 2026-08-06, the 0.9.0 fixture candidate rebuilt and verified all 29 fixture

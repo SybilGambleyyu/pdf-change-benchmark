@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 (unreleased)
+
+- Add normal and shared-array action-subtype order pairs. They exchange GoTo
+  and SetOCGState successors while retaining fixed action inventory and
+  selected payload evidence, requiring the generic
+  active_content_execution_order_changed signal plus PFP001.
+
 ## 0.9.0 (unreleased)
 
 - Add normal and shared-array JavaScript action-chain reorder pairs. Both keep

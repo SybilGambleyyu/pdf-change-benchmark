@@ -20,12 +20,12 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 0.9 contains 29 fixture pairs spanning active content, embedded
+Version 1.0 contains 31 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure, metadata, encryption, and revision-chain evidence.
 It adds paired regressions for reordered JavaScript action successors,
 including a shared successor array that is reachable outside its execution
-trigger.
+trigger, plus action-subtype order changes with no selected payload rewrite.
 
 ## Install
 

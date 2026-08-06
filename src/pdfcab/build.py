@@ -206,6 +206,34 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.action_chain_action_types_reordered",
+        "active_content",
+        (
+            "Two non-payload action types exchange positions in a stored action "
+            "chain while their public action inventory is fixed."
+        ),
+        "action_chain_action_types_reordered",
+        (
+            "active_content_execution_order_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_action_types_reordered_shared_array",
+        "active_content",
+        (
+            "Two non-payload action types exchange positions in a shared stored "
+            "action chain that is also reachable outside the execution trigger."
+        ),
+        "action_chain_action_types_reordered_shared_array",
+        (
+            "active_content_execution_order_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_stream_filter_rewritten",
         "active_content",
         (
@@ -552,6 +580,38 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "action_chain_action_types_reordered":
+        _write(
+            _catalog_action_type_chain_writer(
+                first_successor="/SetOCGState",
+                second_successor="/GoTo",
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_type_chain_writer(
+                first_successor="/GoTo",
+                second_successor="/SetOCGState",
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_action_types_reordered_shared_array":
+        _write(
+            _catalog_action_type_chain_writer(
+                first_successor="/SetOCGState",
+                second_successor="/GoTo",
+                previsit_successors=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_type_chain_writer(
+                first_successor="/GoTo",
+                second_successor="/SetOCGState",
+                previsit_successors=True,
+            ),
+            candidate,
+        )
     elif mutation == "javascript_stream_filter_rewritten":
         _write(
             _writer(
@@ -833,6 +893,77 @@ def _catalog_javascript_action_chain_writer(
             javascript_action(first_next_payload),
             javascript_action(second_next_payload),
         ]
+    )
+    if previsit_successors:
+        shared_successors = writer._add_object(successors)
+        writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
+            {
+                NameObject("/PDFCAB"): DictionaryObject(
+                    {NameObject("/Shared"): shared_successors}
+                )
+            }
+        )
+        primary.get_object()[NameObject("/Next")] = shared_successors
+    else:
+        primary.get_object()[NameObject("/Next")] = successors
+    writer._root_object[NameObject("/OpenAction")] = primary
+    return writer
+
+
+def _catalog_action_type_chain_writer(
+    *,
+    first_successor: str,
+    second_successor: str,
+    previsit_successors: bool = False,
+) -> PdfWriter:
+    """Build a document-open action with ordered non-payload successors."""
+
+    writer = _writer()
+    optional_content_group = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/OCG"),
+                NameObject("/Name"): TextStringObject(_MARKER_A),
+            }
+        )
+    )
+    writer._root_object[NameObject("/OCProperties")] = DictionaryObject(
+        {
+            NameObject("/OCGs"): ArrayObject([optional_content_group]),
+            NameObject("/D"): DictionaryObject(),
+        }
+    )
+
+    def successor(kind: str) -> IndirectObject:
+        action = DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject(kind),
+            }
+        )
+        if kind == "/SetOCGState":
+            action[NameObject("/State")] = ArrayObject(
+                [NameObject("/ON"), optional_content_group]
+            )
+        elif kind == "/GoTo":
+            action[NameObject("/D")] = ArrayObject(
+                [writer.pages[0].indirect_reference, NameObject("/Fit")]
+            )
+        else:
+            raise FixtureError("action-chain successor is unsupported")
+        return writer._add_object(action)
+
+    primary = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+            }
+        )
+    )
+    successors = ArrayObject(
+        [successor(first_successor), successor(second_successor)]
     )
     if previsit_successors:
         shared_successors = writer._add_object(successors)
