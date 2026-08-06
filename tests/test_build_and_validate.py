@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import pytest
+from pypdf import PdfReader
 
 from pdfcab.build import FIXTURE_SPECS, build_fixture_tree
 from pdfcab.errors import FixtureError
@@ -56,6 +57,26 @@ def test_public_truth_has_no_inert_payload_marker():
     assert "PDFCAB_INERT" not in public_truth
     assert "example.invalid" not in public_truth
     assert "pdfcab-inert-password" not in public_truth
+
+
+def test_action_subtype_pair_retains_an_embedded_child_target(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.goto_to_embedded_goto"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+
+    for reader in (baseline, candidate):
+        names = reader.root_object["/Names"]
+        embedded_files = names["/EmbeddedFiles"]["/Names"]
+        assert len(embedded_files) == 2
+
+    action = candidate.root_object["/OpenAction"].get_object()
+    target = action["/T"]
+    assert str(action["/S"]) == "/GoToE"
+    assert str(target["/R"]) == "/C"
+    assert str(target["/N"]) == "PDFCAB_CHILD.pdf"
 
 
 def _tree_bytes(root: Path) -> dict[str, bytes]:

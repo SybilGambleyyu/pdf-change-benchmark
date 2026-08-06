@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from io import BytesIO
 from pathlib import Path
 
 from pypdf import PdfReader, PdfWriter
@@ -25,6 +26,7 @@ _MARKER_A = "PDFCAB_INERT_A"
 _MARKER_B = "PDFCAB_INERT_B"
 _URI = "https://example.invalid/pdfcab"
 _PASSWORD = "pdfcab-inert-password"
+_CHILD_DOCUMENT_NAME = "PDFCAB_CHILD.pdf"
 
 
 @dataclass(frozen=True)
@@ -315,8 +317,20 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
         _write(_writer(), baseline)
         _write(_writer(action="/SetOCGState"), candidate)
     elif mutation == "goto_to_embedded_goto":
-        _write(_writer(action="/GoTo"), baseline)
-        _write(_writer(action="/GoToE"), candidate)
+        _write(
+            _writer(
+                action="/GoTo",
+                embedded_child_document=True,
+            ),
+            baseline,
+        )
+        _write(
+            _writer(
+                action="/GoToE",
+                embedded_child_document=True,
+            ),
+            candidate,
+        )
     elif mutation == "javascript_payload_rewritten":
         _write(_writer(javascript=_MARKER_A), baseline)
         _write(_writer(javascript=_MARKER_B), candidate)
@@ -372,6 +386,7 @@ def _writer(
     javascript: str | None = None,
     action: str | None = None,
     embedded_file: bool = False,
+    embedded_child_document: bool = False,
     form_field: bool = False,
     link_annotation: bool = False,
     xfa: bool = False,
@@ -393,6 +408,8 @@ def _writer(
         writer._root_object[NameObject("/OpenAction")] = action_reference
     if embedded_file:
         writer.add_attachment(f"{_MARKER_A}.txt", _MARKER_A.encode("utf-8"))
+    if embedded_child_document:
+        writer.add_attachment(_CHILD_DOCUMENT_NAME, _child_document_bytes())
     if form_field or xfa or signature:
         _add_acroform(
             writer,
@@ -447,7 +464,25 @@ def _action(kind: str) -> DictionaryObject:
         action[NameObject("/F")] = TextStringObject(_MARKER_A)
     elif kind == "/SetOCGState":
         action[NameObject("/State")] = ArrayObject()
+    elif kind == "/GoTo":
+        action[NameObject("/D")] = TextStringObject(_MARKER_A)
+    elif kind == "/GoToE":
+        action[NameObject("/D")] = TextStringObject(_MARKER_A)
+        action[NameObject("/T")] = DictionaryObject(
+            {
+                NameObject("/R"): NameObject("/C"),
+                NameObject("/N"): TextStringObject(_CHILD_DOCUMENT_NAME),
+            }
+        )
     return action
+
+
+def _child_document_bytes() -> bytes:
+    child = PdfWriter()
+    child.add_blank_page(width=72, height=72)
+    stream = BytesIO()
+    child.write(stream)
+    return stream.getvalue()
 
 
 def _add_javascript(writer: PdfWriter, javascript: str) -> None:
