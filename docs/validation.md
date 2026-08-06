@@ -9,6 +9,18 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 0.7.0 candidate integration evidence
+
+On 2026-08-06, the 0.7.0 fixture candidate rebuilt and verified all 26 fixture
+pairs with pypdf 6.15.0. It scored the PDFFence 0.7.0 candidate through its
+process-bound command-line executable: 26 of 26 pairs passed.
+
+The five new pairs retain their action type and public inventory while changing
+only a Launch, remote- or embedded-GoTo, SubmitForm, or ImportData target.
+PDFFence 0.6.0 scores 21 of 26 on this suite. Its only misses report the
+stored-byte change but neither the generic active-content payload change nor
+PFP001, which isolates the private target-evidence regression.
+
 ## 0.6.0 candidate integration evidence
 
 On 2026-08-06, the 0.6.0 fixture candidate rebuilt and verified all 21 fixture

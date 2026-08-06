@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 (unreleased)
+
+- Add fixed-inventory target-rewrite pairs for Launch, remote and embedded
+  GoTo, SubmitForm, and ImportData actions. They require the generic
+  active-content payload change and PFP001 without exposing a target in
+  fixture truth.
+
 ## 0.6.0 (unreleased)
 
 - Add URI, JavaScript text, and JavaScript stream-decoding-configuration

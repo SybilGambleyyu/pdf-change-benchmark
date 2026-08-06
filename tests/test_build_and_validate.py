@@ -144,6 +144,43 @@ def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     assert candidate_stream.get_data() == b"A"
 
 
+@pytest.mark.parametrize(
+    ("fixture_id", "action_type", "as_file_specification"),
+    (
+        ("active.launch_target_rewritten", "/Launch", False),
+        ("active.remote_goto_target_rewritten", "/GoToR", True),
+        ("active.embedded_goto_target_rewritten", "/GoToE", True),
+        ("active.submit_form_target_rewritten", "/SubmitForm", False),
+        ("active.import_data_target_rewritten", "/ImportData", True),
+    ),
+)
+def test_external_action_target_pairs_keep_the_action_inventory_fixed(
+    tmp_path,
+    fixture_id,
+    action_type,
+    as_file_specification,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / fixture_id
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+    baseline_target = baseline_action["/F"]
+    candidate_target = candidate_action["/F"]
+
+    assert str(baseline_action["/S"]) == action_type
+    assert str(candidate_action["/S"]) == action_type
+    if as_file_specification:
+        assert str(baseline_target["/Type"]) == "/Filespec"
+        assert str(candidate_target["/Type"]) == "/Filespec"
+        baseline_target = baseline_target["/F"]
+        candidate_target = candidate_target["/F"]
+    assert str(baseline_target) != str(candidate_target)
+
+
 def _tree_bytes(root: Path) -> dict[str, bytes]:
     return {
         str(path.relative_to(root)): path.read_bytes()

@@ -43,6 +43,12 @@ syntactically valid JavaScript stream with different decoded material. Their
 truth records require a generic active-content payload-change signal and the
 existing active-content policy ID, never a source value or digest.
 
+The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
+target-rewrite fixtures also retain their action type and public inventory.
+They alter only inert file or endpoint targets, including direct and FileSpec
+representations. Their truth remains generic so an adapter must report a
+private payload-change signal, rather than exposing a file name or endpoint.
+
 The Associated Files fixture holds the embedded stream and file specification
 constant, then adds a document-level association. It tests association topology
 without exposing the file name, payload, or relationship value in public truth.

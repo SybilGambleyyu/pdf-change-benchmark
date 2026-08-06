@@ -28,6 +28,16 @@ _URI = "https://example.invalid/pdfcab"
 _URI_B = "https://example.invalid/pdfcab-b"
 _JAVASCRIPT_STREAM_RAW = b"41>0"
 _JAVASCRIPT_STREAM_FILTER = "/ASCIIHexDecode"
+_LAUNCH_TARGET_A = "PDFCAB_LAUNCH_A.txt"
+_LAUNCH_TARGET_B = "PDFCAB_LAUNCH_B.txt"
+_REMOTE_GOTO_TARGET_A = "PDFCAB_REMOTE_A.pdf"
+_REMOTE_GOTO_TARGET_B = "PDFCAB_REMOTE_B.pdf"
+_EMBEDDED_GOTO_TARGET_A = "PDFCAB_EMBEDDED_A.pdf"
+_EMBEDDED_GOTO_TARGET_B = "PDFCAB_EMBEDDED_B.pdf"
+_SUBMIT_TARGET_A = "https://example.invalid/pdfcab-submit-a"
+_SUBMIT_TARGET_B = "https://example.invalid/pdfcab-submit-b"
+_IMPORT_TARGET_A = "PDFCAB_IMPORT_A.fdf"
+_IMPORT_TARGET_B = "PDFCAB_IMPORT_B.fdf"
 _PASSWORD = "pdfcab-inert-password"
 _CHILD_DOCUMENT_NAME = "PDFCAB_CHILD.pdf"
 
@@ -160,6 +170,73 @@ FIXTURE_SPECS = (
             "stored bytes and public action inventory remain fixed."
         ),
         "javascript_stream_filter_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.launch_target_rewritten",
+        "active_content",
+        "A Launch action target changes while its public action inventory is fixed.",
+        "launch_target_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.remote_goto_target_rewritten",
+        "active_content",
+        (
+            "A remote GoTo action file target changes while its public action "
+            "inventory is fixed."
+        ),
+        "remote_goto_target_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_target_rewritten",
+        "active_content",
+        (
+            "An embedded GoTo action file target changes while its public "
+            "action inventory is fixed."
+        ),
+        "embedded_goto_target_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.submit_form_target_rewritten",
+        "active_content",
+        (
+            "A SubmitForm endpoint changes while its public action inventory "
+            "is fixed."
+        ),
+        "submit_form_target_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.import_data_target_rewritten",
+        "active_content",
+        (
+            "An ImportData file target changes while its public action "
+            "inventory is fixed."
+        ),
+        "import_data_target_rewritten",
         (
             "active_content_payload_changed",
             "stored_pdf_bytes_changed",
@@ -401,6 +478,69 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "launch_target_rewritten":
+        _write(_writer(action="/Launch", action_target=_LAUNCH_TARGET_A), baseline)
+        _write(_writer(action="/Launch", action_target=_LAUNCH_TARGET_B), candidate)
+    elif mutation == "remote_goto_target_rewritten":
+        _write(
+            _writer(
+                action="/GoToR",
+                action_target=_REMOTE_GOTO_TARGET_A,
+                action_target_as_file_specification=True,
+            ),
+            baseline,
+        )
+        _write(
+            _writer(
+                action="/GoToR",
+                action_target=_REMOTE_GOTO_TARGET_B,
+                action_target_as_file_specification=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_target_rewritten":
+        _write(
+            _writer(
+                action="/GoToE",
+                embedded_goto_target=_EMBEDDED_GOTO_TARGET_A,
+                embedded_goto_target_as_file_specification=True,
+            ),
+            baseline,
+        )
+        _write(
+            _writer(
+                action="/GoToE",
+                embedded_goto_target=_EMBEDDED_GOTO_TARGET_B,
+                embedded_goto_target_as_file_specification=True,
+            ),
+            candidate,
+        )
+    elif mutation == "submit_form_target_rewritten":
+        _write(
+            _writer(action="/SubmitForm", action_target=_SUBMIT_TARGET_A),
+            baseline,
+        )
+        _write(
+            _writer(action="/SubmitForm", action_target=_SUBMIT_TARGET_B),
+            candidate,
+        )
+    elif mutation == "import_data_target_rewritten":
+        _write(
+            _writer(
+                action="/ImportData",
+                action_target=_IMPORT_TARGET_A,
+                action_target_as_file_specification=True,
+            ),
+            baseline,
+        )
+        _write(
+            _writer(
+                action="/ImportData",
+                action_target=_IMPORT_TARGET_B,
+                action_target_as_file_specification=True,
+            ),
+            candidate,
+        )
     elif mutation == "embedded_file_added":
         _write(_writer(), baseline)
         _write(_writer(embedded_file=True), candidate)
@@ -453,6 +593,10 @@ def _writer(
     javascript: str | None = None,
     action: str | None = None,
     uri: str = _URI,
+    action_target: str = _MARKER_A,
+    action_target_as_file_specification: bool = False,
+    embedded_goto_target: str | None = None,
+    embedded_goto_target_as_file_specification: bool = False,
     javascript_stream_payload: bytes | None = None,
     javascript_stream_filter: str | None = None,
     embedded_file: bool = False,
@@ -495,6 +639,14 @@ def _writer(
                 three_d_annotation=three_d_annotation,
                 document_part=document_part,
                 uri=uri,
+                action_target=action_target,
+                action_target_as_file_specification=(
+                    action_target_as_file_specification
+                ),
+                embedded_goto_target=embedded_goto_target,
+                embedded_goto_target_as_file_specification=(
+                    embedded_goto_target_as_file_specification
+                ),
                 javascript_stream=javascript_stream,
             )
         )
@@ -550,6 +702,10 @@ def _action(
     three_d_annotation: IndirectObject | None = None,
     document_part: IndirectObject | None = None,
     uri: str = _URI,
+    action_target: str = _MARKER_A,
+    action_target_as_file_specification: bool = False,
+    embedded_goto_target: str | None = None,
+    embedded_goto_target_as_file_specification: bool = False,
     javascript_stream: IndirectObject | None = None,
 ) -> DictionaryObject:
     action = DictionaryObject(
@@ -565,7 +721,26 @@ def _action(
             raise FixtureError("JavaScript action requires a stream")
         action[NameObject("/JS")] = javascript_stream
     elif kind == "/Launch":
-        action[NameObject("/F")] = TextStringObject(_MARKER_A)
+        action[NameObject("/F")] = _file_target(
+            action_target,
+            as_file_specification=action_target_as_file_specification,
+        )
+    elif kind == "/GoToR":
+        action[NameObject("/F")] = _file_target(
+            action_target,
+            as_file_specification=action_target_as_file_specification,
+        )
+        action[NameObject("/D")] = TextStringObject(_MARKER_A)
+    elif kind == "/SubmitForm":
+        action[NameObject("/F")] = _file_target(
+            action_target,
+            as_file_specification=action_target_as_file_specification,
+        )
+    elif kind == "/ImportData":
+        action[NameObject("/F")] = _file_target(
+            action_target,
+            as_file_specification=action_target_as_file_specification,
+        )
     elif kind == "/SetOCGState":
         action[NameObject("/State")] = ArrayObject()
     elif kind == "/GoTo":
@@ -578,6 +753,11 @@ def _action(
                 NameObject("/N"): TextStringObject(_CHILD_DOCUMENT_NAME),
             }
         )
+        if embedded_goto_target is not None:
+            action[NameObject("/F")] = _file_target(
+                embedded_goto_target,
+                as_file_specification=embedded_goto_target_as_file_specification,
+            )
     elif kind == "/GoTo3DView":
         if three_d_annotation is None:
             raise FixtureError("GoTo3DView action requires a target annotation")
@@ -588,6 +768,17 @@ def _action(
             raise FixtureError("GoToDp action requires a document-part target")
         action[NameObject("/Dp")] = document_part
     return action
+
+
+def _file_target(target: str, *, as_file_specification: bool) -> object:
+    if not as_file_specification:
+        return TextStringObject(target)
+    return DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Filespec"),
+            NameObject("/F"): TextStringObject(target),
+        }
+    )
 
 
 def _add_navigation_targets(writer: PdfWriter) -> tuple[IndirectObject, IndirectObject]:
