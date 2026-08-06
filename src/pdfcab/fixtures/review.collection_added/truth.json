@@ -1,0 +1,13 @@
+{
+  "category": "interactive_feature",
+  "description": "A document collection declaration is added.",
+  "expected_change_kinds": [
+    "interactive_feature_inventory_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP003"
+  ],
+  "id": "review.collection_added",
+  "schema_version": 1
+}

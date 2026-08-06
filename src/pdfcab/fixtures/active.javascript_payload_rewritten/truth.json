@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "A JavaScript payload changes while its public action inventory is fixed.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.javascript_payload_rewritten",
+  "schema_version": 1
+}

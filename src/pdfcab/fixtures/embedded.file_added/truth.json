@@ -1,0 +1,14 @@
+{
+  "category": "embedded_content",
+  "description": "A stored embedded-file stream and file specification are added.",
+  "expected_change_kinds": [
+    "embedded_content_inventory_changed",
+    "reachable_object_count_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP002"
+  ],
+  "id": "embedded.file_added",
+  "schema_version": 1
+}

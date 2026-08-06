@@ -1,0 +1,14 @@
+{
+  "category": "interactive_feature",
+  "description": "A stored link annotation is added without a target action.",
+  "expected_change_kinds": [
+    "interactive_feature_inventory_changed",
+    "reachable_object_count_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP003"
+  ],
+  "id": "interaction.link_annotation_added",
+  "schema_version": 1
+}
