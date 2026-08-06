@@ -20,18 +20,22 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.4 contains 48 fixture pairs spanning active content, embedded
+Version 1.5 contains 61 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure, metadata, encryption, and revision-chain evidence.
-It adds direct-navigation regressions for a document-open destination, Link
-annotation, and outline item. Each rebind retains its stored navigation root
-while changing only the selected target; paired negative cases isolate target
-page state and unrelated legacy mappings. Together they distinguish a changed
-navigation target from a broad recursive hash of page state or a whole mapping
-dictionary. It also retains the same three-case coverage for document-open and
-successor local GoTo actions, reordered JavaScript action successors,
-action-subtype order changes with no selected payload rewrite, and same-subtype
-GoTo successors that exchange distinct real-page destinations.
+It adds PDF 2.0 structure-destination coverage for catalog GoTo actions,
+document-open destinations, Link annotations, outline items, catalog named
+destinations, and semantic GoTo action chains. Rebind pairs retain their stored
+root while moving only the selected structure-tree element. Paired negatives
+change target metadata or an overridden /D fallback while preserving the
+effective /SD target. Together they distinguish a changed navigation target
+from a broad recursive hash of element metadata, page state, or an entire
+destination dictionary. It also retains direct-navigation regressions for a
+document-open destination, Link annotation, and outline item; the three-case
+coverage for document-open and successor local GoTo actions; reordered
+JavaScript action successors; action-subtype order changes with no selected
+payload rewrite; and same-subtype GoTo successors that exchange distinct
+real-page destinations.
 
 ## Install
 

@@ -261,6 +261,167 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.action_chain_structure_destination_rebound",
+        "active_content",
+        (
+            "A GoTo successor's PDF 2.0 structure destination moves to a "
+            "different tagged element while its action chain remains fixed."
+        ),
+        "action_chain_structure_destination_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_structure_destination_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a GoTo successor's fixed structure target changes "
+            "without rebinding the action-chain destination."
+        ),
+        "action_chain_structure_destination_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.goto_structure_destination_fallback_rewritten",
+        "active_content",
+        (
+            "A local GoTo action's D fallback changes while its PDF 2.0 SD "
+            "structure destination remains fixed."
+        ),
+        "goto_structure_destination_fallback_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.goto_structure_destination_rebound",
+        "active_content",
+        (
+            "A local GoTo action's PDF 2.0 SD structure destination is "
+            "rebound while its D fallback remains fixed."
+        ),
+        "goto_structure_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.goto_structure_destination_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a local GoTo action's fixed PDF 2.0 structure "
+            "target changes without changing the effective destination."
+        ),
+        "goto_structure_destination_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.link_named_structure_destination_fallback_rewritten",
+        "active_content",
+        (
+            "A named Link destination's D fallback changes while its "
+            "catalog SD structure target remains fixed."
+        ),
+        "link_named_structure_destination_fallback_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.link_named_structure_destination_rebound",
+        "active_content",
+        (
+            "A named Link destination is rebound through its catalog SD "
+            "structure target while its D fallback remains fixed."
+        ),
+        "link_named_structure_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.link_structure_destination_rebound",
+        "active_content",
+        (
+            "An actionless Link annotation's direct structure destination is "
+            "rebound to a different tagged element."
+        ),
+        "link_structure_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.link_structure_destination_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on an actionless Link annotation's fixed structure "
+            "target changes without rebinding the destination."
+        ),
+        "link_structure_destination_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.open_structure_destination_rebound",
+        "active_content",
+        (
+            "An actionless document-open structure destination is rebound to "
+            "a different tagged element."
+        ),
+        "open_structure_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.open_structure_destination_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on an actionless document-open structure target changes "
+            "without rebinding the destination."
+        ),
+        "open_structure_destination_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.outline_structure_destination_rebound",
+        "active_content",
+        (
+            "An actionless outline destination is rebound to a different "
+            "tagged structure element."
+        ),
+        "outline_structure_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.outline_structure_destination_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on an actionless outline's fixed structure target "
+            "changes without rebinding the destination."
+        ),
+        "outline_structure_destination_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.goto_3d_view_to_document_part",
         "active_content",
         (
@@ -858,6 +1019,181 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             _catalog_named_destination_outline_writer(
                 destination=0,
                 unrelated_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_structure_destination_rebound":
+        _write(
+            _catalog_action_chain_structure_destination_writer(
+                structure_destination=0
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_structure_destination_writer(
+                structure_destination=1
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_structure_destination_target_metadata_rewritten":
+        _write(
+            _catalog_action_chain_structure_destination_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_structure_destination_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "goto_structure_destination_fallback_rewritten":
+        _write(
+            _catalog_structure_destination_goto_writer(
+                structure_destination=0,
+                fallback_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_goto_writer(
+                structure_destination=0,
+                fallback_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "goto_structure_destination_rebound":
+        _write(
+            _catalog_structure_destination_goto_writer(
+                structure_destination=0
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_goto_writer(
+                structure_destination=1
+            ),
+            candidate,
+        )
+    elif mutation == "goto_structure_destination_target_metadata_rewritten":
+        _write(
+            _catalog_structure_destination_goto_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_goto_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "link_named_structure_destination_fallback_rewritten":
+        _write(
+            _catalog_named_structure_destination_link_writer(
+                structure_destination=0,
+                fallback_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_structure_destination_link_writer(
+                structure_destination=0,
+                fallback_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "link_named_structure_destination_rebound":
+        _write(
+            _catalog_named_structure_destination_link_writer(
+                structure_destination=0
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_named_structure_destination_link_writer(
+                structure_destination=1
+            ),
+            candidate,
+        )
+    elif mutation == "link_structure_destination_rebound":
+        _write(
+            _catalog_structure_destination_link_writer(structure_destination=0),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_link_writer(structure_destination=1),
+            candidate,
+        )
+    elif mutation == "link_structure_destination_target_metadata_rewritten":
+        _write(
+            _catalog_structure_destination_link_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_link_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "open_structure_destination_rebound":
+        _write(
+            _catalog_structure_destination_open_writer(structure_destination=0),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_open_writer(structure_destination=1),
+            candidate,
+        )
+    elif mutation == "open_structure_destination_target_metadata_rewritten":
+        _write(
+            _catalog_structure_destination_open_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_open_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "outline_structure_destination_rebound":
+        _write(
+            _catalog_structure_destination_outline_writer(
+                structure_destination=0
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_outline_writer(
+                structure_destination=1
+            ),
+            candidate,
+        )
+    elif mutation == "outline_structure_destination_target_metadata_rewritten":
+        _write(
+            _catalog_structure_destination_outline_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_structure_destination_outline_writer(
+                structure_destination=0,
+                first_structure_alt=_MARKER_B,
             ),
             candidate,
         )
@@ -1721,6 +2057,262 @@ def _catalog_named_destination_outline_writer(
     outlines.get_object()[NameObject("/First")] = item
     outlines.get_object()[NameObject("/Last")] = item
     writer._root_object[NameObject("/Outlines")] = outlines
+    return writer
+
+
+def _structure_destination_writer_parts(
+    *,
+    first_structure_alt: str = _MARKER_A,
+) -> tuple[PdfWriter, tuple[object, object], tuple[IndirectObject, IndirectObject]]:
+    """Build stable pages and tagged targets for PDF 2.0 destination pairs."""
+
+    writer = _writer()
+    writer._header = b"%PDF-2.0"
+    first_page = writer.pages[0]
+    second_page = writer.add_blank_page(width=72, height=72)
+    structure_root = writer._add_object(
+        DictionaryObject({NameObject("/Type"): NameObject("/StructTreeRoot")})
+    )
+    first_element = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/StructElem"),
+                NameObject("/S"): NameObject("/P"),
+                NameObject("/P"): structure_root,
+                NameObject("/Pg"): first_page.indirect_reference,
+                NameObject("/K"): NumberObject(0),
+                NameObject("/Alt"): TextStringObject(first_structure_alt),
+            }
+        )
+    )
+    second_element = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/StructElem"),
+                NameObject("/S"): NameObject("/P"),
+                NameObject("/Pg"): first_page.indirect_reference,
+                NameObject("/K"): NumberObject(1),
+                NameObject("/P"): structure_root,
+                NameObject("/Alt"): TextStringObject(_MARKER_C),
+            }
+        )
+    )
+    structure_root.get_object()[NameObject("/K")] = ArrayObject(
+        [first_element, second_element]
+    )
+    writer._root_object[NameObject("/StructTreeRoot")] = structure_root
+    return writer, (first_page, second_page), (first_element, second_element)
+
+
+def _catalog_structure_destination_goto_writer(
+    *,
+    structure_destination: int,
+    fallback_destination: int = 0,
+    first_structure_alt: str = _MARKER_A,
+) -> PdfWriter:
+    """Build a local GoTo action whose SD target overrides its D fallback."""
+
+    writer, pages, elements = _structure_destination_writer_parts(
+        first_structure_alt=first_structure_alt
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/GoTo"),
+                NameObject("/D"): ArrayObject(
+                    [
+                        pages[fallback_destination].indirect_reference,
+                        NameObject("/Fit"),
+                    ]
+                ),
+                NameObject("/SD"): ArrayObject(
+                    [elements[structure_destination], NameObject("/Fit")]
+                ),
+            }
+        )
+    )
+    return writer
+
+
+def _catalog_structure_destination_open_writer(
+    *,
+    structure_destination: int,
+    first_structure_alt: str = _MARKER_A,
+) -> PdfWriter:
+    """Build an actionless document-open structure destination."""
+
+    writer, _, elements = _structure_destination_writer_parts(
+        first_structure_alt=first_structure_alt
+    )
+    writer._root_object[NameObject("/OpenAction")] = ArrayObject(
+        [elements[structure_destination], NameObject("/Fit")]
+    )
+    return writer
+
+
+def _catalog_structure_destination_link_writer(
+    *,
+    structure_destination: int,
+    first_structure_alt: str = _MARKER_A,
+) -> PdfWriter:
+    """Build an actionless Link annotation with a direct structure target."""
+
+    writer, pages, elements = _structure_destination_writer_parts(
+        first_structure_alt=first_structure_alt
+    )
+    annotation = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Annot"),
+                NameObject("/Subtype"): NameObject("/Link"),
+                NameObject("/Rect"): ArrayObject(
+                    [
+                        NumberObject(0),
+                        NumberObject(0),
+                        NumberObject(12),
+                        NumberObject(12),
+                    ]
+                ),
+                NameObject("/Border"): ArrayObject(
+                    [NumberObject(0), NumberObject(0), NumberObject(0)]
+                ),
+                NameObject("/Dest"): ArrayObject(
+                    [elements[structure_destination], NameObject("/Fit")]
+                ),
+            }
+        )
+    )
+    pages[0][NameObject("/Annots")] = ArrayObject([annotation])
+    return writer
+
+
+def _catalog_structure_destination_outline_writer(
+    *,
+    structure_destination: int,
+    first_structure_alt: str = _MARKER_A,
+) -> PdfWriter:
+    """Build one actionless outline item with a structure destination."""
+
+    writer, _, elements = _structure_destination_writer_parts(
+        first_structure_alt=first_structure_alt
+    )
+    outlines = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Outlines"),
+                NameObject("/Count"): NumberObject(1),
+            }
+        )
+    )
+    item = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Title"): TextStringObject(_MARKER_A),
+                NameObject("/Parent"): outlines,
+                NameObject("/Dest"): ArrayObject(
+                    [elements[structure_destination], NameObject("/Fit")]
+                ),
+            }
+        )
+    )
+    outlines.get_object()[NameObject("/First")] = item
+    outlines.get_object()[NameObject("/Last")] = item
+    writer._root_object[NameObject("/Outlines")] = outlines
+    return writer
+
+
+def _catalog_named_structure_destination_link_writer(
+    *,
+    structure_destination: int,
+    fallback_destination: int = 0,
+    first_structure_alt: str = _MARKER_A,
+) -> PdfWriter:
+    """Build a Link name resolved through a Dests dictionary with SD."""
+
+    writer, pages, elements = _structure_destination_writer_parts(
+        first_structure_alt=first_structure_alt
+    )
+    destination_name = NameObject(f"/{_MARKER_B}")
+    writer._root_object[NameObject("/Dests")] = DictionaryObject(
+        {
+            destination_name: DictionaryObject(
+                {
+                    NameObject("/D"): ArrayObject(
+                        [
+                            pages[fallback_destination].indirect_reference,
+                            NameObject("/Fit"),
+                        ]
+                    ),
+                    NameObject("/SD"): ArrayObject(
+                        [elements[structure_destination], NameObject("/Fit")]
+                    ),
+                }
+            )
+        }
+    )
+    annotation = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Annot"),
+                NameObject("/Subtype"): NameObject("/Link"),
+                NameObject("/Rect"): ArrayObject(
+                    [
+                        NumberObject(0),
+                        NumberObject(0),
+                        NumberObject(12),
+                        NumberObject(12),
+                    ]
+                ),
+                NameObject("/Border"): ArrayObject(
+                    [NumberObject(0), NumberObject(0), NumberObject(0)]
+                ),
+                NameObject("/Dest"): destination_name,
+            }
+        )
+    )
+    pages[0][NameObject("/Annots")] = ArrayObject([annotation])
+    return writer
+
+
+def _catalog_action_chain_structure_destination_writer(
+    *,
+    structure_destination: int,
+    fallback_destination: int = 0,
+    first_structure_alt: str = _MARKER_A,
+) -> PdfWriter:
+    """Build a GoTo successor whose SD target overrides its D fallback."""
+
+    writer, pages, elements = _structure_destination_writer_parts(
+        first_structure_alt=first_structure_alt
+    )
+    successor = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/GoTo"),
+                NameObject("/D"): ArrayObject(
+                    [
+                        pages[fallback_destination].indirect_reference,
+                        NameObject("/Fit"),
+                    ]
+                ),
+                NameObject("/SD"): ArrayObject(
+                    [elements[structure_destination], NameObject("/Fit")]
+                ),
+            }
+        )
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+                NameObject("/Next"): successor,
+            }
+        )
+    )
     return writer
 
 

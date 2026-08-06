@@ -1,0 +1,13 @@
+{
+  "category": "active_content",
+  "description": "An actionless document-open structure destination is rebound to a different tagged element.",
+  "expected_change_kinds": [
+    "active_content_payload_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP001"
+  ],
+  "id": "active.open_structure_destination_rebound",
+  "schema_version": 1
+}

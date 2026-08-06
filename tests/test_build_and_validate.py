@@ -623,6 +623,176 @@ def test_named_outline_destination_pairs_keep_the_item_and_mapping_fixed(
     ].indirect_reference
 
 
+def _open_destination(reader: PdfReader) -> ArrayObject:
+    value = reader.root_object["/OpenAction"]
+    assert isinstance(value, ArrayObject)
+    return value
+
+
+def _link_destination(reader: PdfReader) -> ArrayObject:
+    link = reader.pages[0]["/Annots"][0].get_object()
+    assert "/A" not in link
+    value = link["/Dest"]
+    assert isinstance(value, ArrayObject)
+    return value
+
+
+def _outline_destination(reader: PdfReader) -> ArrayObject:
+    item = reader.root_object["/Outlines"]["/First"].get_object()
+    assert "/A" not in item
+    value = item["/Dest"]
+    assert isinstance(value, ArrayObject)
+    return value
+
+
+def _assert_structure_target(
+    reader: PdfReader,
+    destination: ArrayObject,
+    expected_index: int,
+):
+    assert len(destination) == 2
+    assert str(destination[1]) == "/Fit"
+    targets = reader.root_object["/StructTreeRoot"]["/K"]
+    assert destination[0] == targets[expected_index]
+    target = destination[0].get_object()
+    assert str(target["/Type"]) == "/StructElem"
+    return target
+
+
+def _named_link_destination_map(reader: PdfReader):
+    link = reader.pages[0]["/Annots"][0].get_object()
+    assert "/A" not in link
+    return reader.root_object["/Dests"][link["/Dest"]]
+
+
+def test_goto_structure_destination_pairs_preserve_sd_precedence(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    rebound = generated / "active.goto_structure_destination_rebound"
+    fallback = generated / "active.goto_structure_destination_fallback_rewritten"
+    metadata = (
+        generated / "active.goto_structure_destination_target_metadata_rewritten"
+    )
+
+    before = PdfReader(rebound / "baseline.pdf", strict=True)
+    after = PdfReader(rebound / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"].get_object()
+    after_action = after.root_object["/OpenAction"].get_object()
+    assert str(before_action["/S"]) == str(after_action["/S"]) == "/GoTo"
+    assert before_action["/D"][0] == before.pages[0].indirect_reference
+    assert after_action["/D"][0] == after.pages[0].indirect_reference
+    _assert_structure_target(before, before_action["/SD"], 0)
+    _assert_structure_target(after, after_action["/SD"], 1)
+
+    before = PdfReader(fallback / "baseline.pdf", strict=True)
+    after = PdfReader(fallback / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"].get_object()
+    after_action = after.root_object["/OpenAction"].get_object()
+    assert before_action["/D"][0] == before.pages[0].indirect_reference
+    assert after_action["/D"][0] == after.pages[1].indirect_reference
+    _assert_structure_target(before, before_action["/SD"], 0)
+    _assert_structure_target(after, after_action["/SD"], 0)
+
+    before = PdfReader(metadata / "baseline.pdf", strict=True)
+    after = PdfReader(metadata / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"].get_object()
+    after_action = after.root_object["/OpenAction"].get_object()
+    before_target = _assert_structure_target(before, before_action["/SD"], 0)
+    after_target = _assert_structure_target(after, after_action["/SD"], 0)
+    assert str(before_target["/Alt"]) != str(after_target["/Alt"])
+
+
+@pytest.mark.parametrize(
+    ("rebound_id", "metadata_id", "destination"),
+    (
+        (
+            "active.open_structure_destination_rebound",
+            "active.open_structure_destination_target_metadata_rewritten",
+            _open_destination,
+        ),
+        (
+            "active.link_structure_destination_rebound",
+            "active.link_structure_destination_target_metadata_rewritten",
+            _link_destination,
+        ),
+        (
+            "active.outline_structure_destination_rebound",
+            "active.outline_structure_destination_target_metadata_rewritten",
+            _outline_destination,
+        ),
+    ),
+)
+def test_direct_structure_destination_pairs_keep_the_root_fixed(
+    tmp_path,
+    rebound_id,
+    metadata_id,
+    destination,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+
+    before = PdfReader(generated / rebound_id / "baseline.pdf", strict=True)
+    after = PdfReader(generated / rebound_id / "candidate.pdf", strict=True)
+    before_target = _assert_structure_target(before, destination(before), 0)
+    after_target = _assert_structure_target(after, destination(after), 1)
+    assert str(before_target["/Type"]) == str(after_target["/Type"]) == "/StructElem"
+
+    before = PdfReader(generated / metadata_id / "baseline.pdf", strict=True)
+    after = PdfReader(generated / metadata_id / "candidate.pdf", strict=True)
+    before_target = _assert_structure_target(before, destination(before), 0)
+    after_target = _assert_structure_target(after, destination(after), 0)
+    assert str(before_target["/Alt"]) != str(after_target["/Alt"])
+
+
+def test_named_and_action_chain_structure_destination_pairs_are_semantic(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    named_rebound = generated / "active.link_named_structure_destination_rebound"
+    named_fallback = (
+        generated / "active.link_named_structure_destination_fallback_rewritten"
+    )
+    chain_rebound = generated / "active.action_chain_structure_destination_rebound"
+    chain_metadata = (
+        generated
+        / "active.action_chain_structure_destination_target_metadata_rewritten"
+    )
+
+    before = PdfReader(named_rebound / "baseline.pdf", strict=True)
+    after = PdfReader(named_rebound / "candidate.pdf", strict=True)
+    before_map = _named_link_destination_map(before)
+    after_map = _named_link_destination_map(after)
+    assert before_map["/D"][0] == before.pages[0].indirect_reference
+    assert after_map["/D"][0] == after.pages[0].indirect_reference
+    _assert_structure_target(before, before_map["/SD"], 0)
+    _assert_structure_target(after, after_map["/SD"], 1)
+
+    before = PdfReader(named_fallback / "baseline.pdf", strict=True)
+    after = PdfReader(named_fallback / "candidate.pdf", strict=True)
+    before_map = _named_link_destination_map(before)
+    after_map = _named_link_destination_map(after)
+    assert before_map["/D"][0] == before.pages[0].indirect_reference
+    assert after_map["/D"][0] == after.pages[1].indirect_reference
+    _assert_structure_target(before, before_map["/SD"], 0)
+    _assert_structure_target(after, after_map["/SD"], 0)
+
+    before = PdfReader(chain_rebound / "baseline.pdf", strict=True)
+    after = PdfReader(chain_rebound / "candidate.pdf", strict=True)
+    before_successor = before.root_object["/OpenAction"]["/Next"].get_object()
+    after_successor = after.root_object["/OpenAction"]["/Next"].get_object()
+    _assert_structure_target(before, before_successor["/SD"], 0)
+    _assert_structure_target(after, after_successor["/SD"], 1)
+
+    before = PdfReader(chain_metadata / "baseline.pdf", strict=True)
+    after = PdfReader(chain_metadata / "candidate.pdf", strict=True)
+    before_successor = before.root_object["/OpenAction"]["/Next"].get_object()
+    after_successor = after.root_object["/OpenAction"]["/Next"].get_object()
+    before_target = _assert_structure_target(before, before_successor["/SD"], 0)
+    after_target = _assert_structure_target(after, after_successor["/SD"], 0)
+    assert str(before_target["/Alt"]) != str(after_target["/Alt"])
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

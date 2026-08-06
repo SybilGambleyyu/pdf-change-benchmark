@@ -113,6 +113,21 @@ the stored-byte change. They prevent a compatibility adapter from passing by
 hashing a target page or the whole destination dictionary, and they never
 publish a root, target, mapping, position, or digest.
 
+The PDF 2.0 structure-destination fixtures cover a GoTo action's effective
+/SD value, actionless document-open destinations, Link and outline Dest
+entries, a legacy and a string-keyed catalog named destination, and a semantic
+GoTo action-chain member. Each structure tree has two sibling StructElem
+targets beneath a StructTreeRoot. The rebind cases hold the root, its public
+inventory, and the surrounding structure tree fixed while changing only the
+selected sibling. They require a generic active-content change and PFP001,
+without publishing an element identity, destination, position, or digest.
+The negatives change only an element's Alt metadata or the /D value overridden
+by /SD. They require only the stored-byte change: a compatibility adapter must
+follow the effective PDF 2.0 destination, not recurse through arbitrary target
+metadata or treat an inactive fallback as selected. The catalog named cases
+exercise both a legacy /Dests dictionary and a /Names /Dests name tree, whose
+mapped dictionary contains both /D and /SD.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

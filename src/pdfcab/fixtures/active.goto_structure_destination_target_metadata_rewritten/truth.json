@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "Metadata on a local GoTo action's fixed PDF 2.0 structure target changes without changing the effective destination.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.goto_structure_destination_target_metadata_rewritten",
+  "schema_version": 1
+}

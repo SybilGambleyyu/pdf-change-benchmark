@@ -9,6 +9,22 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.5.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.5.0 fixture candidate rebuilt and verified all 61 fixture
+pairs with pypdf 6.15.0. Its 39 tests and Ruff checks passed. It scored the
+PDFFence 1.5.0 source candidate through its process-bound command-line
+executable: 61 of 61 pairs passed.
+
+The structure-destination rebinds retain their GoTo, document-open, Link,
+outline, named-destination, or action-chain root while moving only the
+selected StructElem. The paired negatives confirm that selected element
+metadata and an overridden /D fallback remain stored-byte-only changes. The
+held PDFFence 1.4.0 source candidate scores 53 of 61: it misses the two /SD
+rebinds in GoTo contexts and flags the six fallback or metadata negatives as
+active-content changes. This isolates effective PDF 2.0 /SD precedence and a
+bounded structure-tree identity from broad target hashing.
+
 ## 1.4.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.4.0 fixture candidate rebuilt and verified all 48 fixture

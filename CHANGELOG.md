@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0 (unreleased)
+
+- Add thirteen PDF 2.0 structure-destination regressions covering effective
+  /SD precedence over /D in catalog GoTo actions, actionless document-open
+  destinations, Link annotations, outline items, catalog named destinations,
+  and semantic GoTo action chains. The five rebind pairs retain the stored
+  root while moving only the selected structure-tree element, requiring the
+  appropriate generic active-content signal and PFP001.
+- Add target-element-metadata and overridden-fallback negatives. They require
+  only stored_pdf_bytes_changed, preventing broad recursive hashes of a
+  structure element or its target page, and preventing an adapter from treating
+  an inactive /D fallback as the effective PDF 2.0 destination.
+
 ## 1.4.0 (unreleased)
 
 - Add eight direct-navigation regressions for an actionless document-open
