@@ -25,6 +25,15 @@ no current-file boundary was lost, and PFP010 remains quiet because both
 boundaries still reach EOF. The fixture does not claim signature validity or
 publish an offset, signature value, certificate, digest, or trust result.
 
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all eight PDFFence and PDFCAB artifacts passed Twine metadata
+checks. Fresh paired wheel installs on Python 3.12 and 3.13, plus a clean
+paired Python 3.12 source-archive install, passed `pip check`, fixture
+verification, and all 156 process-bound score cases in deterministic shards.
+After updating the isolated audit tool, dependency auditing found no known
+vulnerabilities; the local distributions were correctly skipped because they
+are not on PyPI.
+
 ## 1.18.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.18.0 fixture candidate rebuilt and verified all 155
