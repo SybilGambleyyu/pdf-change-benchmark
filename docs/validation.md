@@ -28,6 +28,14 @@ reference, value, offset, signature content, certificate, digest, or trust
 result. The held PDFFence 1.19.0 source reports stored-byte evidence alone for
 this pair, so it does not satisfy the new direct-value contract.
 
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and the paired PDFFence and PDFCAB artifacts passed Twine metadata
+checks. Fresh paired wheel installs on Python 3.12 and 3.13, plus a clean paired
+Python 3.12 source-archive install, passed `pip check`, fixture verification,
+and all 157 process-bound score cases. Dependency auditing found no known
+vulnerabilities; the local distributions were correctly skipped because they
+are not on PyPI.
+
 ## 1.19.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.19.0 fixture candidate rebuilt and verified all 156
