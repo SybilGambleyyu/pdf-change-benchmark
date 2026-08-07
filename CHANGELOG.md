@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.17.0 (2026-08-06)
+
+- Add a semantic signature ByteRange control: a field-root range reaches the
+  original file end, then a valid incremental update leaves that range at the
+  prior revision. It requires the generic coverage event and PFP009 without
+  publishing offsets, contents, certificates, or hashes.
+- Add a private PieceInfo `/Type /Sig` and `/ByteRange` lookalike addition. It
+  requires reachability plus stored bytes only, preventing an adapter from
+  treating arbitrary private data as signature structure.
+- Increase the deterministic fixture set from 152 to 154 pairs.
+
 ## 1.16.0 (2026-08-06)
 
 - Add two private-inventory controls: one changes a PieceInfo action-shaped

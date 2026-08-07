@@ -146,6 +146,17 @@ requires reachability plus stored bytes. Neither has a semantic action owner,
 so neither may produce an active-content inventory change or PFP001. No truth
 record publishes an action subtype, owner path, action value, or fingerprint.
 
+The signature-boundary controls use a field-root `/Type /Sig` dictionary whose
+`/ByteRange` starts at byte zero and reaches the original physical file end.
+An incremental update then appends a later revision without changing that
+signature dictionary. Its truth requires generic revision, reachability,
+metadata, stored-byte, and signature-coverage changes plus PFP009; it does not
+claim signature validity or disclose an offset, signature content, certificate,
+or hash. A paired private PieceInfo `/Type /Sig` and `/ByteRange` addition has
+no form-field or catalog-permission owner and requires reachability plus stored
+bytes only. Together they distinguish a standard signature root and current
+file boundary from an arbitrary signature-shaped dictionary.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

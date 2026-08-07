@@ -60,6 +60,48 @@ def test_public_truth_has_no_inert_payload_marker():
     assert "pdfcab-inert-password" not in public_truth
 
 
+def test_signature_current_file_coverage_pair_retains_a_prior_byte_range(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "signature.current_file_coverage_lost"
+
+    baseline_path = fixture / "baseline.pdf"
+    candidate_path = fixture / "candidate.pdf"
+    baseline = PdfReader(baseline_path, strict=True)
+    candidate = PdfReader(candidate_path, strict=True)
+    baseline_signature = baseline.root_object["/AcroForm"]["/Fields"][0]["/V"]
+    candidate_signature = candidate.root_object["/AcroForm"]["/Fields"][0]["/V"]
+    baseline_range = tuple(int(value) for value in baseline_signature["/ByteRange"])
+    candidate_range = tuple(int(value) for value in candidate_signature["/ByteRange"])
+
+    assert str(baseline_signature["/Type"]) == "/Sig"
+    assert str(candidate_signature["/Type"]) == "/Sig"
+    assert baseline_range == candidate_range
+    assert baseline_range[0] == 0
+    assert baseline_range[-2] + baseline_range[-1] == baseline_path.stat().st_size
+    assert candidate_path.stat().st_size > baseline_path.stat().st_size
+    assert candidate_range[-2] + candidate_range[-1] < candidate_path.stat().st_size
+
+
+def test_private_signature_lookalike_pair_has_no_semantic_signature_owner(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "signature.private_piece_info_lookalike_added"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    assert "/AcroForm" not in baseline.root_object
+    assert "/AcroForm" not in candidate.root_object
+    assert "/Perms" not in baseline.root_object
+    assert "/Perms" not in candidate.root_object
+    baseline_private = baseline.root_object["/PieceInfo"]["/PDFCAB"]["/Private"]
+    candidate_private = candidate.root_object["/PieceInfo"]["/PDFCAB"]["/Private"]
+    assert "/Signature" not in baseline_private
+    candidate_signature = candidate_private["/Signature"].get_object()
+    assert str(candidate_signature["/Type"]) == "/Sig"
+    assert tuple(int(value) for value in candidate_signature["/ByteRange"]) == (0, 1)
+
+
 def test_action_subtype_pair_retains_an_embedded_child_target(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

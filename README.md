@@ -20,20 +20,21 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.16 contains 152 fixture pairs spanning active content, embedded
+Version 1.17 contains 154 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
-signature structure, metadata, encryption, and revision-chain evidence. It
-adds two action-inventory controls: a PieceInfo-private action subtype rewrite
-and a private additional-action-container addition. They require stored bytes
-alone, or reachability plus stored bytes, respectively—never an active-content
-inventory signal. The release retains five action-key semantic-root controls,
-six real standard-path URI-action cases, direct document-action behavior
-rewrites for `/Thread`, `/URI`, `/Sound`, `/Movie`, `/Hide`, `/Named`,
-`/SubmitForm`, `/ResetForm`, `/Rendition`, `/Trans`, and
-`/RichMediaExecute`, GoToE hierarchy-scope negatives, catalog-named and
-FileAttachment GoToE cases, GoTo3DView, SetOCGState, PDF 2.0 GoToDp,
-remote-GoTo, local structure-destination, direct-navigation, and action-chain
-regressions.
+signature structure and ByteRange boundaries, metadata, encryption, and
+revision-chain evidence. It adds a field-root signature range that reaches the
+original file end before a valid incremental update leaves it behind; the
+expected result is a generic coverage event and PFP009, not a claim of
+cryptographic validity. A paired private PieceInfo `/Type /Sig` lookalike
+addition requires reachability plus stored bytes only. The release retains the
+two action-inventory controls, five action-key semantic-root controls, six real
+standard-path URI-action cases, direct document-action behavior rewrites for
+`/Thread`, `/URI`, `/Sound`, `/Movie`, `/Hide`, `/Named`, `/SubmitForm`,
+`/ResetForm`, `/Rendition`, `/Trans`, and `/RichMediaExecute`, GoToE
+hierarchy-scope negatives, catalog-named and FileAttachment GoToE cases,
+GoTo3DView, SetOCGState, PDF 2.0 GoToDp, remote-GoTo, local
+structure-destination, direct-navigation, and action-chain regressions.
 
 ## Install
 

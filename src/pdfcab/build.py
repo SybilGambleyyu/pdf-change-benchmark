@@ -1920,6 +1920,37 @@ FIXTURE_SPECS = (
         ("PFP004",),
     ),
     FixtureSpec(
+        "signature.current_file_coverage_lost",
+        "signature_coverage",
+        (
+            "A semantic signature ByteRange remains well-formed but stops at "
+            "the prior file revision after an incremental update."
+        ),
+        "signature_current_file_coverage_lost",
+        (
+            "metadata_inventory_changed",
+            "reachable_object_count_changed",
+            "revision_chain_changed",
+            "signature_byte_range_coverage_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP009",),
+    ),
+    FixtureSpec(
+        "signature.private_piece_info_lookalike_added",
+        "signature_structure",
+        (
+            "A private PieceInfo Type/Sig dictionary with ByteRange data is "
+            "added without a semantic signature owner."
+        ),
+        "private_signature_lookalike_added",
+        (
+            "reachable_object_count_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        (),
+    ),
+    FixtureSpec(
         "metadata.xmp_added",
         "metadata",
         "A stored XMP metadata stream is added.",
@@ -3505,6 +3536,12 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "signature_added":
         _write(_writer(), baseline)
         _write(_writer(signature=True), candidate)
+    elif mutation == "signature_current_file_coverage_lost":
+        _write_semantic_signature_byte_range(baseline)
+        _increment(baseline, candidate)
+    elif mutation == "private_signature_lookalike_added":
+        _write(_private_signature_lookalike_writer(include_signature=False), baseline)
+        _write(_private_signature_lookalike_writer(include_signature=True), candidate)
     elif mutation == "xmp_added":
         _write(_writer(), baseline)
         _write(_writer(xmp=True), candidate)
@@ -3621,6 +3658,83 @@ def _writer(
 def _write(writer: PdfWriter, path: Path) -> None:
     with path.open("wb") as stream:
         writer.write(stream)
+
+
+def _write_semantic_signature_byte_range(path: Path) -> None:
+    """Write a field-root signature whose ByteRange reaches this file's EOF."""
+
+    objects = (
+        b"<< /Type /Catalog /Pages 2 0 R /AcroForm 5 0 R >>",
+        b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        (
+            b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 72 72] "
+            b"/Contents 4 0 R >>"
+        ),
+        b"<< /Length 0 >>\nstream\n\nendstream",
+        b"<< /Fields [6 0 R] >>",
+        b"<< /FT /Sig /T (Signature) /V 7 0 R >>",
+        (
+            b"<< /Type /Sig /ByteRange [0 1111111111 2222222222 3333333333] "
+            b"/Contents <AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            b"AAAAAAAAAAAAAAAA> >>"
+        ),
+    )
+    document = bytearray(b"%PDF-1.7\n%\xe2\xe3\xcf\xd3\n")
+    offsets = [0]
+    for number, payload in enumerate(objects, 1):
+        offsets.append(len(document))
+        document.extend(f"{number} 0 obj\n".encode("ascii"))
+        document.extend(payload)
+        document.extend(b"\nendobj\n")
+    xref_offset = len(document)
+    document.extend(f"xref\n0 {len(objects) + 1}\n".encode("ascii"))
+    document.extend(b"0000000000 65535 f \n")
+    for offset in offsets[1:]:
+        document.extend(f"{offset:010d} 00000 n \n".encode("ascii"))
+    document.extend(b"trailer\n<< /Size 8 /Root 1 0 R >>\n")
+    document.extend(f"startxref\n{xref_offset}\n%%EOF\n".encode("ascii"))
+
+    contents_start = document.index(b"<", document.index(b"/Contents "))
+    contents_end = document.index(b">", contents_start) + 1
+    for placeholder, value in zip(
+        (b"1111111111", b"2222222222", b"3333333333"),
+        (contents_start, contents_end, len(document) - contents_end),
+        strict=True,
+    ):
+        document = document.replace(placeholder, f"{value:010d}".encode("ascii"), 1)
+    path.write_bytes(document)
+
+
+def _private_signature_lookalike_writer(*, include_signature: bool) -> PdfWriter:
+    """Build private Type/Sig data with no field or permission owner."""
+
+    writer = _writer()
+    private = DictionaryObject()
+    if include_signature:
+        private[NameObject("/Signature")] = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Sig"),
+                    NameObject("/ByteRange"): ArrayObject(
+                        [NumberObject(0), NumberObject(1)]
+                    ),
+                    NameObject("/Contents"): TextStringObject(_MARKER_A),
+                }
+            )
+        )
+    writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
+        {
+            NameObject("/PDFCAB"): DictionaryObject(
+                {
+                    NameObject("/LastModified"): TextStringObject(
+                        "D:20260806000000Z"
+                    ),
+                    NameObject("/Private"): private,
+                }
+            )
+        }
+    )
+    return writer
 
 
 def _catalog_direct_action_field_writer(

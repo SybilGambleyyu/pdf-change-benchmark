@@ -1,0 +1,16 @@
+{
+  "category": "signature_coverage",
+  "description": "A semantic signature ByteRange remains well-formed but stops at the prior file revision after an incremental update.",
+  "expected_change_kinds": [
+    "metadata_inventory_changed",
+    "reachable_object_count_changed",
+    "revision_chain_changed",
+    "signature_byte_range_coverage_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP009"
+  ],
+  "id": "signature.current_file_coverage_lost",
+  "schema_version": 1
+}
