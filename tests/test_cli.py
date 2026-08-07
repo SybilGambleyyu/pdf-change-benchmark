@@ -25,11 +25,11 @@ def test_cli_version_matches_installed_distribution(capsys):
 def test_verify_and_build_commands_emit_public_json(tmp_path, capsys):
     assert main(["verify"]) == 0
     verified = json.loads(capsys.readouterr().out)
-    assert verified["fixture_count"] == 91
+    assert verified["fixture_count"] == 101
 
     destination = tmp_path / "built"
     assert main(["build", str(destination)]) == 0
     built = json.loads(capsys.readouterr().out)
-    assert built["fixture_count"] == 91
+    assert built["fixture_count"] == 101
     assert (destination / "manifest.jsonl").is_file()
     assert "PDFCAB_INERT" not in json.dumps(built)

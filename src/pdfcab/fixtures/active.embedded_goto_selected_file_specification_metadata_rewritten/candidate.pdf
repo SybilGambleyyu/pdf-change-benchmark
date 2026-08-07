@@ -1,0 +1,108 @@
+%PDF-1.7
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+/Title (PDFCAB\137INERT\137A)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 1
+/Kids [ 4 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/Names <<
+/EmbeddedFiles <<
+/Names [ <5044464341425f454d4245444445445f4348494c44> 6 0 R <5044464341425f554e52454c415445445f4348494c44> 8 0 R ]
+>>
+>>
+/OpenAction 9 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 72 72 ]
+/Parent 2 0 R
+>>
+endobj
+5 0 obj
+<<
+/Type /EmbeddedFile
+/Subtype /application#232Fpdf
+/Length 30
+>>
+stream
+PDFCAB_NAMED_EMBEDDED_STREAM_A
+endstream
+endobj
+6 0 obj
+<<
+/Type /Filespec
+/F (PDFCAB\137NAMED\137EMBEDDED\137A\056pdf)
+/EF <<
+/F 5 0 R
+>>
+/Desc (PDFCAB\137INERT\137B)
+>>
+endobj
+7 0 obj
+<<
+/Type /EmbeddedFile
+/Subtype /application#232Fpdf
+/Length 30
+>>
+stream
+PDFCAB_NAMED_EMBEDDED_STREAM_B
+endstream
+endobj
+8 0 obj
+<<
+/Type /Filespec
+/F (PDFCAB\137NAMED\137EMBEDDED\137A\056pdf)
+/EF <<
+/F 7 0 R
+>>
+/Desc (PDFCAB\137INERT\137A)
+>>
+endobj
+9 0 obj
+<<
+/Type /Action
+/S /GoToE
+/D <5044464341425f454d4245444445445f44455354494e4154494f4e>
+/T <<
+/R /C
+/N <5044464341425f454d4245444445445f4348494c44>
+>>
+>>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000084 00000 n 
+0000000143 00000 n 
+0000000359 00000 n 
+0000000451 00000 n 
+0000000581 00000 n 
+0000000711 00000 n 
+0000000841 00000 n 
+0000000971 00000 n 
+trailer
+<<
+/Size 10
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+1139
+%%EOF

@@ -41,6 +41,10 @@ _REMOTE_STRUCTURE_ID_SAME_TEXT_A = b"\xfe\xff\x00A"
 _REMOTE_STRUCTURE_ID_SAME_TEXT_B = b"\xff\xfeA\x00"
 _EMBEDDED_GOTO_TARGET_A = "PDFCAB_EMBEDDED_A.pdf"
 _EMBEDDED_GOTO_TARGET_B = "PDFCAB_EMBEDDED_B.pdf"
+_EMBEDDED_GOTO_NAMED_TARGET_A = "PDFCAB_NAMED_EMBEDDED_A.pdf"
+_EMBEDDED_GOTO_NAMED_TARGET_B = "PDFCAB_NAMED_EMBEDDED_B.pdf"
+_EMBEDDED_GOTO_ROOT_TARGET_A = "PDFCAB_ROOT_EMBEDDED_A.pdf"
+_EMBEDDED_GOTO_ROOT_TARGET_B = "PDFCAB_ROOT_EMBEDDED_B.pdf"
 _SUBMIT_TARGET_A = "https://example.invalid/pdfcab-submit-a"
 _SUBMIT_TARGET_B = "https://example.invalid/pdfcab-submit-b"
 _IMPORT_TARGET_A = "PDFCAB_IMPORT_A.fdf"
@@ -129,6 +133,128 @@ FIXTURE_SPECS = (
         "goto_to_embedded_goto",
         (
             "active_content_inventory_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_named_target_rebound",
+        "active_content",
+        (
+            "A document-open embedded GoTo child name is rebound to a "
+            "different embedded file while its action remains fixed."
+        ),
+        "embedded_goto_named_target_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_named_target_rebound",
+        "active_content",
+        (
+            "An embedded GoTo successor child name is rebound to a different "
+            "embedded file while its action chain remains fixed."
+        ),
+        "action_chain_embedded_goto_named_target_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_selected_file_specification_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a document-open embedded GoTo action's selected file "
+            "specification changes without changing its target."
+        ),
+        "embedded_goto_selected_file_specification_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_selected_file_specification_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on an embedded GoTo successor's selected file "
+            "specification changes without changing its target."
+        ),
+        "action_chain_embedded_goto_selected_file_specification_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_unrelated_named_target_rewritten",
+        "active_content",
+        (
+            "An unrelated embedded-file name-tree target changes while a "
+            "document-open embedded GoTo child name remains fixed."
+        ),
+        "embedded_goto_unrelated_named_target_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_unrelated_named_target_rewritten",
+        "active_content",
+        (
+            "An unrelated embedded-file name-tree target changes while an "
+            "embedded GoTo successor child name remains fixed."
+        ),
+        "action_chain_embedded_goto_unrelated_named_target_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_root_file_specification_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a document-open embedded GoTo action's direct file "
+            "specification changes without changing its target."
+        ),
+        "embedded_goto_root_file_specification_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_root_file_specification_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on an embedded GoTo successor's direct file "
+            "specification changes without changing its target."
+        ),
+        "action_chain_embedded_goto_root_file_specification_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_root_file_target_rewritten",
+        "active_content",
+        (
+            "A document-open embedded GoTo action's direct file target "
+            "changes while its named child remains fixed."
+        ),
+        "embedded_goto_root_file_target_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_root_file_target_rewritten",
+        "active_content",
+        (
+            "An embedded GoTo successor's direct file target changes while "
+            "its named child remains fixed."
+        ),
+        "action_chain_embedded_goto_root_file_target_rewritten",
+        (
+            "active_content_action_sequence_changed",
             "stored_pdf_bytes_changed",
         ),
         ("PFP001",),
@@ -1276,6 +1402,146 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             _writer(
                 action="/GoToE",
                 embedded_child_document=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_named_target_rebound":
+        _write(_catalog_embedded_goto_named_target_writer(target=0), baseline)
+        _write(_catalog_embedded_goto_named_target_writer(target=1), candidate)
+    elif mutation == "action_chain_embedded_goto_named_target_rebound":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=0,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=1,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_selected_file_specification_metadata_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                first_file_metadata=_MARKER_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                first_file_metadata=_MARKER_B
+            ),
+            candidate,
+        )
+    elif (
+        mutation
+        == "action_chain_embedded_goto_selected_file_specification_metadata_rewritten"
+    ):
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                first_file_metadata=_MARKER_A,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                first_file_metadata=_MARKER_B,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_unrelated_named_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                second_file_name=_EMBEDDED_GOTO_NAMED_TARGET_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                second_file_name=_EMBEDDED_GOTO_NAMED_TARGET_B
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_embedded_goto_unrelated_named_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                second_file_name=_EMBEDDED_GOTO_NAMED_TARGET_A,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                second_file_name=_EMBEDDED_GOTO_NAMED_TARGET_B,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_root_file_specification_metadata_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+                root_file_metadata=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+                root_file_metadata=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif (
+        mutation
+        == "action_chain_embedded_goto_root_file_specification_metadata_rewritten"
+    ):
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+                root_file_metadata=_MARKER_A,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+                root_file_metadata=_MARKER_B,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_root_file_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_B
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_embedded_goto_root_file_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_B,
+                action_chain=True,
             ),
             candidate,
         )
@@ -3335,6 +3601,114 @@ def _catalog_action_chain_goto_3d_view_writer(
     successor = writer._add_object(
         _goto_3d_view_action(targets, target=target, view=view)
     )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+                NameObject("/Next"): successor,
+            }
+        )
+    )
+    return writer
+
+
+def _catalog_embedded_goto_named_target_writer(
+    *,
+    target: int = 0,
+    first_file_name: str = _EMBEDDED_GOTO_NAMED_TARGET_A,
+    first_file_metadata: str = _MARKER_A,
+    second_file_name: str = _EMBEDDED_GOTO_NAMED_TARGET_A,
+    second_file_metadata: str = _MARKER_A,
+    root_file_name: str | None = None,
+    root_file_metadata: str = _MARKER_A,
+    action_chain: bool = False,
+) -> PdfWriter:
+    """Build a GoToE action with a selected catalog EmbeddedFiles child."""
+
+    if target not in {0, 1}:
+        raise FixtureError("embedded GoTo target index is invalid")
+    writer = _writer()
+    writer._header = b"%PDF-1.7"
+
+    def file_specification(
+        file_name: str,
+        metadata: str,
+        stream_data: bytes,
+    ) -> IndirectObject:
+        stream = DecodedStreamObject()
+        stream[NameObject("/Type")] = NameObject("/EmbeddedFile")
+        stream[NameObject("/Subtype")] = NameObject("/application#2Fpdf")
+        stream.set_data(stream_data)
+        return writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Filespec"),
+                    NameObject("/F"): TextStringObject(file_name),
+                    NameObject("/EF"): DictionaryObject(
+                        {NameObject("/F"): writer._add_object(stream)}
+                    ),
+                    NameObject("/Desc"): TextStringObject(metadata),
+                }
+            )
+        )
+
+    file_specifications = (
+        file_specification(
+            first_file_name,
+            first_file_metadata,
+            b"PDFCAB_NAMED_EMBEDDED_STREAM_A",
+        ),
+        file_specification(
+            second_file_name,
+            second_file_metadata,
+            b"PDFCAB_NAMED_EMBEDDED_STREAM_B",
+        ),
+    )
+    writer._root_object[NameObject("/Names")] = DictionaryObject(
+        {
+            NameObject("/EmbeddedFiles"): DictionaryObject(
+                {
+                    NameObject("/Names"): ArrayObject(
+                        [
+                            ByteStringObject(b"PDFCAB_EMBEDDED_CHILD"),
+                            file_specifications[target],
+                            ByteStringObject(b"PDFCAB_UNRELATED_CHILD"),
+                            file_specifications[1 - target],
+                        ]
+                    )
+                }
+            )
+        }
+    )
+    action = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Action"),
+            NameObject("/S"): NameObject("/GoToE"),
+            NameObject("/D"): ByteStringObject(b"PDFCAB_EMBEDDED_DESTINATION"),
+            NameObject("/T"): DictionaryObject(
+                {
+                    NameObject("/R"): NameObject("/C"),
+                    NameObject("/N"): ByteStringObject(
+                        b"PDFCAB_EMBEDDED_CHILD"
+                    ),
+                }
+            ),
+        }
+    )
+    if root_file_name is not None:
+        action[NameObject("/F")] = DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Filespec"),
+                NameObject("/F"): TextStringObject(root_file_name),
+                NameObject("/Desc"): TextStringObject(root_file_metadata),
+            }
+        )
+    if not action_chain:
+        writer._root_object[NameObject("/OpenAction")] = writer._add_object(action)
+        return writer
+    successor = writer._add_object(action)
     writer._root_object[NameObject("/OpenAction")] = writer._add_object(
         DictionaryObject(
             {

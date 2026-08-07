@@ -39,6 +39,17 @@ structurally shaped target for that child while changing the fixed action type.
 It tests that an action inventory does not collapse ordinary navigation and
 navigation into embedded documents.
 
+The GoToE target-semantics fixtures use two synthetic FileSpecs in the catalog
+Names/EmbeddedFiles name tree and a child Target dictionary that selects one
+by its binary name. Document-action-root and semantic-chain positives either
+rebind that selected name to the other FileSpec or rewrite a direct action
+FileSpec target. Their paired negatives keep the selected target fixed while
+changing only a selected or direct FileSpec description, or the unrelated
+name-tree entry. The positives require the corresponding generic active-content
+signal and PFP001; negatives require only the stored-byte change. The fixtures
+do not publish a name, file target, stream value, description, position, or
+private fingerprint.
+
 The GoTo3DView-to-GoToDp fixture keeps a page-attached 3D annotation and a
 catalog document-part hierarchy on both sides. The baseline action references
 the 3D annotation; the candidate action references the document part. It tests

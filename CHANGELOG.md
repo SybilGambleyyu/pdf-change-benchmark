@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.10.0 (unreleased)
+
+- Add ten GoToE target-semantics regressions for document-action roots and
+  semantic action-chain members. Selected catalog EmbeddedFiles rebinding and
+  direct action FileSpec target rewrites require the appropriate generic
+  active-content signal and PFP001 while public action inventory remains fixed.
+- Keep selected and direct FileSpec descriptions, plus unrelated
+  EmbeddedFiles-map rewrites, as stored-byte-only negatives. The pairs prevent
+  a compatibility adapter from recursively hashing descriptive metadata or an
+  entire name tree instead of the selected target.
+
 ## 1.9.0 (unreleased)
 
 - Add eight GoTo3DView regressions for document-action roots and semantic

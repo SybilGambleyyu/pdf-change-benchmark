@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 from pypdf import PdfReader
-from pypdf.generic import ArrayObject, NameObject
+from pypdf.generic import ArrayObject, IndirectObject, NameObject
 
 from pdfcab.build import FIXTURE_SPECS, build_fixture_tree
 from pdfcab.errors import FixtureError
@@ -289,6 +289,134 @@ def test_goto_3d_view_pairs_are_semantic(tmp_path):
         assert candidate_action.raw_get(NameObject("/TA")) == candidate_targets[0]
         assert int(baseline.pages[0]["/Rotate"]) == 0
         assert int(candidate.pages[0]["/Rotate"]) == 90
+
+
+def test_embedded_goto_named_target_pairs_are_semantic(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+
+    def action(reader: PdfReader, *, action_chain: bool):
+        root_action = reader.root_object["/OpenAction"].get_object()
+        if not action_chain:
+            return root_action
+        assert str(root_action["/S"]) == "/JavaScript"
+        return root_action["/Next"].get_object()
+
+    def named_file_specifications(reader: PdfReader) -> dict[str, object]:
+        entries = reader.root_object["/Names"]["/EmbeddedFiles"]["/Names"]
+        assert len(entries) == 4
+        result: dict[str, object] = {}
+        for index in range(0, len(entries), 2):
+            file_specification = entries[index + 1]
+            if isinstance(file_specification, IndirectObject):
+                file_specification = file_specification.get_object()
+            result[str(entries[index])] = file_specification
+        return result
+
+    def selected_file_specification(reader: PdfReader, goto: object) -> object:
+        target = goto["/T"]
+        assert str(target["/R"]) == "/C"
+        return named_file_specifications(reader)[str(target["/N"])]
+
+    def stored_embedded_file_data(file_specification: object) -> bytes:
+        stream = file_specification["/EF"]["/F"]
+        if isinstance(stream, IndirectObject):
+            stream = stream.get_object()
+        return bytes(stream._data)
+
+    for fixture_id, action_chain in (
+        ("active.embedded_goto_named_target_rebound", False),
+        ("active.action_chain_embedded_goto_named_target_rebound", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/GoToE"
+        assert str(baseline_action["/D"]) == str(candidate_action["/D"])
+        assert str(baseline_action["/T"]["/N"]) == str(
+            candidate_action["/T"]["/N"]
+        )
+        baseline_file = selected_file_specification(baseline, baseline_action)
+        candidate_file = selected_file_specification(candidate, candidate_action)
+        assert str(baseline_file["/F"]) == str(candidate_file["/F"])
+        assert str(baseline_file["/Desc"]) == str(candidate_file["/Desc"])
+        assert stored_embedded_file_data(baseline_file) != stored_embedded_file_data(
+            candidate_file
+        )
+
+    for fixture_id, action_chain in (
+        (
+            "active.embedded_goto_selected_file_specification_metadata_rewritten",
+            False,
+        ),
+        (
+            "active.action_chain_embedded_goto_selected_file_specification_metadata_rewritten",
+            True,
+        ),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+        baseline_file = selected_file_specification(baseline, baseline_action)
+        candidate_file = selected_file_specification(candidate, candidate_action)
+
+        assert str(baseline_file["/F"]) == str(candidate_file["/F"])
+        assert str(baseline_file["/Desc"]) != str(candidate_file["/Desc"])
+
+    for fixture_id, action_chain in (
+        ("active.embedded_goto_unrelated_named_target_rewritten", False),
+        ("active.action_chain_embedded_goto_unrelated_named_target_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+        baseline_files = named_file_specifications(baseline)
+        candidate_files = named_file_specifications(candidate)
+
+        selected_name = str(baseline_action["/T"]["/N"])
+        assert selected_name == str(candidate_action["/T"]["/N"])
+        assert str(baseline_files[selected_name]["/F"]) == str(
+            candidate_files[selected_name]["/F"]
+        )
+        assert str(baseline_files["PDFCAB_UNRELATED_CHILD"]["/F"]) != str(
+            candidate_files["PDFCAB_UNRELATED_CHILD"]["/F"]
+        )
+
+    for fixture_id, action_chain in (
+        ("active.embedded_goto_root_file_specification_metadata_rewritten", False),
+        (
+            "active.action_chain_embedded_goto_root_file_specification_metadata_rewritten",
+            True,
+        ),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_file = action(baseline, action_chain=action_chain)["/F"]
+        candidate_file = action(candidate, action_chain=action_chain)["/F"]
+
+        assert str(baseline_file["/F"]) == str(candidate_file["/F"])
+        assert str(baseline_file["/Desc"]) != str(candidate_file["/Desc"])
+
+    for fixture_id, action_chain in (
+        ("active.embedded_goto_root_file_target_rewritten", False),
+        ("active.action_chain_embedded_goto_root_file_target_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_file = action(baseline, action_chain=action_chain)["/F"]
+        candidate_file = action(candidate, action_chain=action_chain)["/F"]
+
+        assert str(baseline_file["/F"]) != str(candidate_file["/F"])
+        assert str(baseline_file["/Desc"]) == str(candidate_file["/Desc"])
 
 
 def test_set_ocg_state_pairs_are_semantic(tmp_path):
