@@ -32,6 +32,7 @@ _KNOWN_CHANGE_KINDS: Final = frozenset(
         "signature_byte_range_coverage_changed",
         "signature_direct_value_inventory_changed",
         "signature_own_revision_coverage_inventory_changed",
+        "signature_own_revision_contents_coverage_inventory_changed",
         "signature_structure_inventory_changed",
         "stored_pdf_bytes_changed",
     }
@@ -51,6 +52,7 @@ _KNOWN_POLICY_RULE_IDS: Final = frozenset(
         "PFP011",
         "PFP012",
         "PFP013",
+        "PFP014",
     }
 )
 

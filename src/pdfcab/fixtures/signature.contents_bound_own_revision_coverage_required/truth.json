@@ -1,0 +1,13 @@
+{
+  "category": "signature_coverage",
+  "description": "An older semantic signature still reaches its own revision footer, but the candidate gap no longer exactly matches direct Contents.",
+  "expected_change_kinds": [
+    "signature_own_revision_contents_coverage_inventory_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP014"
+  ],
+  "id": "signature.contents_bound_own_revision_coverage_required",
+  "schema_version": 1
+}

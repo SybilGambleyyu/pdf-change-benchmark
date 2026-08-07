@@ -188,6 +188,18 @@ from an arbitrary earlier endpoint, without publishing an object reference,
 revision boundary, range, signature content, certificate, digest, or trust
 result.
 
+The historical Contents-bound control also starts each side with a field-root
+signature and appends one later incremental update, so neither ByteRange
+reaches the current physical file end. Both ranges still terminate at their
+own signing-revision footers. The baseline's two-pair excluded gap is exactly
+its direct hexadecimal `/Contents` token; the candidate widens the same gap by
+one byte before the token. Its truth requires only the distinct
+own-revision-Contents inventory event and PFP014. The current-file Contents
+aggregate stays zero on both sides, and the own-revision endpoint aggregate
+stays positive, so the pair isolates historical delimiter coverage without
+disclosing an object reference, revision boundary, range, signature content,
+certificate, digest, or trust result.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

@@ -1994,6 +1994,20 @@ FIXTURE_SPECS = (
         ("PFP013",),
     ),
     FixtureSpec(
+        "signature.contents_bound_own_revision_coverage_required",
+        "signature_coverage",
+        (
+            "An older semantic signature still reaches its own revision footer, "
+            "but the candidate gap no longer exactly matches direct Contents."
+        ),
+        "signature_contents_bound_own_revision_coverage_required",
+        (
+            "signature_own_revision_contents_coverage_inventory_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP014",),
+    ),
+    FixtureSpec(
         "signature.private_piece_info_lookalike_added",
         "signature_structure",
         (
@@ -3621,6 +3635,18 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             _write_semantic_signature_byte_range(
                 invalid,
                 revision_end_trim_bytes=2,
+            )
+            _increment(valid, baseline)
+            _increment(invalid, candidate)
+    elif mutation == "signature_contents_bound_own_revision_coverage_required":
+        with tempfile.TemporaryDirectory(prefix="pdfcab-signature-") as temporary:
+            temporary_path = Path(temporary)
+            valid = temporary_path / "valid.pdf"
+            invalid = temporary_path / "invalid.pdf"
+            _write_semantic_signature_byte_range(valid)
+            _write_semantic_signature_byte_range(
+                invalid,
+                contents_gap_prefix_bytes=1,
             )
             _increment(valid, baseline)
             _increment(invalid, candidate)

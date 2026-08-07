@@ -204,6 +204,54 @@ def test_signature_own_revision_coverage_pair_is_stale_but_distinguishable(
     assert candidate_endpoint not in footer_endpoints(candidate_path)
 
 
+def test_signature_contents_bound_own_revision_pair_is_stale_but_precise(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "signature.contents_bound_own_revision_coverage_required"
+
+    def signature_range(path):
+        reader = PdfReader(path, strict=True)
+        signature = reader.root_object["/AcroForm"]["/Fields"][0]["/V"]
+        return tuple(int(value) for value in signature["/ByteRange"])
+
+    def footer_endpoints(path):
+        source = path.read_bytes()
+        return {
+            match.end()
+            for match in re.finditer(
+                rb"startxref\s+\d+\s+%%EOF(?:\r\n|\r|\n)?",
+                source,
+            )
+        }
+
+    baseline_path = fixture / "baseline.pdf"
+    candidate_path = fixture / "candidate.pdf"
+    baseline_range = signature_range(baseline_path)
+    candidate_range = signature_range(candidate_path)
+    baseline_bytes = baseline_path.read_bytes()
+    candidate_bytes = candidate_path.read_bytes()
+    baseline_contents_key = baseline_bytes.rindex(b"/Contents ")
+    candidate_contents_key = candidate_bytes.rindex(b"/Contents ")
+    baseline_contents_start = baseline_bytes.index(b"<", baseline_contents_key)
+    candidate_contents_start = candidate_bytes.index(b"<", candidate_contents_key)
+    baseline_contents_end = baseline_bytes.index(b">", baseline_contents_start) + 1
+    candidate_contents_end = candidate_bytes.index(b">", candidate_contents_start) + 1
+    baseline_endpoint = sum(baseline_range[-2:])
+    candidate_endpoint = sum(candidate_range[-2:])
+
+    assert baseline_endpoint < baseline_path.stat().st_size
+    assert candidate_endpoint < candidate_path.stat().st_size
+    assert baseline_endpoint in footer_endpoints(baseline_path)
+    assert candidate_endpoint in footer_endpoints(candidate_path)
+    assert baseline_range[1:3] == (baseline_contents_start, baseline_contents_end)
+    assert candidate_range[1:3] == (
+        candidate_contents_start - 1,
+        candidate_contents_end,
+    )
+
+
 def test_private_signature_lookalike_pair_has_no_semantic_signature_owner(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

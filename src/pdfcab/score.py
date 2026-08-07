@@ -28,6 +28,7 @@ _RULE_NAMES: Final = {
     "PFP011": "require_contents_bound_current_signature_coverage",
     "PFP012": "require_direct_byte_range_signature_values",
     "PFP013": "require_signature_byte_range_own_revision_coverage",
+    "PFP014": "require_contents_bound_own_revision_signature_coverage",
 }
 _COMMAND_TIMEOUT_SECONDS: Final = 30
 

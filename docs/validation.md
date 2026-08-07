@@ -9,6 +9,33 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.22.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.22.0 fixture candidate rebuilt and verified all 159
+fixture pairs, passed 89 tests and Ruff, and scored the PDFFence 1.22.0 source
+candidate exactly through its process-bound command-line executable: 159 of
+159 pairs passed.
+
+The new semantic-signature control gives both sides a later incremental update,
+so neither ByteRange reaches its current physical file end. Both ranges still
+terminate at their own signing-revision footers. The baseline's excluded gap
+is exactly its direct hexadecimal `/Contents` token; the candidate's gap begins
+one byte earlier. Only the distinct historical Contents inventory event and
+PFP014 are expected. PFP009, PFP012, and PFP013 remain quiet; PFP010 and PFP011
+are deliberately current-file gates and are outside this historical contract.
+The held PDFFence 1.21.0 wheel reports stored-byte evidence alone for this
+pair, so it does not satisfy the new historical-Contents contract. The fixture
+does not claim signature validity or publish an object reference, revision
+boundary, offset, signature content, certificate, digest, or trust result.
+
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all eight PDFFence and PDFCAB artifacts passed Twine metadata
+checks. Fresh paired wheel installs on Python 3.12 and 3.13, plus a clean
+paired Python 3.12 source-archive install, passed `pip check`, fixture
+verification, and all 159 process-bound score cases. Dependency auditing found
+no known vulnerabilities; the local distributions were correctly skipped
+because they are not on PyPI.
+
 ## 1.21.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.21.0 fixture candidate rebuilt and verified all 158

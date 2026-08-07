@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.22.0 (2026-08-06)
+
+- Add a historical Contents-bound semantic-signature control: both ranges are
+  stale relative to later current file ends and still reach their own revision
+  footers, but the candidate's two-pair excluded gap is one byte wider than
+  direct `/Contents`. Its distinct generic event requires PFP014 without
+  duplicating PFP011 or PFP013.
+- Increase the deterministic fixture set from 158 to 159 pairs.
+
 ## 1.21.0 (2026-08-06)
 
 - Add an own-revision semantic-signature control: both ranges are stale with
