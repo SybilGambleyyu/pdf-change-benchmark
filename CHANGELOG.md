@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.16.0 (2026-08-06)
+
+- Add two private-inventory controls: one changes a PieceInfo action-shaped
+  dictionary's subtype, and one adds a private additional-action container and
+  action. Neither has a semantic action owner.
+- Require the subtype rewrite to report stored bytes alone and the addition to
+  report only reachability plus stored bytes. Both reject an active-content
+  inventory signal without exposing an action value or private path.
+- Increase the deterministic fixture set from 150 to 152 pairs.
+
 ## 1.15.0 (2026-08-06)
 
 - Add five passive action-key controls: four catalog PieceInfo private values

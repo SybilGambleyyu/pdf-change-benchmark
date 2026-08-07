@@ -138,6 +138,14 @@ active-content payload signal and PFP001 while keeping the public action
 inventory fixed. No truth record discloses a URI, private owner path, trigger,
 or fingerprint.
 
+The private-inventory controls test the corresponding public-count boundary.
+One rewrites a private action-shaped dictionary from one action subtype to
+another while keeping its object count fixed. The other adds a private `/AA`
+container and its action. The rewrite requires stored bytes alone; the addition
+requires reachability plus stored bytes. Neither has a semantic action owner,
+so neither may produce an active-content inventory change or PFP001. No truth
+record publishes an action subtype, owner path, action value, or fingerprint.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

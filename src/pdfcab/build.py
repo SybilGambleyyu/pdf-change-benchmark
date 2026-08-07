@@ -1426,6 +1426,31 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.passive_piece_info_action_inventory_rewritten",
+        "active_content",
+        (
+            "A private action-shaped dictionary changes its action subtype "
+            "without a semantic action path."
+        ),
+        "passive_piece_info_action_inventory_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_additional_action_inventory_added",
+        "active_content",
+        (
+            "A private action-shaped additional-action container is added "
+            "without a semantic action owner."
+        ),
+        "passive_piece_info_additional_action_inventory_added",
+        (
+            "reachable_object_count_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        (),
+    ),
+    FixtureSpec(
         "active.passive_piece_info_navigation_next_action_rewritten",
         "active_content",
         (
@@ -2025,6 +2050,36 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
                 variant="B",
                 passive_piece_info=True,
                 passive_piece_info_trigger=trigger,
+            ),
+            candidate,
+        )
+    elif mutation == "passive_piece_info_action_inventory_rewritten":
+        _write(
+            _passive_piece_info_inventory_writer(
+                location="action",
+                action_name="/URI",
+            ),
+            baseline,
+        )
+        _write(
+            _passive_piece_info_inventory_writer(
+                location="action",
+                action_name="/JavaScript",
+            ),
+            candidate,
+        )
+    elif mutation == "passive_piece_info_additional_action_inventory_added":
+        _write(
+            _passive_piece_info_inventory_writer(
+                location="additional",
+                action_name=None,
+            ),
+            baseline,
+        )
+        _write(
+            _passive_piece_info_inventory_writer(
+                location="additional",
+                action_name="/URI",
             ),
             candidate,
         )
@@ -3701,6 +3756,52 @@ def _catalog_direct_action_field_writer(
         )
     else:
         writer._root_object[NameObject("/OpenAction")] = action_reference
+    return writer
+
+
+def _passive_piece_info_inventory_writer(
+    *,
+    location: str,
+    action_name: str | None,
+) -> PdfWriter:
+    """Build private action-shaped data that must not alter active inventory."""
+
+    if location not in {"action", "additional"}:
+        raise FixtureError("private action inventory location is unsupported")
+    if action_name not in {None, "/JavaScript", "/URI"}:
+        raise FixtureError("private action inventory action is unsupported")
+    writer = _writer()
+    private = DictionaryObject()
+    if action_name is not None:
+        action = DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject(action_name),
+            }
+        )
+        if action_name == "/JavaScript":
+            action[NameObject("/JS")] = TextStringObject("noop")
+        else:
+            action[NameObject("/URI")] = TextStringObject(_URI)
+        action_reference = writer._add_object(action)
+        if location == "additional":
+            private[NameObject("/AA")] = DictionaryObject(
+                {NameObject("/O"): action_reference}
+            )
+        else:
+            private[NameObject("/Action")] = action_reference
+    writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
+        {
+            NameObject("/PDFCAB"): DictionaryObject(
+                {
+                    NameObject("/LastModified"): TextStringObject(
+                        "D:20260806000000Z"
+                    ),
+                    NameObject("/Private"): private,
+                }
+            )
+        }
+    )
     return writer
 
 

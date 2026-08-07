@@ -1684,6 +1684,50 @@ def test_piece_info_action_trigger_lookalike_pairs_stay_off_execution_paths(
         assert str(baseline_private["/Type"]) == "/NavNode"
 
 
+@pytest.mark.parametrize(
+    ("fixture_id", "location", "baseline_action", "candidate_action"),
+    (
+        (
+            "active.passive_piece_info_action_inventory_rewritten",
+            "action",
+            "/URI",
+            "/JavaScript",
+        ),
+        (
+            "active.passive_piece_info_additional_action_inventory_added",
+            "additional",
+            None,
+            "/URI",
+        ),
+    ),
+)
+def test_piece_info_action_inventory_pairs_stay_outside_semantic_roots(
+    tmp_path,
+    fixture_id,
+    location,
+    baseline_action,
+    candidate_action,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / fixture_id
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    assert "/OpenAction" not in baseline.root_object
+    assert "/OpenAction" not in candidate.root_object
+    baseline_private = baseline.root_object["/PieceInfo"]["/PDFCAB"]["/Private"]
+    candidate_private = candidate.root_object["/PieceInfo"]["/PDFCAB"]["/Private"]
+    if location == "action":
+        baseline_value = baseline_private["/Action"].get_object()
+        candidate_value = candidate_private["/Action"].get_object()
+        assert str(baseline_value["/S"]) == baseline_action
+    else:
+        assert "/AA" not in baseline_private
+        candidate_value = candidate_private["/AA"]["/O"].get_object()
+    assert str(candidate_value["/S"]) == candidate_action
+
+
 def test_link_archived_uri_action_pair_is_not_a_navigation_node_trigger(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)
