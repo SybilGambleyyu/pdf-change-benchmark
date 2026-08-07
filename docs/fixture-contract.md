@@ -127,6 +127,17 @@ because a dictionary happens to contain `/Type /Action` and `/S`. No truth
 record publishes a private application key, date, action value, stream bytes,
 or digest.
 
+The semantic-root controls extend that boundary to trigger-looking keys. Four
+catalog PieceInfo private values are placed beneath `/A`, `/AA`, `/NA`, or
+`/PA` and retain an action-shaped value; each requires only the stored-byte
+change. A real Link annotation's `/PA` archived Web Capture URI is also
+byte-only. The matching positive URI-action cases are reachable, respectively,
+through a page `/AA`, Link `/A`, AcroForm field `/AA`, outline-item `/A`, and
+page `/PresSteps` `/NavNode` `/NA` or `/PA`. They require the generic
+active-content payload signal and PFP001 while keeping the public action
+inventory fixed. No truth record discloses a URI, private owner path, trigger,
+or fingerprint.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

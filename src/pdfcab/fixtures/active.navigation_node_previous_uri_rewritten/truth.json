@@ -1,0 +1,13 @@
+{
+  "category": "active_content",
+  "description": "A NavNode previous URI action changes at a page PresSteps root.",
+  "expected_change_kinds": [
+    "active_content_payload_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP001"
+  ],
+  "id": "active.navigation_node_previous_uri_rewritten",
+  "schema_version": 1
+}

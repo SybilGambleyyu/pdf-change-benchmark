@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.15.0 (2026-08-06)
+
+- Add five passive action-key controls: four catalog PieceInfo private values
+  shaped like `/A`, `/AA`, `/NA`, or `/PA` triggers, plus a real Link
+  annotation's archived Web Capture `/PA` URI. Each changes stored bytes alone.
+- Add six positive URI-action roots through actual page additional-action,
+  Link, AcroForm field, outline, and presentation-step `/NavNode` paths. They
+  retain the public action inventory while requiring generic active-content
+  evidence and PFP001.
+- Increase the deterministic fixture set from 139 to 150 pairs. The new cases
+  distinguish a semantic document path from an action-looking key name without
+  exposing a URI, binding, payload, or private fingerprint.
+
 ## 1.14.0 (unreleased)
 
 - Add eleven standard-form catalog PieceInfo negatives whose private data is

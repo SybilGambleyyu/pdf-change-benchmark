@@ -79,6 +79,20 @@ _PASSIVE_PIECE_INFO_ACTIONS = {
     "passive_piece_info_transition_rewritten": "/Trans",
     "passive_piece_info_rich_media_command_rewritten": "/RichMediaExecute",
 }
+_PASSIVE_PIECE_INFO_ACTION_TRIGGERS = {
+    "passive_piece_info_direct_action_rewritten": "/A",
+    "passive_piece_info_additional_action_rewritten": "/AA",
+    "passive_piece_info_navigation_next_action_rewritten": "/NA",
+    "passive_piece_info_navigation_previous_action_rewritten": "/PA",
+}
+_SEMANTIC_URI_ACTION_ROOTS = {
+    "page_additional_uri_rewritten": "page_additional",
+    "link_direct_uri_rewritten": "link_direct",
+    "field_additional_uri_rewritten": "field_additional",
+    "outline_direct_uri_rewritten": "outline_direct",
+    "navigation_node_next_uri_rewritten": "navigation_next",
+    "navigation_node_previous_uri_rewritten": "navigation_previous",
+}
 
 
 @dataclass(frozen=True)
@@ -1390,6 +1404,127 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.passive_piece_info_direct_action_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data mimics a Link annotation direct-action "
+            "entry without a catalog-to-annotation path."
+        ),
+        "passive_piece_info_direct_action_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_additional_action_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data mimics an additional-action container "
+            "without a standard action owner."
+        ),
+        "passive_piece_info_additional_action_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_navigation_next_action_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data mimics a NavNode next action without a "
+            "page PresSteps path."
+        ),
+        "passive_piece_info_navigation_next_action_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_navigation_previous_action_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data mimics a NavNode previous action without "
+            "a page PresSteps path."
+        ),
+        "passive_piece_info_navigation_previous_action_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.link_archived_uri_action_rewritten",
+        "active_content",
+        (
+            "A Link PA archive URI changes, but PA is not a NavNode execution "
+            "trigger."
+        ),
+        "link_archived_uri_action_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.page_additional_uri_rewritten",
+        "active_content",
+        "A page-open additional-action URI changes at its page-tree root.",
+        "page_additional_uri_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.link_direct_uri_rewritten",
+        "active_content",
+        "A Link annotation direct URI action changes at its Annots root.",
+        "link_direct_uri_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.field_additional_uri_rewritten",
+        "active_content",
+        "A form-field additional-action URI changes at its AcroForm root.",
+        "field_additional_uri_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.outline_direct_uri_rewritten",
+        "active_content",
+        "An outline-item direct URI action changes at its outline-tree root.",
+        "outline_direct_uri_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.navigation_node_next_uri_rewritten",
+        "active_content",
+        "A NavNode next URI action changes at a page PresSteps root.",
+        "navigation_node_next_uri_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.navigation_node_previous_uri_rewritten",
+        "active_content",
+        "A NavNode previous URI action changes at a page PresSteps root.",
+        "navigation_node_previous_uri_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_trigger_rebound",
         "active_content",
         (
@@ -1873,6 +2008,33 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation in _PASSIVE_PIECE_INFO_ACTION_TRIGGERS:
+        trigger = _PASSIVE_PIECE_INFO_ACTION_TRIGGERS[mutation]
+        _write(
+            _catalog_direct_action_field_writer(
+                "/URI",
+                variant="A",
+                passive_piece_info=True,
+                passive_piece_info_trigger=trigger,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_direct_action_field_writer(
+                "/URI",
+                variant="B",
+                passive_piece_info=True,
+                passive_piece_info_trigger=trigger,
+            ),
+            candidate,
+        )
+    elif mutation in _SEMANTIC_URI_ACTION_ROOTS:
+        root = _SEMANTIC_URI_ACTION_ROOTS[mutation]
+        _write(_semantic_uri_action_root_writer(root=root, variant="A"), baseline)
+        _write(_semantic_uri_action_root_writer(root=root, variant="B"), candidate)
+    elif mutation == "link_archived_uri_action_rewritten":
+        _write(_link_archived_uri_action_writer(variant="A"), baseline)
+        _write(_link_archived_uri_action_writer(variant="B"), candidate)
     elif mutation == "javascript_added":
         _write(_writer(), baseline)
         _write(_writer(javascript=_MARKER_A), candidate)
@@ -3411,6 +3573,7 @@ def _catalog_direct_action_field_writer(
     *,
     variant: str,
     passive_piece_info: bool = False,
+    passive_piece_info_trigger: str | None = None,
 ) -> PdfWriter:
     """Build selected action data at a direct root or in passive PieceInfo."""
 
@@ -3500,6 +3663,30 @@ def _catalog_direct_action_field_writer(
         raise FixtureError("direct action field action is unsupported")
     action_reference = writer._add_object(action)
     if passive_piece_info:
+        private = DictionaryObject()
+        if passive_piece_info_trigger is None:
+            private[NameObject("/Action")] = action_reference
+        elif passive_piece_info_trigger == "/AA":
+            private[NameObject("/AA")] = DictionaryObject(
+                {NameObject("/O"): action_reference}
+            )
+        elif passive_piece_info_trigger == "/A":
+            private[NameObject("/Type")] = NameObject("/Annot")
+            private[NameObject("/Subtype")] = NameObject("/Link")
+            private[NameObject("/Rect")] = ArrayObject(
+                [
+                    NumberObject(0),
+                    NumberObject(0),
+                    NumberObject(10),
+                    NumberObject(10),
+                ]
+            )
+            private[NameObject("/A")] = action_reference
+        elif passive_piece_info_trigger in {"/NA", "/PA"}:
+            private[NameObject("/Type")] = NameObject("/NavNode")
+            private[NameObject(passive_piece_info_trigger)] = action_reference
+        else:
+            raise FixtureError("passive PieceInfo action trigger is unsupported")
         writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
             {
                 NameObject("/PDFCAB"): DictionaryObject(
@@ -3507,15 +3694,144 @@ def _catalog_direct_action_field_writer(
                         NameObject("/LastModified"): TextStringObject(
                             "D:20260806000000Z"
                         ),
-                        NameObject("/Private"): DictionaryObject(
-                            {NameObject("/Action"): action_reference}
-                        ),
+                        NameObject("/Private"): private,
                     }
                 )
             }
         )
     else:
         writer._root_object[NameObject("/OpenAction")] = action_reference
+    return writer
+
+
+def _link_archived_uri_action_writer(*, variant: str) -> PdfWriter:
+    """Build a Link PA URI archive, which is not a NavNode action trigger."""
+
+    if variant not in {"A", "B"}:
+        raise FixtureError("link PA URI action variant is unsupported")
+    writer = _writer()
+    action = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/URI"),
+                NameObject("/URI"): TextStringObject(
+                    f"{_URI}?archived={variant}"
+                ),
+            }
+        )
+    )
+    annotation = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Annot"),
+                NameObject("/Subtype"): NameObject("/Link"),
+                NameObject("/Rect"): ArrayObject(
+                    [
+                        NumberObject(0),
+                        NumberObject(0),
+                        NumberObject(10),
+                        NumberObject(10),
+                    ]
+                ),
+                NameObject("/PA"): action,
+            }
+        )
+    )
+    writer.pages[0][NameObject("/Annots")] = ArrayObject([annotation])
+    return writer
+
+
+def _semantic_uri_action_root_writer(*, root: str, variant: str) -> PdfWriter:
+    """Build one URI action at a standard non-catalog execution root."""
+
+    if root not in set(_SEMANTIC_URI_ACTION_ROOTS.values()):
+        raise FixtureError("semantic URI action root is unsupported")
+    if variant not in {"A", "B"}:
+        raise FixtureError("semantic URI action root variant is unsupported")
+    writer = _writer()
+    action = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/URI"),
+                NameObject("/URI"): TextStringObject(
+                    f"{_URI}?root={root}&variant={variant}"
+                ),
+            }
+        )
+    )
+    if root == "page_additional":
+        writer.pages[0][NameObject("/AA")] = DictionaryObject(
+            {NameObject("/O"): action}
+        )
+    elif root == "link_direct":
+        annotation = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Annot"),
+                    NameObject("/Subtype"): NameObject("/Link"),
+                    NameObject("/Rect"): ArrayObject(
+                        [
+                            NumberObject(0),
+                            NumberObject(0),
+                            NumberObject(10),
+                            NumberObject(10),
+                        ]
+                    ),
+                    NameObject("/A"): action,
+                }
+            )
+        )
+        writer.pages[0][NameObject("/Annots")] = ArrayObject([annotation])
+    elif root == "field_additional":
+        field = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/FT"): NameObject("/Tx"),
+                    NameObject("/T"): TextStringObject("PDFCAB_FIELD"),
+                    NameObject("/AA"): DictionaryObject(
+                        {NameObject("/K"): action}
+                    ),
+                }
+            )
+        )
+        writer._root_object[NameObject("/AcroForm")] = DictionaryObject(
+            {NameObject("/Fields"): ArrayObject([field])}
+        )
+    elif root == "outline_direct":
+        outlines = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Outlines"),
+                    NameObject("/Count"): NumberObject(1),
+                }
+            )
+        )
+        item = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Title"): TextStringObject("PDFCAB_OUTLINE"),
+                    NameObject("/Parent"): outlines,
+                    NameObject("/A"): action,
+                }
+            )
+        )
+        outlines.get_object()[NameObject("/First")] = item
+        outlines.get_object()[NameObject("/Last")] = item
+        writer._root_object[NameObject("/Outlines")] = outlines
+    else:
+        node = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/NavNode"),
+                    NameObject(
+                        "/NA" if root == "navigation_next" else "/PA"
+                    ): action,
+                }
+            )
+        )
+        writer.pages[0][NameObject("/PresSteps")] = node
     return writer
 
 

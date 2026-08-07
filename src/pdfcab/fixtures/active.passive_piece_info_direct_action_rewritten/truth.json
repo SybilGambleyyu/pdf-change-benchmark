@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "Private PieceInfo data mimics a Link annotation direct-action entry without a catalog-to-annotation path.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.passive_piece_info_direct_action_rewritten",
+  "schema_version": 1
+}

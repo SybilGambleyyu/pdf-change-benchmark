@@ -1639,6 +1639,134 @@ def test_piece_info_action_field_pairs_keep_behavior_passive(
 
 
 @pytest.mark.parametrize(
+    ("fixture_id", "trigger"),
+    (
+        ("active.passive_piece_info_direct_action_rewritten", "/A"),
+        ("active.passive_piece_info_additional_action_rewritten", "/AA"),
+        ("active.passive_piece_info_navigation_next_action_rewritten", "/NA"),
+        (
+            "active.passive_piece_info_navigation_previous_action_rewritten",
+            "/PA",
+        ),
+    ),
+)
+def test_piece_info_action_trigger_lookalike_pairs_stay_off_execution_paths(
+    tmp_path,
+    fixture_id,
+    trigger,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / fixture_id
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    assert "/OpenAction" not in baseline.root_object
+    assert "/OpenAction" not in candidate.root_object
+    baseline_private = baseline.root_object["/PieceInfo"]["/PDFCAB"]["/Private"]
+    candidate_private = candidate.root_object["/PieceInfo"]["/PDFCAB"]["/Private"]
+    if trigger == "/AA":
+        baseline_action = baseline_private["/AA"]["/O"].get_object()
+        candidate_action = candidate_private["/AA"]["/O"].get_object()
+    else:
+        baseline_action = baseline_private[trigger].get_object()
+        candidate_action = candidate_private[trigger].get_object()
+
+    assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/URI"
+    assert _direct_action_behavior_value(
+        baseline_action,
+        "/URI",
+    ) != _direct_action_behavior_value(candidate_action, "/URI")
+    if trigger == "/A":
+        assert str(baseline_private["/Type"]) == "/Annot"
+        assert str(baseline_private["/Subtype"]) == "/Link"
+    elif trigger in {"/NA", "/PA"}:
+        assert str(baseline_private["/Type"]) == "/NavNode"
+
+
+def test_link_archived_uri_action_pair_is_not_a_navigation_node_trigger(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "active.link_archived_uri_action_rewritten"
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_annotation = baseline.pages[0]["/Annots"][0].get_object()
+    candidate_annotation = candidate.pages[0]["/Annots"][0].get_object()
+    assert "/A" not in baseline_annotation
+    assert "/A" not in candidate_annotation
+    baseline_action = baseline_annotation["/PA"].get_object()
+    candidate_action = candidate_annotation["/PA"].get_object()
+
+    assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/URI"
+    assert str(baseline_action["/URI"]) != str(candidate_action["/URI"])
+
+
+@pytest.mark.parametrize(
+    ("fixture_id", "root"),
+    (
+        ("active.page_additional_uri_rewritten", "page_additional"),
+        ("active.link_direct_uri_rewritten", "link_direct"),
+        ("active.field_additional_uri_rewritten", "field_additional"),
+        ("active.outline_direct_uri_rewritten", "outline_direct"),
+        ("active.navigation_node_next_uri_rewritten", "navigation_next"),
+        (
+            "active.navigation_node_previous_uri_rewritten",
+            "navigation_previous",
+        ),
+    ),
+)
+def test_semantic_uri_action_root_pairs_use_standard_execution_paths(
+    tmp_path,
+    fixture_id,
+    root,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / fixture_id
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    assert "/OpenAction" not in baseline.root_object
+    assert "/OpenAction" not in candidate.root_object
+    if root == "page_additional":
+        baseline_action = baseline.pages[0]["/AA"]["/O"].get_object()
+        candidate_action = candidate.pages[0]["/AA"]["/O"].get_object()
+    elif root == "link_direct":
+        baseline_action = (
+            baseline.pages[0]["/Annots"][0].get_object()["/A"].get_object()
+        )
+        candidate_action = (
+            candidate.pages[0]["/Annots"][0].get_object()["/A"].get_object()
+        )
+    elif root == "field_additional":
+        baseline_action = baseline.root_object["/AcroForm"]["/Fields"][
+            0
+        ].get_object()["/AA"]["/K"].get_object()
+        candidate_action = candidate.root_object["/AcroForm"]["/Fields"][
+            0
+        ].get_object()["/AA"]["/K"].get_object()
+    elif root == "outline_direct":
+        baseline_action = baseline.root_object["/Outlines"]["/First"].get_object()[
+            "/A"
+        ].get_object()
+        candidate_action = candidate.root_object["/Outlines"]["/First"].get_object()[
+            "/A"
+        ].get_object()
+    else:
+        key = "/NA" if root == "navigation_next" else "/PA"
+        baseline_action = baseline.pages[0]["/PresSteps"].get_object()[
+            key
+        ].get_object()
+        candidate_action = candidate.pages[0]["/PresSteps"].get_object()[
+            key
+        ].get_object()
+
+    assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/URI"
+    assert str(baseline_action["/URI"]) != str(candidate_action["/URI"])
+
+
+@pytest.mark.parametrize(
     ("fixture_id", "action_type", "as_file_specification"),
     (
         ("active.launch_target_rewritten", "/Launch", False),

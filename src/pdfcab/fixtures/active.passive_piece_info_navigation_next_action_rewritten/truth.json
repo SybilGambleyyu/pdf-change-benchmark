@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "Private PieceInfo data mimics a NavNode next action without a page PresSteps path.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.passive_piece_info_navigation_next_action_rewritten",
+  "schema_version": 1
+}
