@@ -27,6 +27,20 @@ semantic-chain target rebind, while falsely flagging fixed semantic-chain
 target metadata. This isolates positional target binding from recursive
 annotation or page hashing.
 
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed Twine metadata checks. Fresh wheel installs
+passed pip check, fixture verification, and the complete 91-pair score on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13; a clean Python
+3.12 source-archive install passed the same checks. Installed PDFFence policy
+reports for a root target rebind and semantic-chain view rewrite remained
+generic across JSON, Markdown, and SARIF, reporting only PFP001 and the
+expected generic change kind; no inert marker, GoTo3DView token, target
+identity, page or annotation position, annotation metadata, page state,
+selected view, or private signature appeared. Dependency auditing found no
+known vulnerabilities after the disposable validation environment's bootstrap
+installer was upgraded; the unpublished local distributions were correctly
+skipped because they are not on PyPI.
+
 ## 1.8.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.8.0 fixture candidate rebuilt and verified all 83 fixture
