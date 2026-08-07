@@ -58,7 +58,14 @@ structure-destination, direct-navigation, and action-chain regressions.
 
 ## Install
 
-    python -m pip install pdf-change-benchmark
+PDFCAB is distributed through [GitHub Releases](https://github.com/SybilGambleyyu/pdf-change-benchmark/releases).
+Install the current tagged wheel directly:
+
+    python -m pip install https://github.com/SybilGambleyyu/pdf-change-benchmark/releases/download/v1.24.1/pdf_change_benchmark-1.24.1-py3-none-any.whl
+
+Each release includes a source archive and SHA-256 checksum manifest. A PyPI
+distribution is not currently published, so `pip install pdf-change-benchmark`
+is not a supported install command.
 
 ## Use
 

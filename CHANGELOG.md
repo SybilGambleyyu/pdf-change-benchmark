@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.24.1 (2026-08-06)
+
+- Correct the public installation path: use the versioned, checksummed GitHub
+  Release wheel while no PyPI distribution is published. The former bare
+  `pip install pdf-change-benchmark` instruction did not resolve to a public
+  package.
+
 ## 1.24.0 (2026-08-06)
 
 - Add an unsigned terminal-footer control whose candidate has a confirmed
