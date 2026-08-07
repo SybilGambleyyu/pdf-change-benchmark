@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.12.0 (unreleased)
+
+- Add four GoToE hierarchy-scope regressions for document-action roots and
+  semantic action-chain members. They keep action fields fixed while rewriting
+  a source EmbeddedFiles mapping for an external-root child or nested child;
+  each requires stored_pdf_bytes_changed alone.
+- The cases prevent a compatibility adapter from resolving every /T /R /C /N
+  target through the source document's catalog. A same-root top-level mapping
+  remains covered by the existing positive regressions, while other-document
+  mappings must not generate a false active-content finding.
+
 ## 1.11.0 (unreleased)
 
 - Add twelve GoToE FileAttachment-target regressions for document-action roots

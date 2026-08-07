@@ -20,17 +20,16 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.11 contains 113 fixture pairs spanning active content, embedded
+Version 1.12 contains 117 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure, metadata, encryption, and revision-chain evidence. It
-adds twelve GoToE FileAttachment-target semantics pairs for document-action
-roots and semantic action-chain members. Positives hold /P and /A fixed while
-rebinding the selected attachment through all numeric and named selector forms.
-The paired negatives change only selected FileSpec or annotation metadata and
-require only a stored-byte change. The release retains the catalog-named and
-direct GoToE cases along with GoTo3DView, SetOCGState, PDF 2.0 GoToDp,
-remote-GoTo, local structure-destination, direct-navigation, and action-chain
-regressions.
+adds four GoToE hierarchy-scope negatives for document-action roots and
+semantic action-chain members. They rewrite a source EmbeddedFiles mapping
+that belongs to either an external root or an already-selected nested child and
+require only a stored-byte change. The release retains the same-root
+catalog-named and FileAttachment GoToE cases along with GoTo3DView,
+SetOCGState, PDF 2.0 GoToDp, remote-GoTo, local structure-destination,
+direct-navigation, and action-chain regressions.
 
 ## Install
 

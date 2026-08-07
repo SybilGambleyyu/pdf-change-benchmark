@@ -62,6 +62,15 @@ the corresponding generic active-content signal and PFP001; negatives require
 only the stored-byte change. No truth record publishes a selector, page,
 annotation, file target, stream value, description, or private fingerprint.
 
+The GoToE hierarchy-scope fixtures keep every action field fixed while
+rewriting a source catalog EmbeddedFiles mapping that cannot define the target:
+either the action has a fixed external-root FileSpec or the rewritten name is
+inside a nested Target beneath an already-selected child. Both document-action
+and semantic-chain pairs require only the stored-byte change. The original
+same-root top-level named-child fixtures remain positive controls. No truth
+record publishes a target hierarchy, name, file target, stream value, or
+private fingerprint.
+
 The GoTo3DView-to-GoToDp fixture keeps a page-attached 3D annotation and a
 catalog document-part hierarchy on both sides. The baseline action references
 the 3D annotation; the candidate action references the document part. It tests

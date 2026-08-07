@@ -418,6 +418,50 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.embedded_goto_external_root_named_target_rewritten",
+        "active_content",
+        (
+            "A source EmbeddedFiles mapping changes while an embedded GoTo "
+            "child target belongs to a fixed external root document."
+        ),
+        "embedded_goto_external_root_named_target_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_external_root_named_target_rewritten",
+        "active_content",
+        (
+            "A source EmbeddedFiles mapping changes while an embedded GoTo "
+            "successor child target belongs to a fixed external root document."
+        ),
+        "action_chain_embedded_goto_external_root_named_target_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_nested_named_target_rewritten",
+        "active_content",
+        (
+            "A source EmbeddedFiles mapping changes for an embedded GoTo "
+            "nested child that belongs to an already-selected child document."
+        ),
+        "embedded_goto_nested_named_target_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_nested_named_target_rewritten",
+        "active_content",
+        (
+            "A source EmbeddedFiles mapping changes for an embedded GoTo "
+            "successor's nested child in an already-selected child document."
+        ),
+        "action_chain_embedded_goto_nested_named_target_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.goto_root_named_destination_rebound",
         "active_content",
         (
@@ -1912,6 +1956,70 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
         _write(
             _catalog_embedded_goto_file_attachment_target_writer(
                 page_zero_first_annotation_metadata=_MARKER_B,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_external_root_named_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=0,
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=1,
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_embedded_goto_external_root_named_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=0,
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=1,
+                root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_A,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_nested_named_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=0,
+                nested_target=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=1,
+                nested_target=True,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_embedded_goto_nested_named_target_rewritten":
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=0,
+                nested_target=True,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_named_target_writer(
+                target=1,
+                nested_target=True,
                 action_chain=True,
             ),
             candidate,
@@ -3994,6 +4102,7 @@ def _catalog_embedded_goto_named_target_writer(
     second_file_metadata: str = _MARKER_A,
     root_file_name: str | None = None,
     root_file_metadata: str = _MARKER_A,
+    nested_target: bool = False,
     action_chain: bool = False,
 ) -> PdfWriter:
     """Build a GoToE action with a selected catalog EmbeddedFiles child."""
@@ -4037,35 +4146,55 @@ def _catalog_embedded_goto_named_target_writer(
             b"PDFCAB_NAMED_EMBEDDED_STREAM_B",
         ),
     )
+    name_tree_entries: list[object]
+    if nested_target:
+        name_tree_entries = [
+            ByteStringObject(b"PDFCAB_EMBEDDED_PARENT"),
+            file_specifications[0],
+            ByteStringObject(b"PDFCAB_EMBEDDED_NESTED_CHILD"),
+            file_specifications[target],
+            ByteStringObject(b"PDFCAB_UNRELATED_CHILD"),
+            file_specifications[1 - target],
+        ]
+    else:
+        name_tree_entries = [
+            ByteStringObject(b"PDFCAB_EMBEDDED_CHILD"),
+            file_specifications[target],
+            ByteStringObject(b"PDFCAB_UNRELATED_CHILD"),
+            file_specifications[1 - target],
+        ]
     writer._root_object[NameObject("/Names")] = DictionaryObject(
         {
             NameObject("/EmbeddedFiles"): DictionaryObject(
-                {
-                    NameObject("/Names"): ArrayObject(
-                        [
-                            ByteStringObject(b"PDFCAB_EMBEDDED_CHILD"),
-                            file_specifications[target],
-                            ByteStringObject(b"PDFCAB_UNRELATED_CHILD"),
-                            file_specifications[1 - target],
-                        ]
-                    )
-                }
+                {NameObject("/Names"): ArrayObject(name_tree_entries)}
             )
         }
     )
+    target_dictionary = DictionaryObject(
+        {
+            NameObject("/R"): NameObject("/C"),
+            NameObject("/N"): ByteStringObject(
+                b"PDFCAB_EMBEDDED_PARENT"
+                if nested_target
+                else b"PDFCAB_EMBEDDED_CHILD"
+            ),
+        }
+    )
+    if nested_target:
+        target_dictionary[NameObject("/T")] = DictionaryObject(
+            {
+                NameObject("/R"): NameObject("/C"),
+                NameObject("/N"): ByteStringObject(
+                    b"PDFCAB_EMBEDDED_NESTED_CHILD"
+                ),
+            }
+        )
     action = DictionaryObject(
         {
             NameObject("/Type"): NameObject("/Action"),
             NameObject("/S"): NameObject("/GoToE"),
             NameObject("/D"): ByteStringObject(b"PDFCAB_EMBEDDED_DESTINATION"),
-            NameObject("/T"): DictionaryObject(
-                {
-                    NameObject("/R"): NameObject("/C"),
-                    NameObject("/N"): ByteStringObject(
-                        b"PDFCAB_EMBEDDED_CHILD"
-                    ),
-                }
-            ),
+            NameObject("/T"): target_dictionary,
         }
     )
     if root_file_name is not None:

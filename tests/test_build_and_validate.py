@@ -576,6 +576,86 @@ def test_embedded_goto_file_attachment_target_pairs_are_semantic(tmp_path):
         ) == stored_embedded_file_data(candidate_annotation)
 
 
+def test_embedded_goto_other_document_name_tree_pairs_are_semantic(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+
+    def action(reader: PdfReader, *, action_chain: bool):
+        root_action = reader.root_object["/OpenAction"].get_object()
+        if not action_chain:
+            return root_action
+        assert str(root_action["/S"]) == "/JavaScript"
+        return root_action["/Next"].get_object()
+
+    def named_file_specifications(reader: PdfReader) -> dict[str, object]:
+        entries = reader.root_object["/Names"]["/EmbeddedFiles"]["/Names"]
+        result: dict[str, object] = {}
+        for index in range(0, len(entries), 2):
+            file_specification = entries[index + 1]
+            if isinstance(file_specification, IndirectObject):
+                file_specification = file_specification.get_object()
+            result[str(entries[index])] = file_specification
+        return result
+
+    def stored_embedded_file_data(file_specification: object) -> bytes:
+        stream = file_specification["/EF"]["/F"]
+        if isinstance(stream, IndirectObject):
+            stream = stream.get_object()
+        return bytes(stream._data)
+
+    for fixture_id, action_chain, nested in (
+        ("active.embedded_goto_external_root_named_target_rewritten", False, False),
+        (
+            "active.action_chain_embedded_goto_external_root_named_target_rewritten",
+            True,
+            False,
+        ),
+        ("active.embedded_goto_nested_named_target_rewritten", False, True),
+        (
+            "active.action_chain_embedded_goto_nested_named_target_rewritten",
+            True,
+            True,
+        ),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+        baseline_target = baseline_action["/T"]
+        candidate_target = candidate_action["/T"]
+
+        assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/GoToE"
+        assert str(baseline_action["/D"]) == str(candidate_action["/D"])
+        assert str(baseline_target["/R"]) == str(candidate_target["/R"]) == "/C"
+        assert str(baseline_target["/N"]) == str(candidate_target["/N"])
+
+        baseline_files = named_file_specifications(baseline)
+        candidate_files = named_file_specifications(candidate)
+        if nested:
+            assert str(baseline_target["/N"]) == "PDFCAB_EMBEDDED_PARENT"
+            assert str(candidate_target["/N"]) == "PDFCAB_EMBEDDED_PARENT"
+            assert str(baseline_target["/T"]["/N"]) == str(
+                candidate_target["/T"]["/N"]
+            )
+            assert stored_embedded_file_data(
+                baseline_files["PDFCAB_EMBEDDED_PARENT"]
+            ) == stored_embedded_file_data(
+                candidate_files["PDFCAB_EMBEDDED_PARENT"]
+            )
+            changed_name = "PDFCAB_EMBEDDED_NESTED_CHILD"
+        else:
+            assert "/F" in baseline_action
+            assert "/F" in candidate_action
+            assert str(baseline_action["/F"]["/F"]) == str(
+                candidate_action["/F"]["/F"]
+            )
+            changed_name = str(baseline_target["/N"])
+        assert stored_embedded_file_data(
+            baseline_files[changed_name]
+        ) != stored_embedded_file_data(candidate_files[changed_name])
+
+
 def test_set_ocg_state_pairs_are_semantic(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)
