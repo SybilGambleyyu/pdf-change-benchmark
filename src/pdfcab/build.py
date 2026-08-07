@@ -2003,6 +2003,7 @@ FIXTURE_SPECS = (
         ),
         "signature_terminal_footer_required",
         (
+            "revision_terminal_footer_changed",
             "signature_own_revision_coverage_inventory_changed",
             "stored_pdf_bytes_changed",
         ),
@@ -2055,6 +2056,14 @@ FIXTURE_SPECS = (
         "incremental_update_added",
         ("revision_chain_changed", "stored_pdf_bytes_changed"),
         ("PFP006",),
+    ),
+    FixtureSpec(
+        "review.terminal_footer_required",
+        "revision_chain",
+        "Unlinked bytes are appended after the final PDF revision footer.",
+        "terminal_footer_required",
+        ("revision_terminal_footer_changed", "stored_pdf_bytes_changed"),
+        ("PFP015",),
     ),
     FixtureSpec(
         "review.encryption_enabled",
@@ -3680,6 +3689,9 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "incremental_update_added":
         _write(_writer(), baseline)
         _increment(baseline, candidate)
+    elif mutation == "terminal_footer_required":
+        _write(_writer(), baseline)
+        candidate.write_bytes(baseline.read_bytes() + b"UNLINKED_TRAILING_BYTES")
     elif mutation == "encryption_enabled":
         _write(_writer(), baseline)
         _write(_writer(encrypted=True), candidate)

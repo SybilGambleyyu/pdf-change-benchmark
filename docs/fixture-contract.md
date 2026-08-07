@@ -205,10 +205,19 @@ signature on both sides. The candidate then appends inert unlinked bytes after
 the final PDF footer; it does not add objects, a cross-reference section, or a
 trailer. Both stored ByteRange endpoints still reach the original signing
 revision footer, and neither reaches the current physical file end. Its truth
-requires the existing own-revision event and PFP013, proving that a permissive
-parser's acceptance of a tail does not count as a valid later revision. No
-truth record publishes a tail, object reference, revision boundary, range,
-signature content, certificate, digest, or trust result.
+requires the general terminal-footer event and the existing own-revision event,
+with PFP013 as its focused policy contract. It proves that a permissive parser's
+acceptance of a tail does not count as a valid later revision. No truth record
+publishes a tail, object reference, revision boundary, range, signature
+content, certificate, digest, or trust result.
+
+The unsigned terminal-footer control begins with a normal one-revision PDF and
+appends inert unlinked bytes only to its candidate. Both public revision counts
+remain confirmed at one, so the pair isolates terminal-footer status from
+PFP006's single-revision condition. Its truth requires only the generic
+terminal-footer event, stored-byte evidence, and PFP015. It does not disclose
+the tail, a footer location, an object reference, an offset, a revision
+boundary, or a hash.
 
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and

@@ -9,6 +9,35 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.24.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.24.0 fixture candidate rebuilt and verified all 161
+fixture pairs, passed 91 tests and Ruff, and scored the PDFFence 1.24.0 source
+candidate exactly through its process-bound command-line executable: 161 of
+161 pairs passed.
+
+The new unsigned terminal-footer control starts with a structurally confirmed
+single-revision PDF. Its candidate appends unlinked raw bytes after the final
+PDF footer without adding an object, cross-reference section, or trailer. Both
+revision counts remain one, so PFP006 is deliberately outside the contract;
+the expected generic terminal-footer event and PFP015 isolate the new
+fail-closed structural condition. The older semantic-signature tail control
+now expects that same general event in addition to its established own-revision
+coverage event, while retaining PFP013 as its focused policy expectation. The
+held PDFFence 1.23.0 wheel reports stored-byte evidence alone on the unsigned
+control, so it does not satisfy the new contract. Neither fixture claims PDF
+conformance or signature validity, or publishes a tail, offset, footer
+location, object reference, revision boundary, range, certificate, digest, or
+trust result.
+
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four paired PDFFence and PDFCAB artifacts passed Twine metadata
+checks. Fresh paired wheel installs on Python 3.12 and 3.13, plus a clean paired
+Python 3.12 source-archive install, passed `pip check`, fixture verification,
+and all 161 process-bound score cases. Dependency auditing found no known
+vulnerabilities; the local distributions were correctly skipped because they
+are not on PyPI.
+
 ## 1.23.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.23.0 fixture candidate rebuilt and verified all 160

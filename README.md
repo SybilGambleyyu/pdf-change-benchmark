@@ -20,10 +20,13 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.23 contains 160 fixture pairs spanning active content, embedded
+Version 1.24 contains 161 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure and ByteRange boundaries, metadata, encryption, and
-revision-chain evidence. It adds a field-root signature range that reaches the
+revision-chain evidence. It adds an unsigned terminal-footer control whose
+candidate appends unlinked bytes after an otherwise confirmed single revision;
+the expected result is the generic terminal-footer event and PFP015, while
+PFP006 remains independent. It also adds a field-root signature range that reaches the
 original file end before a valid incremental update leaves it behind; the
 expected result is a generic coverage event and PFP009, not a claim of
 cryptographic validity. It also adds a pair whose two sides both retain an
@@ -43,7 +46,8 @@ candidate's excluded gap by one byte before its direct `/Contents` token; it
 requires PFP014 without duplicating the current-file PFP011 control. It also
 includes a terminal-footer control: both historical signature ranges still
 reach their original revision footer, but the candidate appends unlinked bytes
-after the final PDF footer, requiring PFP013. It retains the two
+after the final PDF footer, requiring the general terminal-footer event and
+PFP013 under its focused signature policy. It retains the two
 action-inventory controls, five action-key semantic-root controls, six real
 standard-path URI-action cases, direct document-action behavior rewrites for
 `/Thread`, `/URI`, `/Sound`, `/Movie`, `/Hide`, `/Named`, `/SubmitForm`,

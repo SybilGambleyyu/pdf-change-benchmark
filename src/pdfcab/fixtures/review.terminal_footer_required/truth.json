@@ -1,0 +1,13 @@
+{
+  "category": "revision_chain",
+  "description": "Unlinked bytes are appended after the final PDF revision footer.",
+  "expected_change_kinds": [
+    "revision_terminal_footer_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP015"
+  ],
+  "id": "review.terminal_footer_required",
+  "schema_version": 1
+}

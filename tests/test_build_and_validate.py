@@ -240,6 +240,29 @@ def test_signature_terminal_footer_pair_rejects_unlinked_trailing_bytes(
     assert candidate_path.read_bytes().endswith(b"UNLINKED_TRAILING_BYTES")
 
 
+def test_terminal_revision_footer_pair_rejects_unlinked_trailing_bytes(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "review.terminal_footer_required"
+
+    def footer_endpoints(path):
+        return {
+            match.end()
+            for match in re.finditer(
+                rb"startxref\s+\d+\s+%%EOF(?:\r\n|\r|\n)?",
+                path.read_bytes(),
+            )
+        }
+
+    baseline_path = fixture / "baseline.pdf"
+    candidate_path = fixture / "candidate.pdf"
+    assert PdfReader(baseline_path, strict=True).pages
+    assert PdfReader(candidate_path, strict=True).pages
+    assert max(footer_endpoints(baseline_path)) == baseline_path.stat().st_size
+    assert max(footer_endpoints(candidate_path)) < candidate_path.stat().st_size
+    assert candidate_path.read_bytes().endswith(b"UNLINKED_TRAILING_BYTES")
+
+
 def test_signature_contents_bound_own_revision_pair_is_stale_but_precise(
     tmp_path,
 ):

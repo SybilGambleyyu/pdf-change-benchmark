@@ -2,6 +2,7 @@
   "category": "signature_coverage",
   "description": "An older semantic signature still reaches its own revision footer, but the candidate appends unlinked bytes after the final PDF footer.",
   "expected_change_kinds": [
+    "revision_terminal_footer_changed",
     "signature_own_revision_coverage_inventory_changed",
     "stored_pdf_bytes_changed"
   ],

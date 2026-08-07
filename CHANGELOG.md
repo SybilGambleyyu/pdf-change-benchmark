@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.24.0 (2026-08-06)
+
+- Add an unsigned terminal-footer control whose candidate has a confirmed
+  single revision plus unlinked trailing bytes. It requires the generic
+  `revision_terminal_footer_changed` event and PFP015 while leaving PFP006
+  independent.
+- Update the signature terminal-footer control to expect that same general
+  event alongside its established own-revision coverage event and focused
+  PFP013 policy contract.
+- Increase the deterministic fixture set from 160 to 161 pairs.
+
 ## 1.23.0 (2026-08-06)
 
 - Add a terminal-footer semantic-signature control: both historical ranges
