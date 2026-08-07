@@ -45,6 +45,18 @@ the 3D annotation; the candidate action references the document part. It tests
 that an inventory does not collapse those two standard action types while
 keeping their surrounding targets reachable and unchanged.
 
+The GoTo3DView target-binding fixtures use two page-attached 3D annotations.
+The document-open and semantic action-chain positives either select the other
+annotation or rewrite /V while retaining public action inventory. Target-rebind
+pairs deliberately omit the annotation's optional /P page reference and make
+the two target annotations otherwise indistinguishable, so an adapter must
+prove target membership through the catalog page tree and the page's Annots
+array. The paired negatives keep the selection fixed while changing annotation
+metadata or page Rotate state. Positives require the appropriate generic
+active-content signal and PFP001; negatives require only the stored-byte
+change. No truth record publishes a target identity, page or annotation
+position, annotation contents, selected view, or private fingerprint.
+
 The GoToDp target-binding fixtures use a catalog DPartRoot, its DPartRootNode,
 and nested DParts arrays containing two leaf document parts. The document-open
 and semantic action-chain rebind pairs choose different leaves while retaining

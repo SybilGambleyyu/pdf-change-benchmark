@@ -9,6 +9,24 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.9.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.9.0 fixture candidate rebuilt and verified all 91 fixture
+pairs with pypdf 6.15.0. Its 44 tests and Ruff checks passed. It scored the
+PDFFence 1.9.0 source candidate through its process-bound command-line
+executable: 91 of 91 pairs passed.
+
+The eight GoTo3DView cases hold their document-action root or semantic chain
+position and public action inventory fixed. Positives rebind a page-attached 3D
+annotation or rewrite /V; the target-rebind pairs omit the annotation's
+optional /P page reference and make both target annotations otherwise
+indistinguishable. Fixed annotation metadata and fixed target-page rotation are
+stored-byte-only negatives. The held PDFFence 1.8.0 source candidate scores 87
+of 91: it misses both root target/view rewrites and the indistinguishable
+semantic-chain target rebind, while falsely flagging fixed semantic-chain
+target metadata. This isolates positional target binding from recursive
+annotation or page hashing.
+
 ## 1.8.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.8.0 fixture candidate rebuilt and verified all 83 fixture

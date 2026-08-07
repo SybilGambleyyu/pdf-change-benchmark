@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.9.0 (unreleased)
+
+- Add eight GoTo3DView regressions for document-action roots and semantic
+  action-chain members. Rebinding a page-attached 3D target or rewriting the
+  selected view requires the corresponding generic active-content signal and
+  PFP001 while public inventory remains fixed.
+- Deliberately omit the optional annotation /P page reference in each target
+  rebind pair, and keep the two target annotations otherwise indistinguishable.
+  Fixed target metadata and target-page rotation remain stored-byte-only
+  negatives, preventing broad recursive target hashes from passing the suite.
+
 ## 1.8.0 (unreleased)
 
 - Add ten SetOCGState regressions for document-action roots and semantic

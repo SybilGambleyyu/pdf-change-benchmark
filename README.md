@@ -20,25 +20,18 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.8 contains 83 fixture pairs spanning active content, embedded
+Version 1.9 contains 91 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure, metadata, encryption, and revision-chain evidence. It
-adds SetOCGState coverage for a document-action root and semantic action-chain
-member. The positives rebind a selected catalog OCG, rewrite an ON/OFF state
-operation, or change PreserveRB while retaining the public action inventory.
-The paired negatives change only OCG Name or Usage metadata, or make the
-specified PreserveRB=true default explicit; they require only a stored-byte
-change. Together they distinguish the selected group and state semantics from
-broad recursive target hashes and default-shape noise. The release retains PDF
-2.0 GoToDp coverage for a document-action root and semantic action-chain
-member. The rebind cases retain their public action inventory while moving only
-the selected DPart-tree member; fixed DPart metadata and target-page-state
-negatives require only a stored-byte change. It also retains PDF 2.0
-remote-GoTo coverage for /SD precedence at a document-action root and semantic
-action-chain member, plus PDF 2.0 local structure-destination coverage,
-direct-navigation regressions, reordered JavaScript action successors,
-action-subtype order changes, and same-subtype GoTo successors that exchange
-distinct real-page destinations.
+adds GoTo3DView coverage for a document-action root and semantic action-chain
+member. The positives rebind a page-attached 3D annotation or rewrite its
+selected view while retaining public action inventory. The target-rebind cases
+deliberately omit the annotation's optional /P page reference and make both
+target objects otherwise indistinguishable; adapters must bind membership in
+the page tree and Annots array rather than recurse into annotation contents.
+The paired metadata and page-rotation negatives require only a stored-byte
+change. The release retains SetOCGState, PDF 2.0 GoToDp, remote-GoTo, local
+structure-destination, direct-navigation, and action-chain regressions.
 
 ## Install
 

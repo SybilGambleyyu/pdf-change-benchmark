@@ -1,6 +1,6 @@
 """PDF Change Assurance Benchmark."""
 
-__version__ = "1.8.0"
+__version__ = "1.9.0"
 
 from pdfcab.score import score_pdffence
 from pdfcab.validate import verify_fixture_tree
