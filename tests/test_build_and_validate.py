@@ -138,6 +138,35 @@ def test_signature_contents_bound_coverage_pair_has_one_wider_current_gap(tmp_pa
     )
 
 
+def test_signature_direct_value_pair_keeps_coverage_and_indirects_one_value(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "signature.direct_byte_range_values_required"
+
+    baseline_path = fixture / "baseline.pdf"
+    candidate_path = fixture / "candidate.pdf"
+    baseline = PdfReader(baseline_path, strict=True)
+    candidate = PdfReader(candidate_path, strict=True)
+    baseline_signature = baseline.root_object["/AcroForm"]["/Fields"][0]["/V"]
+    candidate_signature = candidate.root_object["/AcroForm"]["/Fields"][0]["/V"]
+
+    assert not isinstance(baseline_signature.raw_get("/Reason"), IndirectObject)
+    assert isinstance(candidate_signature.raw_get("/Reason"), IndirectObject)
+    for path, signature in (
+        (baseline_path, baseline_signature),
+        (candidate_path, candidate_signature),
+    ):
+        byte_range = tuple(int(value) for value in signature["/ByteRange"])
+        document = path.read_bytes()
+        contents_key = document.rindex(b"/Contents ")
+        contents_start = document.index(b"<", contents_key)
+        contents_end = document.index(b">", contents_start) + 1
+
+        assert byte_range[0] == 0
+        assert byte_range[-2] + byte_range[-1] == path.stat().st_size
+        assert byte_range[1:3] == (contents_start, contents_end)
+
+
 def test_private_signature_lookalike_pair_has_no_semantic_signature_owner(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

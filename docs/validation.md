@@ -9,6 +9,25 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.20.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.20.0 fixture candidate rebuilt and verified all 157
+fixture pairs, passed 87 tests and Ruff, and scored the PDFFence 1.20.0 source
+candidate exactly through its process-bound command-line executable: 157 of 157
+pairs passed. The scorer ran in deterministic shards of 32, 32, 31, 31, and 31
+pairs because the execution environment bounds individual commands; each shard
+was exact.
+
+The new semantic signature control retains a current, well-formed two-pair
+ByteRange whose excluded gap exactly matches direct `/Contents` on both sides.
+The candidate alone makes one top-level signature-dictionary value indirect,
+while the same target remains independently catalog-reachable. Only the
+generic direct-value event and PFP012 are expected; PFP009 through PFP011 stay
+quiet. The fixture does not claim signature validity or publish an object
+reference, value, offset, signature content, certificate, digest, or trust
+result. The held PDFFence 1.19.0 source reports stored-byte evidence alone for
+this pair, so it does not satisfy the new direct-value contract.
+
 ## 1.19.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.19.0 fixture candidate rebuilt and verified all 156

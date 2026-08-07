@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.20.0 (2026-08-06)
+
+- Add a semantic-signature direct-value control whose current ByteRange and
+  exact direct `/Contents` boundary remain intact while one top-level signature
+  value becomes indirect. Its generic direct-value change requires PFP012;
+  PFP009 through PFP011 remain quiet.
+- Increase the deterministic fixture set from 156 to 157 pairs.
+
 ## 1.19.0 (2026-08-06)
 
 - Add a semantic signature control where both ByteRanges still reach the

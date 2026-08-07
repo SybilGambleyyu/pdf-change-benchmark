@@ -1966,6 +1966,20 @@ FIXTURE_SPECS = (
         ("PFP011",),
     ),
     FixtureSpec(
+        "signature.direct_byte_range_values_required",
+        "signature_structure",
+        (
+            "A semantic signature ByteRange retains its current exact Contents "
+            "boundary but gains an indirect top-level signature value."
+        ),
+        "signature_direct_byte_range_values_required",
+        (
+            "signature_direct_value_inventory_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP012",),
+    ),
+    FixtureSpec(
         "signature.private_piece_info_lookalike_added",
         "signature_structure",
         (
@@ -3577,6 +3591,13 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "signature_contents_bound_current_coverage_required":
         _write_semantic_signature_byte_range(baseline)
         _write_semantic_signature_byte_range(candidate, contents_gap_prefix_bytes=1)
+    elif mutation == "signature_direct_byte_range_values_required":
+        _write_semantic_signature_byte_range(baseline, include_reason=True)
+        _write_semantic_signature_byte_range(
+            candidate,
+            include_reason=True,
+            indirect_signature_value=True,
+        )
     elif mutation == "private_signature_lookalike_added":
         _write(_private_signature_lookalike_writer(include_signature=False), baseline)
         _write(_private_signature_lookalike_writer(include_signature=True), candidate)
@@ -3702,11 +3723,28 @@ def _write_semantic_signature_byte_range(
     path: Path,
     *,
     contents_gap_prefix_bytes: int = 0,
+    include_reason: bool = False,
+    indirect_signature_value: bool = False,
 ) -> None:
-    """Write a field-root signature with an optionally widened Contents gap."""
+    """Write a field-root signature with configurable static boundary traits."""
+
+    if indirect_signature_value and not include_reason:
+        raise FixtureError("Indirect signature value requires a signature Reason")
+    reason = b""
+    catalog = b"<< /Type /Catalog /Pages 2 0 R /AcroForm 5 0 R >>"
+    if include_reason:
+        reason = b" /Reason 8 0 R" if indirect_signature_value else b" /Reason (Reason)"
+        catalog = b"<< /Type /Catalog /Pages 2 0 R /AcroForm 5 0 R /Lang 8 0 R >>"
+    signature = (
+        b"<< /Type /Sig /ByteRange [0 1111111111 2222222222 3333333333] "
+        b"/Contents <AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        b"AAAAAAAAAAAAAAAA>"
+        + reason
+        + b" >>"
+    )
 
     objects = (
-        b"<< /Type /Catalog /Pages 2 0 R /AcroForm 5 0 R >>",
+        catalog,
         b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
         (
             b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 72 72] "
@@ -3715,12 +3753,10 @@ def _write_semantic_signature_byte_range(
         b"<< /Length 0 >>\nstream\n\nendstream",
         b"<< /Fields [6 0 R] >>",
         b"<< /FT /Sig /T (Signature) /V 7 0 R >>",
-        (
-            b"<< /Type /Sig /ByteRange [0 1111111111 2222222222 3333333333] "
-            b"/Contents <AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-            b"AAAAAAAAAAAAAAAA> >>"
-        ),
+        signature,
     )
+    if include_reason:
+        objects += (b"(en-US)",)
     document = bytearray(b"%PDF-1.7\n%\xe2\xe3\xcf\xd3\n")
     offsets = [0]
     for number, payload in enumerate(objects, 1):
@@ -3733,7 +3769,9 @@ def _write_semantic_signature_byte_range(
     document.extend(b"0000000000 65535 f \n")
     for offset in offsets[1:]:
         document.extend(f"{offset:010d} 00000 n \n".encode("ascii"))
-    document.extend(b"trailer\n<< /Size 8 /Root 1 0 R >>\n")
+    document.extend(
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\n".encode("ascii")
+    )
     document.extend(f"startxref\n{xref_offset}\n%%EOF\n".encode("ascii"))
 
     contents_key = document.rindex(b"/Contents ")

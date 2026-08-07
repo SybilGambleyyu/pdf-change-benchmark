@@ -169,6 +169,14 @@ PFP011 only: PFP009 sees no current-file regression, and PFP010 sees a current
 file boundary on both sides. It exposes neither an offset nor any signature,
 certificate, digest, or trust result.
 
+The direct-value control keeps that two-pair current-file ByteRange and exact
+direct `/Contents` gap on both sides. Its candidate changes one top-level
+signature-dictionary value from direct to indirect while keeping the target
+object otherwise reachable through the catalog. Its truth requires the generic
+direct-value inventory event and PFP012 only; PFP009 through PFP011 remain
+quiet. It does not claim signature validity or disclose an object reference,
+value, offset, certificate, digest, or trust result.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of
