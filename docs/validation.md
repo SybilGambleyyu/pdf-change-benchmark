@@ -25,6 +25,16 @@ and falsely flags fixed DPart metadata in a semantic chain. This isolates
 position-bound PDF 2.0 document-part targeting from broad recursive hashes of
 the target or its page.
 
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed Twine metadata checks. Fresh wheel installs
+passed pip check, fixture verification, and the complete 73-pair score on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13; a clean Python
+3.12 source-archive install passed the same checks. Installed PDFFence reports
+for both positive cases remained generic across JSON, Markdown, and SARIF.
+Dependency auditing found no known vulnerabilities after the disposable
+validation environment's bootstrap installer was upgraded; the unpublished
+local distributions were correctly skipped because they are not on PyPI.
+
 ## 1.6.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.6.0 fixture candidate rebuilt and verified all 67 fixture
