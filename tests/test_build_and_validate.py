@@ -188,6 +188,109 @@ def test_document_part_destination_pairs_are_semantic(tmp_path):
         assert int(candidate.pages[0]["/Rotate"]) == 90
 
 
+def test_goto_3d_view_pairs_are_semantic(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+
+    def action(reader: PdfReader, *, action_chain: bool):
+        root_action = reader.root_object["/OpenAction"].get_object()
+        if not action_chain:
+            return root_action
+        assert str(root_action["/S"]) == "/JavaScript"
+        return root_action["/Next"].get_object()
+
+    def targets(reader: PdfReader, *, target_page_reference: bool = True):
+        page = reader.pages[0]
+        annotations = tuple(page["/Annots"])
+        assert len(annotations) == 2
+        for annotation in annotations:
+            target = annotation.get_object()
+            assert str(target["/Type"]) == "/Annot"
+            assert str(target["/Subtype"]) == "/3D"
+            if target_page_reference:
+                assert target.raw_get(NameObject("/P")) == page.indirect_reference
+            else:
+                assert NameObject("/P") not in target
+            model = target["/3DD"].get_object()
+            assert str(model["/Type"]) == "/3D"
+            assert str(model["/Subtype"]) == "/U3D"
+        return annotations
+
+    for fixture_id, action_chain in (
+        ("active.goto_3d_view_target_rebound", False),
+        ("active.action_chain_goto_3d_view_target_rebound", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_targets = targets(baseline, target_page_reference=False)
+        candidate_targets = targets(candidate, target_page_reference=False)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert (
+            str(baseline_action["/S"])
+            == str(candidate_action["/S"])
+            == "/GoTo3DView"
+        )
+        assert baseline_action.raw_get(NameObject("/TA")) == baseline_targets[0]
+        assert candidate_action.raw_get(NameObject("/TA")) == candidate_targets[1]
+        assert str(baseline_action["/V"]) == str(candidate_action["/V"]) == "/D"
+
+    for fixture_id, action_chain in (
+        ("active.goto_3d_view_view_rewritten", False),
+        ("active.action_chain_goto_3d_view_view_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_targets = targets(baseline)
+        candidate_targets = targets(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert baseline_action.raw_get(NameObject("/TA")) == baseline_targets[0]
+        assert candidate_action.raw_get(NameObject("/TA")) == candidate_targets[0]
+        assert str(baseline_action["/V"]) == "/D"
+        assert str(candidate_action["/V"]) == "/F"
+
+    for fixture_id, action_chain in (
+        ("active.goto_3d_view_target_metadata_rewritten", False),
+        ("active.action_chain_goto_3d_view_target_metadata_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_targets = targets(baseline)
+        candidate_targets = targets(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert baseline_action.raw_get(NameObject("/TA")) == baseline_targets[0]
+        assert candidate_action.raw_get(NameObject("/TA")) == candidate_targets[0]
+        assert (
+            baseline_targets[0].get_object()["/Contents"]
+            != candidate_targets[0].get_object()["/Contents"]
+        )
+
+    for fixture_id, action_chain in (
+        ("active.goto_3d_view_target_page_rotated", False),
+        ("active.action_chain_goto_3d_view_target_page_rotated", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_targets = targets(baseline)
+        candidate_targets = targets(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert baseline_action.raw_get(NameObject("/TA")) == baseline_targets[0]
+        assert candidate_action.raw_get(NameObject("/TA")) == candidate_targets[0]
+        assert int(baseline.pages[0]["/Rotate"]) == 0
+        assert int(candidate.pages[0]["/Rotate"]) == 90
+
+
 def test_set_ocg_state_pairs_are_semantic(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

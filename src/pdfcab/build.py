@@ -292,6 +292,56 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.action_chain_goto_3d_view_target_rebound",
+        "active_content",
+        (
+            "A GoTo3DView successor selects a different page-attached 3D "
+            "annotation while its action chain remains fixed."
+        ),
+        "action_chain_goto_3d_view_target_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_goto_3d_view_view_rewritten",
+        "active_content",
+        (
+            "A GoTo3DView successor changes its selected 3D view while its "
+            "target annotation and action chain remain fixed."
+        ),
+        "action_chain_goto_3d_view_view_rewritten",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_goto_3d_view_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a GoTo3DView successor's fixed target annotation "
+            "changes without changing its action semantics."
+        ),
+        "action_chain_goto_3d_view_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_goto_3d_view_target_page_rotated",
+        "active_content",
+        (
+            "Page state on a GoTo3DView successor's fixed target annotation "
+            "changes without changing its action semantics."
+        ),
+        "action_chain_goto_3d_view_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.action_chain_document_part_rebound",
         "active_content",
         (
@@ -565,6 +615,58 @@ FIXTURE_SPECS = (
             "stored_pdf_bytes_changed",
         ),
         ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.goto_3d_view_target_rebound",
+        "active_content",
+        (
+            "A document-open GoTo3DView action selects a different "
+            "page-attached 3D annotation while its public action inventory "
+            "remains fixed."
+        ),
+        "goto_3d_view_target_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.goto_3d_view_view_rewritten",
+        "active_content",
+        (
+            "A document-open GoTo3DView action changes its selected 3D view "
+            "while its target annotation and public action inventory remain "
+            "fixed."
+        ),
+        "goto_3d_view_view_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.goto_3d_view_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a document-open GoTo3DView action's fixed target "
+            "annotation changes without changing its action semantics."
+        ),
+        "goto_3d_view_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.goto_3d_view_target_page_rotated",
+        "active_content",
+        (
+            "Page state on a document-open GoTo3DView action's fixed target "
+            "annotation changes without changing its action semantics."
+        ),
+        "goto_3d_view_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
     ),
     FixtureSpec(
         "active.goto_document_part_rebound",
@@ -1377,6 +1479,60 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "action_chain_goto_3d_view_target_rebound":
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(
+                target=0,
+                target_page_reference=False,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(
+                target=1,
+                target_page_reference=False,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_goto_3d_view_view_rewritten":
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(target=0, view="/D"),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(target=0, view="/F"),
+            candidate,
+        )
+    elif mutation == "action_chain_goto_3d_view_target_metadata_rewritten":
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(
+                target=0,
+                first_annotation_metadata=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(
+                target=0,
+                first_annotation_metadata=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_goto_3d_view_target_page_rotated":
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(
+                target=0,
+                first_page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_goto_3d_view_writer(
+                target=0,
+                first_page_rotation=90,
+            ),
+            candidate,
+        )
     elif mutation == "action_chain_set_ocg_state_group_rebound":
         _write(
             _catalog_action_chain_set_ocg_state_writer(group=0),
@@ -1626,6 +1782,60 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "goto_3d_view_to_document_part":
         _write(_writer(action="/GoTo3DView"), baseline)
         _write(_writer(action="/GoToDp"), candidate)
+    elif mutation == "goto_3d_view_target_rebound":
+        _write(
+            _catalog_goto_3d_view_writer(
+                target=0,
+                target_page_reference=False,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_goto_3d_view_writer(
+                target=1,
+                target_page_reference=False,
+            ),
+            candidate,
+        )
+    elif mutation == "goto_3d_view_view_rewritten":
+        _write(
+            _catalog_goto_3d_view_writer(target=0, view="/D"),
+            baseline,
+        )
+        _write(
+            _catalog_goto_3d_view_writer(target=0, view="/F"),
+            candidate,
+        )
+    elif mutation == "goto_3d_view_target_metadata_rewritten":
+        _write(
+            _catalog_goto_3d_view_writer(
+                target=0,
+                first_annotation_metadata=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_goto_3d_view_writer(
+                target=0,
+                first_annotation_metadata=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "goto_3d_view_target_page_rotated":
+        _write(
+            _catalog_goto_3d_view_writer(
+                target=0,
+                first_page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_goto_3d_view_writer(
+                target=0,
+                first_page_rotation=90,
+            ),
+            candidate,
+        )
     elif mutation == "goto_document_part_rebound":
         _write(
             _catalog_document_part_goto_writer(document_part_destination=0),
@@ -3009,6 +3219,121 @@ def _catalog_action_chain_document_part_goto_writer(
                 NameObject("/Dp"): targets[document_part_destination],
             }
         )
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+                NameObject("/Next"): successor,
+            }
+        )
+    )
+    return writer
+
+
+def _goto_3d_view_writer_parts(
+    *,
+    first_annotation_metadata: str = _MARKER_A,
+    second_annotation_metadata: str = _MARKER_A,
+    first_page_rotation: int = 0,
+    include_page_reference: bool = True,
+) -> tuple[PdfWriter, tuple[IndirectObject, IndirectObject]]:
+    """Build two page-attached 3D annotations with inert model streams."""
+
+    writer = _writer()
+    writer._header = b"%PDF-1.7"
+    page = writer.pages[0]
+    page_reference = page.indirect_reference
+    if page_reference is None:
+        raise FixtureError("fixture page cannot be referenced")
+    page[NameObject("/Rotate")] = NumberObject(first_page_rotation)
+    annotations: list[IndirectObject] = []
+    for metadata in (first_annotation_metadata, second_annotation_metadata):
+        model = DecodedStreamObject()
+        model[NameObject("/Type")] = NameObject("/3D")
+        model[NameObject("/Subtype")] = NameObject("/U3D")
+        model.set_data(b"")
+        annotation = DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Annot"),
+                NameObject("/Subtype"): NameObject("/3D"),
+                NameObject("/Rect"): ArrayObject(
+                    [
+                        NumberObject(0),
+                        NumberObject(0),
+                        NumberObject(10),
+                        NumberObject(10),
+                    ]
+                ),
+                NameObject("/3DD"): writer._add_object(model),
+                NameObject("/Contents"): TextStringObject(metadata),
+            }
+        )
+        if include_page_reference:
+            annotation[NameObject("/P")] = page_reference
+        annotations.append(writer._add_object(annotation))
+    page[NameObject("/Annots")] = ArrayObject(annotations)
+    return writer, (annotations[0], annotations[1])
+
+
+def _goto_3d_view_action(
+    targets: tuple[IndirectObject, IndirectObject],
+    *,
+    target: int,
+    view: str,
+) -> DictionaryObject:
+    """Build a GoTo3DView action with a selected annotation and view."""
+
+    return DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Action"),
+            NameObject("/S"): NameObject("/GoTo3DView"),
+            NameObject("/TA"): targets[target],
+            NameObject("/V"): NameObject(view),
+        }
+    )
+
+
+def _catalog_goto_3d_view_writer(
+    *,
+    target: int,
+    view: str = "/D",
+    first_annotation_metadata: str = _MARKER_A,
+    first_page_rotation: int = 0,
+    target_page_reference: bool = True,
+) -> PdfWriter:
+    """Build a document-open GoTo3DView action with stable targets."""
+
+    writer, targets = _goto_3d_view_writer_parts(
+        first_annotation_metadata=first_annotation_metadata,
+        first_page_rotation=first_page_rotation,
+        include_page_reference=target_page_reference,
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        _goto_3d_view_action(targets, target=target, view=view)
+    )
+    return writer
+
+
+def _catalog_action_chain_goto_3d_view_writer(
+    *,
+    target: int,
+    view: str = "/D",
+    first_annotation_metadata: str = _MARKER_A,
+    first_page_rotation: int = 0,
+    target_page_reference: bool = True,
+) -> PdfWriter:
+    """Build a semantic GoTo3DView successor with stable targets."""
+
+    writer, targets = _goto_3d_view_writer_parts(
+        first_annotation_metadata=first_annotation_metadata,
+        first_page_rotation=first_page_rotation,
+        include_page_reference=target_page_reference,
+    )
+    successor = writer._add_object(
+        _goto_3d_view_action(targets, target=target, view=view)
     )
     writer._root_object[NameObject("/OpenAction")] = writer._add_object(
         DictionaryObject(
