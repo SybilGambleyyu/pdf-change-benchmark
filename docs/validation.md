@@ -28,6 +28,15 @@ remote fallback rewrites as active-content changes, reports the action-chain
 class, and misses the byte-reencoding pair. This isolates effective remote /SD
 precedence and semantic action-chain evidence without opening a remote target.
 
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed metadata checks. Fresh wheel installs
+passed pip check, fixture verification, and the complete 67-pair score on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13; a clean Python
+3.12 source-archive install passed the same checks. Dependency auditing found
+no known vulnerabilities after the disposable validation environment's
+bootstrap installer was upgraded; the unpublished local distributions were
+correctly skipped because they are not on PyPI.
+
 ## 1.5.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.5.0 fixture candidate rebuilt and verified all 61 fixture
