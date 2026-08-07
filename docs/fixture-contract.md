@@ -128,6 +128,21 @@ metadata or treat an inactive fallback as selected. The catalog named cases
 exercise both a legacy /Dests dictionary and a /Names /Dests name tree, whose
 mapped dictionary contains both /D and /SD.
 
+The PDF 2.0 remote-GoTo fixtures use an action's effective /SD value at a
+document-action root and a semantic /Next member. Its first array entry is a
+synthetic opaque byte-string structure identifier for a remote document; the
+benchmark never opens that document. The rebind pairs hold their action root,
+file specification, public inventory, and /D fallback fixed while changing
+only that identifier. Their truth requires the generic root payload or
+action-sequence signal and PFP001. The paired fallback negatives change only
+the /D value overridden by /SD and require only stored_pdf_bytes_changed. A
+separate no-/SD pair changes /D and requires the generic active-content payload
+signal and PFP001. A byte-reencoding pair uses distinct identifier bytes that
+the pinned parser decodes to the same text, so an adapter must retain the
+original bytes. Together these fixtures require an adapter to preserve effective
+/SD precedence without disclosing a remote file, identifier, destination,
+position, or private digest.
+
 The Launch, remote- and embedded-GoTo, SubmitForm, and ImportData
 target-rewrite fixtures also retain their action type and public inventory.
 They alter only inert file or endpoint targets, including direct and FileSpec

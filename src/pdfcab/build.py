@@ -10,6 +10,7 @@ from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     ArrayObject,
+    ByteStringObject,
     DecodedStreamObject,
     DictionaryObject,
     IndirectObject,
@@ -33,6 +34,10 @@ _LAUNCH_TARGET_A = "PDFCAB_LAUNCH_A.txt"
 _LAUNCH_TARGET_B = "PDFCAB_LAUNCH_B.txt"
 _REMOTE_GOTO_TARGET_A = "PDFCAB_REMOTE_A.pdf"
 _REMOTE_GOTO_TARGET_B = "PDFCAB_REMOTE_B.pdf"
+_REMOTE_STRUCTURE_ID_A = b"PDFCAB_REMOTE_STRUCTURE_A"
+_REMOTE_STRUCTURE_ID_B = b"PDFCAB_REMOTE_STRUCTURE_B"
+_REMOTE_STRUCTURE_ID_SAME_TEXT_A = b"\xfe\xff\x00A"
+_REMOTE_STRUCTURE_ID_SAME_TEXT_B = b"\xff\xfeA\x00"
 _EMBEDDED_GOTO_TARGET_A = "PDFCAB_EMBEDDED_A.pdf"
 _EMBEDDED_GOTO_TARGET_B = "PDFCAB_EMBEDDED_B.pdf"
 _SUBMIT_TARGET_A = "https://example.invalid/pdfcab-submit-a"
@@ -284,6 +289,31 @@ FIXTURE_SPECS = (
         "action_chain_structure_destination_target_metadata_rewritten",
         ("stored_pdf_bytes_changed",),
         (),
+    ),
+    FixtureSpec(
+        "active.action_chain_remote_goto_structure_destination_fallback_rewritten",
+        "active_content",
+        (
+            "A remote GoTo successor's D fallback changes while its PDF 2.0 "
+            "SD structure identifier remains fixed."
+        ),
+        "action_chain_remote_goto_structure_destination_fallback_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_remote_goto_structure_destination_rebound",
+        "active_content",
+        (
+            "A remote GoTo successor's PDF 2.0 SD structure identifier changes "
+            "while its action chain remains fixed."
+        ),
+        "action_chain_remote_goto_structure_destination_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
     ),
     FixtureSpec(
         "active.goto_structure_destination_fallback_rewritten",
@@ -635,6 +665,59 @@ FIXTURE_SPECS = (
             "inventory is fixed."
         ),
         "remote_goto_target_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.remote_goto_destination_rewritten",
+        "active_content",
+        (
+            "A remote GoTo action's explicit D destination changes without a "
+            "PDF 2.0 SD override."
+        ),
+        "remote_goto_destination_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.remote_goto_structure_destination_fallback_rewritten",
+        "active_content",
+        (
+            "A remote GoTo action's D fallback changes while its PDF 2.0 SD "
+            "structure identifier remains fixed."
+        ),
+        "remote_goto_structure_destination_fallback_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.remote_goto_structure_destination_rebound",
+        "active_content",
+        (
+            "A remote GoTo action's PDF 2.0 SD structure identifier changes "
+            "while its D fallback remains fixed."
+        ),
+        "remote_goto_structure_destination_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.remote_goto_structure_destination_reencoded",
+        "active_content",
+        (
+            "A remote GoTo action's PDF 2.0 SD identifier changes bytes while "
+            "retaining a parser-decoded text value."
+        ),
+        "remote_goto_structure_destination_reencoded",
         (
             "active_content_payload_changed",
             "stored_pdf_bytes_changed",
@@ -1050,6 +1133,36 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif (
+        mutation == "action_chain_remote_goto_structure_destination_fallback_rewritten"
+    ):
+        _write(
+            _catalog_action_chain_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_A,
+                fallback_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_A,
+                fallback_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_remote_goto_structure_destination_rebound":
+        _write(
+            _catalog_action_chain_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_B
+            ),
+            candidate,
+        )
     elif mutation == "goto_structure_destination_fallback_rewritten":
         _write(
             _catalog_structure_destination_goto_writer(
@@ -1398,6 +1511,62 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
                 action="/GoToR",
                 action_target=_REMOTE_GOTO_TARGET_B,
                 action_target_as_file_specification=True,
+            ),
+            candidate,
+        )
+    elif mutation == "remote_goto_destination_rewritten":
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=None,
+                fallback_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=None,
+                fallback_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "remote_goto_structure_destination_fallback_rewritten":
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_A,
+                fallback_destination=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_A,
+                fallback_destination=1,
+            ),
+            candidate,
+        )
+    elif mutation == "remote_goto_structure_destination_rebound":
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_B
+            ),
+            candidate,
+        )
+    elif mutation == "remote_goto_structure_destination_reencoded":
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_SAME_TEXT_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_remote_goto_structure_destination_writer(
+                structure_destination=_REMOTE_STRUCTURE_ID_SAME_TEXT_B
             ),
             candidate,
         )
@@ -2301,6 +2470,81 @@ def _catalog_action_chain_structure_destination_writer(
                     [elements[structure_destination], NameObject("/Fit")]
                 ),
             }
+        )
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+                NameObject("/Next"): successor,
+            }
+        )
+    )
+    return writer
+
+
+def _remote_goto_structure_destination_action(
+    *,
+    structure_destination: bytes | None,
+    fallback_destination: int,
+) -> DictionaryObject:
+    """Build a PDF 2.0 remote GoTo with an optional SD override."""
+
+    action = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Action"),
+            NameObject("/S"): NameObject("/GoToR"),
+            NameObject("/F"): _file_target(
+                _REMOTE_GOTO_TARGET_A,
+                as_file_specification=True,
+            ),
+            NameObject("/D"): ArrayObject(
+                [NumberObject(fallback_destination), NameObject("/Fit")]
+            ),
+        }
+    )
+    if structure_destination is not None:
+        action[NameObject("/SD")] = ArrayObject(
+            [ByteStringObject(structure_destination), NameObject("/Fit")]
+        )
+    return action
+
+
+def _catalog_remote_goto_structure_destination_writer(
+    *,
+    structure_destination: bytes | None,
+    fallback_destination: int = 0,
+) -> PdfWriter:
+    """Build a document-open remote GoTo with PDF 2.0 SD precedence."""
+
+    writer = PdfWriter()
+    writer._header = b"%PDF-2.0"
+    writer.add_blank_page(width=72, height=72)
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        _remote_goto_structure_destination_action(
+            structure_destination=structure_destination,
+            fallback_destination=fallback_destination,
+        )
+    )
+    return writer
+
+
+def _catalog_action_chain_remote_goto_structure_destination_writer(
+    *,
+    structure_destination: bytes,
+    fallback_destination: int = 0,
+) -> PdfWriter:
+    """Build a semantic remote GoTo successor with PDF 2.0 SD precedence."""
+
+    writer = PdfWriter()
+    writer._header = b"%PDF-2.0"
+    writer.add_blank_page(width=72, height=72)
+    successor = writer._add_object(
+        _remote_goto_structure_destination_action(
+            structure_destination=structure_destination,
+            fallback_destination=fallback_destination,
         )
     )
     writer._root_object[NameObject("/OpenAction")] = writer._add_object(

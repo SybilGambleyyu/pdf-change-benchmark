@@ -793,6 +793,95 @@ def test_named_and_action_chain_structure_destination_pairs_are_semantic(
     assert str(before_target["/Alt"]) != str(after_target["/Alt"])
 
 
+def test_remote_goto_structure_destination_pairs_preserve_sd_precedence(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    rebound = generated / "active.remote_goto_structure_destination_rebound"
+    fallback = (
+        generated / "active.remote_goto_structure_destination_fallback_rewritten"
+    )
+    reencoded = generated / "active.remote_goto_structure_destination_reencoded"
+    destination = generated / "active.remote_goto_destination_rewritten"
+
+    before = PdfReader(rebound / "baseline.pdf", strict=True)
+    after = PdfReader(rebound / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"].get_object()
+    after_action = after.root_object["/OpenAction"].get_object()
+    assert str(before_action["/S"]) == str(after_action["/S"]) == "/GoToR"
+    assert str(before_action["/F"]["/Type"]) == "/Filespec"
+    assert str(after_action["/F"]["/Type"]) == "/Filespec"
+    assert before_action["/D"][0] == after_action["/D"][0] == 0
+    assert before_action["/SD"][0].original_bytes == b"PDFCAB_REMOTE_STRUCTURE_A"
+    assert after_action["/SD"][0].original_bytes == b"PDFCAB_REMOTE_STRUCTURE_B"
+    assert str(before_action["/SD"][1]) == str(after_action["/SD"][1]) == "/Fit"
+
+    before = PdfReader(reencoded / "baseline.pdf", strict=True)
+    after = PdfReader(reencoded / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"].get_object()
+    after_action = after.root_object["/OpenAction"].get_object()
+    assert str(before_action["/SD"][0]) == str(after_action["/SD"][0]) == "A"
+    assert before_action["/SD"][0].original_bytes == b"\xfe\xff\x00A"
+    assert after_action["/SD"][0].original_bytes == b"\xff\xfeA\x00"
+
+    before = PdfReader(fallback / "baseline.pdf", strict=True)
+    after = PdfReader(fallback / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"].get_object()
+    after_action = after.root_object["/OpenAction"].get_object()
+    assert before_action["/D"][0] == 0
+    assert after_action["/D"][0] == 1
+    assert (
+        before_action["/SD"][0].original_bytes
+        == after_action["/SD"][0].original_bytes
+    )
+
+    before = PdfReader(destination / "baseline.pdf", strict=True)
+    after = PdfReader(destination / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"].get_object()
+    after_action = after.root_object["/OpenAction"].get_object()
+    assert "/SD" not in before_action
+    assert "/SD" not in after_action
+    assert before_action["/D"][0] == 0
+    assert after_action["/D"][0] == 1
+
+
+def test_remote_goto_structure_destination_action_chain_pairs_are_semantic(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    rebound = (
+        generated / "active.action_chain_remote_goto_structure_destination_rebound"
+    )
+    fallback = generated / (
+        "active.action_chain_remote_goto_structure_destination_fallback_rewritten"
+    )
+
+    before = PdfReader(rebound / "baseline.pdf", strict=True)
+    after = PdfReader(rebound / "candidate.pdf", strict=True)
+    before_root = before.root_object["/OpenAction"].get_object()
+    after_root = after.root_object["/OpenAction"].get_object()
+    before_action = before_root["/Next"].get_object()
+    after_action = after_root["/Next"].get_object()
+    assert str(before_root["/S"]) == str(after_root["/S"]) == "/JavaScript"
+    assert str(before_action["/S"]) == str(after_action["/S"]) == "/GoToR"
+    assert before_action["/D"][0] == after_action["/D"][0] == 0
+    assert before_action["/SD"][0].original_bytes == b"PDFCAB_REMOTE_STRUCTURE_A"
+    assert after_action["/SD"][0].original_bytes == b"PDFCAB_REMOTE_STRUCTURE_B"
+
+    before = PdfReader(fallback / "baseline.pdf", strict=True)
+    after = PdfReader(fallback / "candidate.pdf", strict=True)
+    before_action = before.root_object["/OpenAction"]["/Next"].get_object()
+    after_action = after.root_object["/OpenAction"]["/Next"].get_object()
+    assert before_action["/D"][0] == 0
+    assert after_action["/D"][0] == 1
+    assert (
+        before_action["/SD"][0].original_bytes
+        == after_action["/SD"][0].original_bytes
+    )
+
+
 def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

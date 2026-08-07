@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.6.0 (unreleased)
+
+- Add six PDF 2.0 remote-GoTo regressions for effective /SD precedence at a
+  document-action root and a semantic /Next member. The remote /SD values use
+  synthetic opaque byte-string identifiers and do not require opening a target
+  document.
+- Require stored_pdf_bytes_changed alone for overridden remote /D fallback
+  rewrites; require the appropriate generic active-content signal and PFP001
+  for remote /SD rebinds; and retain a no-/SD remote /D rewrite as an
+  active-content regression. One rebind preserves the parser-decoded text while
+  changing the original identifier bytes, guarding against parser-text
+  collisions.
+
 ## 1.5.0 (unreleased)
 
 - Add thirteen PDF 2.0 structure-destination regressions covering effective

@@ -9,6 +9,25 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.6.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.6.0 fixture candidate rebuilt and verified all 67 fixture
+pairs with pypdf 6.15.0. Its 41 tests and Ruff checks passed. It scored the
+PDFFence 1.6.0 source candidate through its process-bound command-line
+executable: 67 of 67 pairs passed.
+
+The remote-GoTo /SD rebinds retain their action root, FileSpec, public
+inventory, and /D fallback while changing only a synthetic opaque remote
+structure identifier. The paired overridden-/D negatives require only the
+stored-byte change, while the no-/SD remote /D rewrite retains the established
+active-content expectation. The raw byte-reencoding pair retains the same
+parser-decoded text while changing the original identifier bytes. The held
+PDFFence 1.5.0 source candidate scores 63 of 67: it flags the two overridden
+remote fallback rewrites as active-content changes, reports the action-chain
+/SD rebind with the payload class rather than the required action-sequence
+class, and misses the byte-reencoding pair. This isolates effective remote /SD
+precedence and semantic action-chain evidence without opening a remote target.
+
 ## 1.5.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.5.0 fixture candidate rebuilt and verified all 61 fixture

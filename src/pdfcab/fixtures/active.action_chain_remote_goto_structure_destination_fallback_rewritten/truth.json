@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "A remote GoTo successor's D fallback changes while its PDF 2.0 SD structure identifier remains fixed.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.action_chain_remote_goto_structure_destination_fallback_rewritten",
+  "schema_version": 1
+}
