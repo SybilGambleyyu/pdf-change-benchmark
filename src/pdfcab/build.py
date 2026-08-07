@@ -1994,6 +1994,21 @@ FIXTURE_SPECS = (
         ("PFP013",),
     ),
     FixtureSpec(
+        "signature.terminal_footer_required",
+        "signature_coverage",
+        (
+            "An older semantic signature still reaches its own revision "
+            "footer, but the candidate appends unlinked bytes after the final "
+            "PDF footer."
+        ),
+        "signature_terminal_footer_required",
+        (
+            "signature_own_revision_coverage_inventory_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP013",),
+    ),
+    FixtureSpec(
         "signature.contents_bound_own_revision_coverage_required",
         "signature_coverage",
         (
@@ -3638,6 +3653,12 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             )
             _increment(valid, baseline)
             _increment(invalid, candidate)
+    elif mutation == "signature_terminal_footer_required":
+        with tempfile.TemporaryDirectory(prefix="pdfcab-signature-") as temporary:
+            signed = Path(temporary) / "signed.pdf"
+            _write_semantic_signature_byte_range(signed)
+            _increment(signed, baseline)
+        candidate.write_bytes(baseline.read_bytes() + b"UNLINKED_TRAILING_BYTES")
     elif mutation == "signature_contents_bound_own_revision_coverage_required":
         with tempfile.TemporaryDirectory(prefix="pdfcab-signature-") as temporary:
             temporary_path = Path(temporary)

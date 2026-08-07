@@ -204,6 +204,42 @@ def test_signature_own_revision_coverage_pair_is_stale_but_distinguishable(
     assert candidate_endpoint not in footer_endpoints(candidate_path)
 
 
+def test_signature_terminal_footer_pair_rejects_unlinked_trailing_bytes(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "signature.terminal_footer_required"
+
+    def signature_endpoint(path):
+        reader = PdfReader(path, strict=True)
+        signature = reader.root_object["/AcroForm"]["/Fields"][0]["/V"]
+        byte_range = tuple(int(value) for value in signature["/ByteRange"])
+        return sum(byte_range[-2:])
+
+    def footer_endpoints(path):
+        return {
+            match.end()
+            for match in re.finditer(
+                rb"startxref\s+\d+\s+%%EOF(?:\r\n|\r|\n)?",
+                path.read_bytes(),
+            )
+        }
+
+    baseline_path = fixture / "baseline.pdf"
+    candidate_path = fixture / "candidate.pdf"
+    baseline_footer_endpoints = footer_endpoints(baseline_path)
+    candidate_footer_endpoints = footer_endpoints(candidate_path)
+
+    assert signature_endpoint(baseline_path) < baseline_path.stat().st_size
+    assert signature_endpoint(candidate_path) < candidate_path.stat().st_size
+    assert signature_endpoint(baseline_path) in baseline_footer_endpoints
+    assert signature_endpoint(candidate_path) in candidate_footer_endpoints
+    assert max(baseline_footer_endpoints) == baseline_path.stat().st_size
+    assert max(candidate_footer_endpoints) < candidate_path.stat().st_size
+    assert candidate_path.read_bytes().endswith(b"UNLINKED_TRAILING_BYTES")
+
+
 def test_signature_contents_bound_own_revision_pair_is_stale_but_precise(
     tmp_path,
 ):

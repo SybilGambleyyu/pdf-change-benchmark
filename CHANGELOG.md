@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.23.0 (2026-08-06)
+
+- Add a terminal-footer semantic-signature control: both historical ranges
+  reach the original revision footer, but the candidate appends unlinked bytes
+  after the final PDF footer. Its generic own-revision event requires PFP013.
+- Increase the deterministic fixture set from 159 to 160 pairs.
+
 ## 1.22.0 (2026-08-06)
 
 - Add a historical Contents-bound semantic-signature control: both ranges are

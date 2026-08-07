@@ -200,6 +200,16 @@ stays positive, so the pair isolates historical delimiter coverage without
 disclosing an object reference, revision boundary, range, signature content,
 certificate, digest, or trust result.
 
+The terminal-footer control starts with the same stale-but-own-revision-bound
+signature on both sides. The candidate then appends inert unlinked bytes after
+the final PDF footer; it does not add objects, a cross-reference section, or a
+trailer. Both stored ByteRange endpoints still reach the original signing
+revision footer, and neither reaches the current physical file end. Its truth
+requires the existing own-revision event and PFP013, proving that a permissive
+parser's acceptance of a tail does not count as a valid later revision. No
+truth record publishes a tail, object reference, revision boundary, range,
+signature content, certificate, digest, or trust result.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of
