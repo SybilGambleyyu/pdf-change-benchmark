@@ -9,6 +9,22 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.7.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.7.0 fixture candidate rebuilt and verified all 73 fixture
+pairs with pypdf 6.15.0. Its 42 tests and Ruff checks passed. It scored the
+PDFFence 1.7.0 source candidate through its process-bound command-line
+executable: 73 of 73 pairs passed.
+
+The six new GoToDp cases retain a catalog DPartRoot tree on both sides. The
+root and semantic-chain rebinds select different leaf DParts while retaining
+their public action inventory; fixed DPart metadata and fixed target-page
+rotation pairs require only the stored-byte change. The held PDFFence 1.6.0
+source candidate scores 71 of 73: it misses the document-action-root rebind
+and falsely flags fixed DPart metadata in a semantic chain. This isolates
+position-bound PDF 2.0 document-part targeting from broad recursive hashes of
+the target or its page.
+
 ## 1.6.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.6.0 fixture candidate rebuilt and verified all 67 fixture

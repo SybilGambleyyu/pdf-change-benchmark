@@ -109,6 +109,85 @@ def test_action_subtype_pair_retains_3d_and_document_part_targets(tmp_path):
     assert str(candidate_action["/Dp"].get_object()["/Type"]) == "/DPart"
 
 
+def test_document_part_destination_pairs_are_semantic(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+
+    def action(reader: PdfReader, *, action_chain: bool):
+        root_action = reader.root_object["/OpenAction"].get_object()
+        if not action_chain:
+            return root_action
+        assert str(root_action["/S"]) == "/JavaScript"
+        return root_action["/Next"].get_object()
+
+    def targets(reader: PdfReader):
+        document_part_root = reader.root_object["/DPartRoot"].get_object()
+        root = document_part_root["/DPartRootNode"].get_object()
+        group = root["/DParts"][0][0].get_object()
+        leaves = (
+            group["/DParts"][0][0],
+            group["/DParts"][1][0],
+        )
+        assert str(document_part_root["/Type"]) == "/DPartRoot"
+        assert str(root["/Type"]) == str(group["/Type"]) == "/DPart"
+        assert all(
+            str(leaf.get_object()["/Type"]) == "/DPart" for leaf in leaves
+        )
+        return leaves
+
+    for fixture_id, action_chain in (
+        ("active.goto_document_part_rebound", False),
+        ("active.action_chain_document_part_rebound", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_targets = targets(baseline)
+        candidate_targets = targets(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/GoToDp"
+        assert baseline_action.raw_get(NameObject("/Dp")) == baseline_targets[0]
+        assert candidate_action.raw_get(NameObject("/Dp")) == candidate_targets[1]
+
+    for fixture_id, action_chain in (
+        ("active.goto_document_part_target_metadata_rewritten", False),
+        ("active.action_chain_document_part_target_metadata_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_targets = targets(baseline)
+        candidate_targets = targets(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert baseline_action.raw_get(NameObject("/Dp")) == baseline_targets[0]
+        assert candidate_action.raw_get(NameObject("/Dp")) == candidate_targets[0]
+        assert (
+            str(baseline_targets[0].get_object()["/DPM"]["/Private"])
+            != str(candidate_targets[0].get_object()["/DPM"]["/Private"])
+        )
+
+    for fixture_id, action_chain in (
+        ("active.goto_document_part_target_page_rotated", False),
+        ("active.action_chain_document_part_target_page_rotated", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_targets = targets(baseline)
+        candidate_targets = targets(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert baseline_action.raw_get(NameObject("/Dp")) == baseline_targets[0]
+        assert candidate_action.raw_get(NameObject("/Dp")) == candidate_targets[0]
+        assert int(baseline.pages[0]["/Rotate"]) == 0
+        assert int(candidate.pages[0]["/Rotate"]) == 90
+
+
 def test_uri_payload_rewrite_pair_keeps_the_action_inventory_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

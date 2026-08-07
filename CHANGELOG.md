@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.7.0 (unreleased)
+
+- Add six PDF 2.0 GoToDp regressions covering a document-action root and a
+  semantic /Next member. The two rebind pairs require the corresponding
+  generic active-content signal and PFP001 while their public action inventory
+  remains fixed.
+- Add fixed-target DPart-metadata and target-page-state negatives for each
+  root. They require stored_pdf_bytes_changed alone, preventing an adapter
+  from passing by recursively hashing DPart metadata or a referenced page
+  instead of binding the selected DPart-tree position.
+
 ## 1.6.0 (unreleased)
 
 - Add six PDF 2.0 remote-GoTo regressions for effective /SD precedence at a

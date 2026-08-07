@@ -1,0 +1,13 @@
+{
+  "category": "active_content",
+  "description": "A document-open GoToDp action moves to a different PDF 2.0 document part while its public action inventory remains fixed.",
+  "expected_change_kinds": [
+    "active_content_payload_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP001"
+  ],
+  "id": "active.goto_document_part_rebound",
+  "schema_version": 1
+}

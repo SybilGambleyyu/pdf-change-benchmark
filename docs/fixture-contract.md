@@ -35,6 +35,16 @@ the 3D annotation; the candidate action references the document part. It tests
 that an inventory does not collapse those two standard action types while
 keeping their surrounding targets reachable and unchanged.
 
+The GoToDp target-binding fixtures use a catalog DPartRoot, its DPartRootNode,
+and nested DParts arrays containing two leaf document parts. The document-open
+and semantic action-chain rebind pairs choose different leaves while retaining
+their public action inventory. Their paired negatives keep the selected leaf
+fixed while changing only its DPM metadata or its referenced page's Rotate
+state. The positives require the appropriate generic active-content signal and
+PFP001; the negatives require only the stored-byte change. No truth record
+publishes a DPart identity, metadata value, page reference, tree position, or
+private fingerprint.
+
 The JavaScript and URI payload-rewrite fixtures keep their respective action
 types and public inventory fixed while changing only inert stored payload
 material. The JavaScript stream pair retains exactly the same raw stream bytes

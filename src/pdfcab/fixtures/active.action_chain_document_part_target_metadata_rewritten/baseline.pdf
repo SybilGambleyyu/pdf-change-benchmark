@@ -1,0 +1,126 @@
+%PDF-2.0
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+/Title (PDFCAB\137INERT\137A)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 2
+/Kids [ 4 0 R 5 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/DPartRoot 6 0 R
+/OpenAction 12 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 72 72 ]
+/Parent 2 0 R
+/Rotate 0
+/DPart 9 0 R
+>>
+endobj
+5 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 72 72 ]
+/Parent 2 0 R
+/DPart 10 0 R
+>>
+endobj
+6 0 obj
+<<
+/Type /DPartRoot
+/NodeNameList [ /Job /Group /Record ]
+/DPartRootNode 7 0 R
+>>
+endobj
+7 0 obj
+<<
+/Type /DPart
+/Parent 6 0 R
+/DParts [ [ 8 0 R ] ]
+>>
+endobj
+8 0 obj
+<<
+/Type /DPart
+/Parent 7 0 R
+/DParts [ [ 9 0 R ] [ 10 0 R ] ]
+>>
+endobj
+9 0 obj
+<<
+/Type /DPart
+/Parent 8 0 R
+/Start 4 0 R
+/End 4 0 R
+/DPM <<
+/Private (PDFCAB\137INERT\137A)
+>>
+>>
+endobj
+10 0 obj
+<<
+/Type /DPart
+/Parent 8 0 R
+/Start 5 0 R
+/End 5 0 R
+/DPM <<
+/Private (PDFCAB\137INERT\137C)
+>>
+>>
+endobj
+11 0 obj
+<<
+/Type /Action
+/S /GoToDp
+/Dp 9 0 R
+>>
+endobj
+12 0 obj
+<<
+/Type /Action
+/S /JavaScript
+/JS (PDFCAB\137INERT\137A)
+/Next 11 0 R
+>>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000015 00000 n 
+0000000084 00000 n 
+0000000149 00000 n 
+0000000234 00000 n 
+0000000349 00000 n 
+0000000455 00000 n 
+0000000552 00000 n 
+0000000622 00000 n 
+0000000703 00000 n 
+0000000818 00000 n 
+0000000934 00000 n 
+0000000991 00000 n 
+trailer
+<<
+/Size 13
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+1082
+%%EOF

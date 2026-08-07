@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "Page state in a document-open GoToDp action's fixed document-part target changes without rebinding the destination.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.goto_document_part_target_page_rotated",
+  "schema_version": 1
+}

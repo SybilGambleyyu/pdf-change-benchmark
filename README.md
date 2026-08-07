@@ -20,17 +20,21 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.6 contains 67 fixture pairs spanning active content, embedded
+Version 1.7 contains 73 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
-signature structure, metadata, encryption, and revision-chain evidence.
-It adds PDF 2.0 remote-GoTo coverage for /SD precedence at a document-action
-root and semantic action-chain member. Remote structure identifiers are
-synthetic opaque bytes and no fixture opens a remote document. The rebind cases
-retain their roots and public inventory while changing only that identifier;
-the overridden /D-fallback negatives require only a stored-byte change. A
-legacy remote /D rewrite without /SD remains an active-content change. Together
-these cases distinguish effective remote targeting from a broad action hash or
-an inactive fallback. A separate pair changes the raw identifier bytes while
+signature structure, metadata, encryption, and revision-chain evidence. It
+adds PDF 2.0 GoToDp coverage for a document-action root and semantic
+action-chain member. The rebind cases retain their public action inventory
+while moving only the selected DPart-tree member; fixed DPart metadata and
+target-page-state negatives require only a stored-byte change. Together they
+distinguish a selected document part from broad recursive target hashes. The
+release also retains PDF 2.0 remote-GoTo coverage for /SD precedence at a
+document-action root and semantic action-chain member. Remote structure
+identifiers are synthetic opaque bytes and no fixture opens a remote document.
+The rebind cases retain their roots and public inventory while changing only
+that identifier; the overridden /D-fallback negatives require only a
+stored-byte change. A legacy remote /D rewrite without /SD remains an
+active-content change. A separate pair changes the raw identifier bytes while
 retaining the same parser-decoded text. It also retains PDF 2.0 local
 structure-destination coverage for catalog GoTo actions, document-open
 destinations, Link annotations, outline items, catalog named destinations, and

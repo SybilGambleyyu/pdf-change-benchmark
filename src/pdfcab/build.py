@@ -291,6 +291,42 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.action_chain_document_part_rebound",
+        "active_content",
+        (
+            "A GoToDp successor moves to a different PDF 2.0 document part "
+            "while its action chain remains fixed."
+        ),
+        "action_chain_document_part_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_document_part_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a GoToDp successor's fixed document-part target "
+            "changes without rebinding the action-chain destination."
+        ),
+        "action_chain_document_part_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_document_part_target_page_rotated",
+        "active_content",
+        (
+            "Page state in a GoToDp successor's fixed document-part target "
+            "changes without rebinding the action-chain destination."
+        ),
+        "action_chain_document_part_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.action_chain_remote_goto_structure_destination_fallback_rewritten",
         "active_content",
         (
@@ -464,6 +500,42 @@ FIXTURE_SPECS = (
             "stored_pdf_bytes_changed",
         ),
         ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.goto_document_part_rebound",
+        "active_content",
+        (
+            "A document-open GoToDp action moves to a different PDF 2.0 "
+            "document part while its public action inventory remains fixed."
+        ),
+        "goto_document_part_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.goto_document_part_target_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a document-open GoToDp action's fixed document-part "
+            "target changes without rebinding the destination."
+        ),
+        "goto_document_part_target_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.goto_document_part_target_page_rotated",
+        "active_content",
+        (
+            "Page state in a document-open GoToDp action's fixed document-part "
+            "target changes without rebinding the destination."
+        ),
+        "goto_document_part_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
     ),
     FixtureSpec(
         "active.uri_payload_rewritten",
@@ -1133,6 +1205,49 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "action_chain_document_part_rebound":
+        _write(
+            _catalog_action_chain_document_part_goto_writer(
+                document_part_destination=0
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_document_part_goto_writer(
+                document_part_destination=1
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_document_part_target_metadata_rewritten":
+        _write(
+            _catalog_action_chain_document_part_goto_writer(
+                document_part_destination=0,
+                first_document_part_metadata=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_document_part_goto_writer(
+                document_part_destination=0,
+                first_document_part_metadata=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_document_part_target_page_rotated":
+        _write(
+            _catalog_action_chain_document_part_goto_writer(
+                document_part_destination=0,
+                first_page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_document_part_goto_writer(
+                document_part_destination=0,
+                first_page_rotation=90,
+            ),
+            candidate,
+        )
     elif (
         mutation == "action_chain_remote_goto_structure_destination_fallback_rewritten"
     ):
@@ -1313,6 +1428,45 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "goto_3d_view_to_document_part":
         _write(_writer(action="/GoTo3DView"), baseline)
         _write(_writer(action="/GoToDp"), candidate)
+    elif mutation == "goto_document_part_rebound":
+        _write(
+            _catalog_document_part_goto_writer(document_part_destination=0),
+            baseline,
+        )
+        _write(
+            _catalog_document_part_goto_writer(document_part_destination=1),
+            candidate,
+        )
+    elif mutation == "goto_document_part_target_metadata_rewritten":
+        _write(
+            _catalog_document_part_goto_writer(
+                document_part_destination=0,
+                first_document_part_metadata=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_document_part_goto_writer(
+                document_part_destination=0,
+                first_document_part_metadata=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "goto_document_part_target_page_rotated":
+        _write(
+            _catalog_document_part_goto_writer(
+                document_part_destination=0,
+                first_page_rotation=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_document_part_goto_writer(
+                document_part_destination=0,
+                first_page_rotation=90,
+            ),
+            candidate,
+        )
     elif mutation == "uri_payload_rewritten":
         _write(_writer(action="/URI", uri=_URI), baseline)
         _write(_writer(action="/URI", uri=_URI_B), candidate)
@@ -2469,6 +2623,147 @@ def _catalog_action_chain_structure_destination_writer(
                 NameObject("/SD"): ArrayObject(
                     [elements[structure_destination], NameObject("/Fit")]
                 ),
+            }
+        )
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+                NameObject("/Next"): successor,
+            }
+        )
+    )
+    return writer
+
+
+def _document_part_destination_writer_parts(
+    *,
+    first_document_part_metadata: str = _MARKER_A,
+    first_page_rotation: int = 0,
+) -> tuple[PdfWriter, tuple[IndirectObject, IndirectObject]]:
+    """Build a PDF 2.0 DPart tree with two stable leaf targets."""
+
+    writer = _writer()
+    writer._header = b"%PDF-2.0"
+    first_page = writer.pages[0]
+    first_page[NameObject("/Rotate")] = NumberObject(first_page_rotation)
+    second_page = writer.add_blank_page(width=72, height=72)
+    document_part_root = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/DPartRoot"),
+                NameObject("/NodeNameList"): ArrayObject(
+                    [
+                        NameObject("/Job"),
+                        NameObject("/Group"),
+                        NameObject("/Record"),
+                    ]
+                ),
+            }
+        )
+    )
+    root = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/DPart"),
+                NameObject("/Parent"): document_part_root,
+            }
+        )
+    )
+    group = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/DPart"),
+                NameObject("/Parent"): root,
+            }
+        )
+    )
+    first_leaf = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/DPart"),
+                NameObject("/Parent"): group,
+                NameObject("/Start"): first_page.indirect_reference,
+                NameObject("/End"): first_page.indirect_reference,
+                NameObject("/DPM"): DictionaryObject(
+                    {
+                        NameObject("/Private"): TextStringObject(
+                            first_document_part_metadata
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    second_leaf = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/DPart"),
+                NameObject("/Parent"): group,
+                NameObject("/Start"): second_page.indirect_reference,
+                NameObject("/End"): second_page.indirect_reference,
+                NameObject("/DPM"): DictionaryObject(
+                    {NameObject("/Private"): TextStringObject(_MARKER_C)}
+                ),
+            }
+        )
+    )
+    group.get_object()[NameObject("/DParts")] = ArrayObject(
+        [ArrayObject([first_leaf]), ArrayObject([second_leaf])]
+    )
+    root.get_object()[NameObject("/DParts")] = ArrayObject([ArrayObject([group])])
+    document_part_root.get_object()[NameObject("/DPartRootNode")] = root
+    writer._root_object[NameObject("/DPartRoot")] = document_part_root
+    first_page[NameObject("/DPart")] = first_leaf
+    second_page[NameObject("/DPart")] = second_leaf
+    return writer, (first_leaf, second_leaf)
+
+
+def _catalog_document_part_goto_writer(
+    *,
+    document_part_destination: int,
+    first_document_part_metadata: str = _MARKER_A,
+    first_page_rotation: int = 0,
+) -> PdfWriter:
+    """Build a document-open GoToDp action with a stable DPart tree."""
+
+    writer, targets = _document_part_destination_writer_parts(
+        first_document_part_metadata=first_document_part_metadata,
+        first_page_rotation=first_page_rotation,
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/GoToDp"),
+                NameObject("/Dp"): targets[document_part_destination],
+            }
+        )
+    )
+    return writer
+
+
+def _catalog_action_chain_document_part_goto_writer(
+    *,
+    document_part_destination: int,
+    first_document_part_metadata: str = _MARKER_A,
+    first_page_rotation: int = 0,
+) -> PdfWriter:
+    """Build a semantic GoToDp successor with a stable DPart tree."""
+
+    writer, targets = _document_part_destination_writer_parts(
+        first_document_part_metadata=first_document_part_metadata,
+        first_page_rotation=first_page_rotation,
+    )
+    successor = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/GoToDp"),
+                NameObject("/Dp"): targets[document_part_destination],
             }
         )
     )
