@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.18.0 (2026-08-06)
+
+- Add a semantic-signature stale-boundary control whose baseline and candidate
+  both have a well-formed ByteRange before the current physical file end. It
+  requires PFP010 without a coverage-change event, proving that an adapter can
+  enforce a current boundary even without a known-good baseline.
+- Increase the deterministic fixture set from 154 to 155 pairs.
+
 ## 1.17.0 (2026-08-06)
 
 - Add a semantic signature ByteRange control: a field-root range reaches the

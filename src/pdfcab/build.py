@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import tempfile
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
@@ -1937,6 +1938,20 @@ FIXTURE_SPECS = (
         ("PFP009",),
     ),
     FixtureSpec(
+        "signature.current_file_coverage_required",
+        "signature_coverage",
+        (
+            "Semantic signature ByteRanges are already behind the current "
+            "physical file end on both sides of a later incremental update."
+        ),
+        "signature_current_file_coverage_required",
+        (
+            "revision_chain_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP010",),
+    ),
+    FixtureSpec(
         "signature.private_piece_info_lookalike_added",
         "signature_structure",
         (
@@ -3539,6 +3554,12 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
     elif mutation == "signature_current_file_coverage_lost":
         _write_semantic_signature_byte_range(baseline)
         _increment(baseline, candidate)
+    elif mutation == "signature_current_file_coverage_required":
+        with tempfile.TemporaryDirectory(prefix="pdfcab-signature-") as temporary:
+            signed = Path(temporary) / "signed.pdf"
+            _write_semantic_signature_byte_range(signed)
+            _increment(signed, baseline)
+        _increment(baseline, candidate, subject=_MARKER_B)
     elif mutation == "private_signature_lookalike_added":
         _write(_private_signature_lookalike_writer(include_signature=False), baseline)
         _write(_private_signature_lookalike_writer(include_signature=True), candidate)
@@ -5553,10 +5574,15 @@ def _catalog_action_chain_remote_goto_structure_destination_writer(
     return writer
 
 
-def _increment(source: Path, destination: Path) -> None:
+def _increment(
+    source: Path,
+    destination: Path,
+    *,
+    subject: str = _MARKER_A,
+) -> None:
     reader = PdfReader(source, strict=True)
     writer = PdfWriter(reader, incremental=True)
-    writer.add_metadata({"/Subject": _MARKER_A})
+    writer.add_metadata({"/Subject": subject})
     _write(writer, destination)
 
 

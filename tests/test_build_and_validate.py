@@ -83,6 +83,29 @@ def test_signature_current_file_coverage_pair_retains_a_prior_byte_range(tmp_pat
     assert candidate_range[-2] + candidate_range[-1] < candidate_path.stat().st_size
 
 
+def test_signature_current_file_coverage_requirement_pair_is_stale_on_both_sides(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "signature.current_file_coverage_required"
+
+    baseline_path = fixture / "baseline.pdf"
+    candidate_path = fixture / "candidate.pdf"
+    baseline = PdfReader(baseline_path, strict=True)
+    candidate = PdfReader(candidate_path, strict=True)
+    baseline_signature = baseline.root_object["/AcroForm"]["/Fields"][0]["/V"]
+    candidate_signature = candidate.root_object["/AcroForm"]["/Fields"][0]["/V"]
+    baseline_range = tuple(int(value) for value in baseline_signature["/ByteRange"])
+    candidate_range = tuple(int(value) for value in candidate_signature["/ByteRange"])
+
+    assert baseline_range == candidate_range
+    assert baseline_range[0] == 0
+    assert baseline_range[-2] + baseline_range[-1] < baseline_path.stat().st_size
+    assert candidate_path.stat().st_size > baseline_path.stat().st_size
+    assert candidate_range[-2] + candidate_range[-1] < candidate_path.stat().st_size
+
+
 def test_private_signature_lookalike_pair_has_no_semantic_signature_owner(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)
