@@ -1,0 +1,13 @@
+{
+  "category": "signature_coverage",
+  "description": "A semantic signature ByteRange still reaches the current physical file end, but its gap no longer exactly matches direct Contents.",
+  "expected_change_kinds": [
+    "signature_byte_range_coverage_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP011"
+  ],
+  "id": "signature.contents_bound_current_coverage_required",
+  "schema_version": 1
+}

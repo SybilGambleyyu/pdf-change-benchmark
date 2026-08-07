@@ -161,6 +161,14 @@ Together they distinguish a standard signature root and current file boundary
 from an arbitrary signature-shaped dictionary without deciding validity or
 whether an update is allowed.
 
+The Contents-boundary control starts with a current-file two-pair ByteRange
+whose one omitted gap exactly matches the direct hexadecimal `/Contents`
+token. Its candidate keeps the same physical file end but widens that gap by
+one byte before the token. The truth requires the generic coverage event and
+PFP011 only: PFP009 sees no current-file regression, and PFP010 sees a current
+file boundary on both sides. It exposes neither an offset nor any signature,
+certificate, digest, or trust result.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

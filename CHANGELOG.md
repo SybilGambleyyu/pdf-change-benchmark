@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.19.0 (2026-08-06)
+
+- Add a semantic signature control where both ByteRanges still reach the
+  current physical end, while the candidate's sole gap is one byte wider than
+  its direct `/Contents` token. Its generic coverage change requires PFP011,
+  while PFP009 and PFP010 correctly remain quiet.
+- Correct the prior synthetic signature helpers so their baseline ByteRanges
+  exclude the actual signature `/Contents` token rather than an earlier PDF
+  token. No fixture truth discloses offsets, contents, certificates, or hashes.
+- Increase the deterministic fixture set from 155 to 156 pairs.
+
 ## 1.18.0 (2026-08-06)
 
 - Add a semantic-signature stale-boundary control whose baseline and candidate

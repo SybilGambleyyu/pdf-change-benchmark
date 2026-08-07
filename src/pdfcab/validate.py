@@ -46,6 +46,7 @@ _KNOWN_POLICY_RULE_IDS: Final = frozenset(
         "PFP008",
         "PFP009",
         "PFP010",
+        "PFP011",
     }
 )
 

@@ -25,6 +25,7 @@ _RULE_NAMES: Final = {
     "PFP008": "no_optional_content_changes",
     "PFP009": "no_signature_coverage_regressions",
     "PFP010": "require_current_file_signature_coverage",
+    "PFP011": "require_contents_bound_current_signature_coverage",
 }
 _COMMAND_TIMEOUT_SECONDS: Final = 30
 

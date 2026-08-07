@@ -1952,6 +1952,20 @@ FIXTURE_SPECS = (
         ("PFP010",),
     ),
     FixtureSpec(
+        "signature.contents_bound_current_coverage_required",
+        "signature_coverage",
+        (
+            "A semantic signature ByteRange still reaches the current physical "
+            "file end, but its gap no longer exactly matches direct Contents."
+        ),
+        "signature_contents_bound_current_coverage_required",
+        (
+            "signature_byte_range_coverage_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP011",),
+    ),
+    FixtureSpec(
         "signature.private_piece_info_lookalike_added",
         "signature_structure",
         (
@@ -3560,6 +3574,9 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             _write_semantic_signature_byte_range(signed)
             _increment(signed, baseline)
         _increment(baseline, candidate, subject=_MARKER_B)
+    elif mutation == "signature_contents_bound_current_coverage_required":
+        _write_semantic_signature_byte_range(baseline)
+        _write_semantic_signature_byte_range(candidate, contents_gap_prefix_bytes=1)
     elif mutation == "private_signature_lookalike_added":
         _write(_private_signature_lookalike_writer(include_signature=False), baseline)
         _write(_private_signature_lookalike_writer(include_signature=True), candidate)
@@ -3681,8 +3698,12 @@ def _write(writer: PdfWriter, path: Path) -> None:
         writer.write(stream)
 
 
-def _write_semantic_signature_byte_range(path: Path) -> None:
-    """Write a field-root signature whose ByteRange reaches this file's EOF."""
+def _write_semantic_signature_byte_range(
+    path: Path,
+    *,
+    contents_gap_prefix_bytes: int = 0,
+) -> None:
+    """Write a field-root signature with an optionally widened Contents gap."""
 
     objects = (
         b"<< /Type /Catalog /Pages 2 0 R /AcroForm 5 0 R >>",
@@ -3715,11 +3736,18 @@ def _write_semantic_signature_byte_range(path: Path) -> None:
     document.extend(b"trailer\n<< /Size 8 /Root 1 0 R >>\n")
     document.extend(f"startxref\n{xref_offset}\n%%EOF\n".encode("ascii"))
 
-    contents_start = document.index(b"<", document.index(b"/Contents "))
+    contents_key = document.rindex(b"/Contents ")
+    contents_start = document.index(b"<", contents_key)
     contents_end = document.index(b">", contents_start) + 1
+    if not 0 <= contents_gap_prefix_bytes < contents_start:
+        raise FixtureError("Contents gap prefix must stay within the source")
     for placeholder, value in zip(
         (b"1111111111", b"2222222222", b"3333333333"),
-        (contents_start, contents_end, len(document) - contents_end),
+        (
+            contents_start - contents_gap_prefix_bytes,
+            contents_end,
+            len(document) - contents_end,
+        ),
         strict=True,
     ):
         document = document.replace(placeholder, f"{value:010d}".encode("ascii"), 1)

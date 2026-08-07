@@ -9,6 +9,22 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.19.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.19.0 fixture candidate rebuilt and verified all 156
+fixture pairs, passed 86 tests and Ruff, and scored the PDFFence 1.19.0 source
+candidate exactly through its process-bound command-line executable: 156 of 156
+pairs passed. The scorer was run in four deterministic 39-pair shards because
+the execution environment bounds individual commands; each shard was exact.
+
+The new semantic signature control keeps both ByteRanges at the current
+physical file end and preserves their well-formed layout. The candidate widens
+its single excluded span by one byte before direct `/Contents`, so only the
+generic coverage event and PFP011 are expected. PFP009 remains quiet because
+no current-file boundary was lost, and PFP010 remains quiet because both
+boundaries still reach EOF. The fixture does not claim signature validity or
+publish an offset, signature value, certificate, digest, or trust result.
+
 ## 1.18.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.18.0 fixture candidate rebuilt and verified all 155
