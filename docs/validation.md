@@ -26,6 +26,19 @@ semantic-chain negatives. This isolates ordered state-array semantics and the
 specified PreserveRB default from broad group metadata hashes and dictionary
 shape differences.
 
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed Twine metadata checks. Fresh wheel installs
+passed pip check, fixture verification, and the complete 83-pair score on
+Python 3.11 from a local offline wheelhouse, 3.12, and 3.13; a clean Python
+3.12 source-archive install passed the same checks. Installed PDFFence policy
+reports for root and semantic-chain positives remained generic across JSON,
+Markdown, and SARIF, reporting only PFP001 and the expected generic change
+kind; no inert marker, SetOCGState token, operation, PreserveRB value, group
+identity, metadata, or private signature appeared. Dependency auditing found no
+known vulnerabilities after the disposable validation environment's bootstrap
+installer was upgraded; the unpublished local distributions were correctly
+skipped because they are not on PyPI.
+
 ## 1.7.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.7.0 fixture candidate rebuilt and verified all 73 fixture
