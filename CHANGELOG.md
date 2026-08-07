@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.21.0 (2026-08-06)
+
+- Add an own-revision semantic-signature control: both ranges are stale with
+  respect to later current file ends, but only the baseline reaches its
+  signature's own incremental-revision footer. Its generic own-revision event
+  requires PFP013 without treating a correct historical signature as a
+  current-file boundary.
+- Increase the deterministic fixture set from 157 to 158 pairs.
+
 ## 1.20.0 (2026-08-06)
 
 - Add a semantic-signature direct-value control whose current ByteRange and

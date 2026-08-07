@@ -1980,6 +1980,20 @@ FIXTURE_SPECS = (
         ("PFP012",),
     ),
     FixtureSpec(
+        "signature.own_revision_coverage_required",
+        "signature_coverage",
+        (
+            "An older semantic signature stays behind the current file, but "
+            "the candidate ByteRange no longer reaches its own revision footer."
+        ),
+        "signature_own_revision_coverage_required",
+        (
+            "signature_own_revision_coverage_inventory_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP013",),
+    ),
+    FixtureSpec(
         "signature.private_piece_info_lookalike_added",
         "signature_structure",
         (
@@ -3598,6 +3612,18 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             include_reason=True,
             indirect_signature_value=True,
         )
+    elif mutation == "signature_own_revision_coverage_required":
+        with tempfile.TemporaryDirectory(prefix="pdfcab-signature-") as temporary:
+            temporary_path = Path(temporary)
+            valid = temporary_path / "valid.pdf"
+            invalid = temporary_path / "invalid.pdf"
+            _write_semantic_signature_byte_range(valid)
+            _write_semantic_signature_byte_range(
+                invalid,
+                revision_end_trim_bytes=2,
+            )
+            _increment(valid, baseline)
+            _increment(invalid, candidate)
     elif mutation == "private_signature_lookalike_added":
         _write(_private_signature_lookalike_writer(include_signature=False), baseline)
         _write(_private_signature_lookalike_writer(include_signature=True), candidate)
@@ -3725,11 +3751,14 @@ def _write_semantic_signature_byte_range(
     contents_gap_prefix_bytes: int = 0,
     include_reason: bool = False,
     indirect_signature_value: bool = False,
+    revision_end_trim_bytes: int = 0,
 ) -> None:
     """Write a field-root signature with configurable static boundary traits."""
 
     if indirect_signature_value and not include_reason:
         raise FixtureError("Indirect signature value requires a signature Reason")
+    if type(revision_end_trim_bytes) is not int or revision_end_trim_bytes < 0:
+        raise FixtureError("Revision-end trim must be a non-negative integer")
     reason = b""
     catalog = b"<< /Type /Catalog /Pages 2 0 R /AcroForm 5 0 R >>"
     if include_reason:
@@ -3779,12 +3808,15 @@ def _write_semantic_signature_byte_range(
     contents_end = document.index(b">", contents_start) + 1
     if not 0 <= contents_gap_prefix_bytes < contents_start:
         raise FixtureError("Contents gap prefix must stay within the source")
+    final_endpoint = len(document) - revision_end_trim_bytes
+    if final_endpoint <= contents_end:
+        raise FixtureError("Revision-end trim must leave a positive ByteRange tail")
     for placeholder, value in zip(
         (b"1111111111", b"2222222222", b"3333333333"),
         (
             contents_start - contents_gap_prefix_bytes,
             contents_end,
-            len(document) - contents_end,
+            final_endpoint - contents_end,
         ),
         strict=True,
     ):

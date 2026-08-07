@@ -177,6 +177,17 @@ direct-value inventory event and PFP012 only; PFP009 through PFP011 remain
 quiet. It does not claim signature validity or disclose an object reference,
 value, offset, certificate, digest, or trust result.
 
+The own-revision control starts each side with a field-root signature and then
+appends one later incremental update, so neither range reaches the current
+physical file end. The baseline range still reaches the original signing
+revision's footer; the candidate stops short of that footer while retaining a
+well-formed layout and the same stale current-file status. Its truth requires
+only the own-revision inventory event and PFP013. It therefore distinguishes
+an older signature that remains structurally bounded to its signing revision
+from an arbitrary earlier endpoint, without publishing an object reference,
+revision boundary, range, signature content, certificate, digest, or trust
+result.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

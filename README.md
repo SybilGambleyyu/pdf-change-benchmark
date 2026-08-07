@@ -20,7 +20,7 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.20 contains 157 fixture pairs spanning active content, embedded
+Version 1.21 contains 158 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure and ByteRange boundaries, metadata, encryption, and
 revision-chain evidence. It adds a field-root signature range that reaches the
@@ -33,7 +33,11 @@ candidate's single excluded gap beyond direct `/Contents`, requiring PFP011
 without a PFP009 or PFP010 result. The new direct-value control preserves that
 exact current boundary but makes one top-level ByteRange signature value
 indirect, requiring PFP012 alone. A paired private PieceInfo `/Type /Sig`
-lookalike addition requires reachability plus stored bytes only. The release
+lookalike addition requires reachability plus stored bytes only. The new
+own-revision control keeps both semantic ranges behind later current file ends,
+but only the baseline ends at its signature's own revision footer; it requires
+PFP013 without conflating a valid historical signature with current-file
+coverage. The release
 retains the two action-inventory controls, five action-key semantic-root controls, six real
 standard-path URI-action cases, direct document-action behavior rewrites for
 `/Thread`, `/URI`, `/Sound`, `/Movie`, `/Hide`, `/Named`, `/SubmitForm`,

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -165,6 +166,42 @@ def test_signature_direct_value_pair_keeps_coverage_and_indirects_one_value(tmp_
         assert byte_range[0] == 0
         assert byte_range[-2] + byte_range[-1] == path.stat().st_size
         assert byte_range[1:3] == (contents_start, contents_end)
+
+
+def test_signature_own_revision_coverage_pair_is_stale_but_distinguishable(
+    tmp_path,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / "signature.own_revision_coverage_required"
+
+    baseline_path = fixture / "baseline.pdf"
+    candidate_path = fixture / "candidate.pdf"
+    baseline = PdfReader(baseline_path, strict=True)
+    candidate = PdfReader(candidate_path, strict=True)
+    baseline_signature = baseline.root_object["/AcroForm"]["/Fields"][0]["/V"]
+    candidate_signature = candidate.root_object["/AcroForm"]["/Fields"][0]["/V"]
+    baseline_endpoint = sum(
+        int(value) for value in baseline_signature["/ByteRange"][-2:]
+    )
+    candidate_endpoint = sum(
+        int(value) for value in candidate_signature["/ByteRange"][-2:]
+    )
+
+    def footer_endpoints(path):
+        source = path.read_bytes()
+        return {
+            match.end()
+            for match in re.finditer(
+                rb"startxref\s+\d+\s+%%EOF(?:\r\n|\r|\n)?",
+                source,
+            )
+        }
+
+    assert baseline_endpoint < baseline_path.stat().st_size
+    assert candidate_endpoint < candidate_path.stat().st_size
+    assert baseline_endpoint in footer_endpoints(baseline_path)
+    assert candidate_endpoint not in footer_endpoints(candidate_path)
 
 
 def test_private_signature_lookalike_pair_has_no_semantic_signature_owner(tmp_path):
