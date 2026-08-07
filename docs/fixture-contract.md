@@ -107,6 +107,17 @@ syntactically valid JavaScript stream with different decoded material. Their
 truth records require a generic active-content payload-change signal and the
 existing active-content policy ID, never a source value or digest.
 
+The direct action behavior-field fixtures cover `/Thread`, `/URI`, `/Sound`,
+`/Movie`, `/Hide`, `/Named`, `/SubmitForm`, `/ResetForm`, `/Rendition`,
+`/Trans`, and `/RichMediaExecute` at the catalog document-open root. Each pair
+keeps the action type and public action inventory fixed while changing one
+standardized behavior-bearing field: respectively `/D`, `/IsMap`, raw
+top-level `/Sound` stream bytes, `/T`, `/T`, `/N`, `/CharSet`, `/Fields`,
+`/JS`, `/Trans`, or `/CMD`. The `/Sound` pair requires comparison of its raw
+stored stream representation; it does not require decoding the payload. Every
+truth record requires generic `active_content_payload_changed` and PFP001, and
+publishes no action value, stream bytes, target, command, or private digest.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

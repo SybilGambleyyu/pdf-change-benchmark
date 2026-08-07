@@ -1556,6 +1556,43 @@ def test_javascript_stream_filter_pair_keeps_raw_bytes_fixed(tmp_path):
 
 
 @pytest.mark.parametrize(
+    ("fixture_id", "action_type"),
+    (
+        ("active.thread_destination_rewritten", "/Thread"),
+        ("active.uri_is_map_rewritten", "/URI"),
+        ("active.sound_stream_rewritten", "/Sound"),
+        ("active.movie_title_rewritten", "/Movie"),
+        ("active.hide_target_rewritten", "/Hide"),
+        ("active.named_action_rewritten", "/Named"),
+        ("active.submit_form_charset_rewritten", "/SubmitForm"),
+        ("active.reset_form_fields_rewritten", "/ResetForm"),
+        ("active.rendition_javascript_rewritten", "/Rendition"),
+        ("active.transition_rewritten", "/Trans"),
+        ("active.rich_media_command_rewritten", "/RichMediaExecute"),
+    ),
+)
+def test_direct_action_field_pairs_rewrite_selected_semantics(
+    tmp_path,
+    fixture_id,
+    action_type,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / fixture_id
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    baseline_action = baseline.root_object["/OpenAction"].get_object()
+    candidate_action = candidate.root_object["/OpenAction"].get_object()
+
+    assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == action_type
+    assert _direct_action_behavior_value(
+        baseline_action,
+        action_type,
+    ) != _direct_action_behavior_value(candidate_action, action_type)
+
+
+@pytest.mark.parametrize(
     ("fixture_id", "action_type", "as_file_specification"),
     (
         ("active.launch_target_rewritten", "/Launch", False),
@@ -1598,6 +1635,30 @@ def _tree_bytes(root: Path) -> dict[str, bytes]:
         for path in sorted(root.rglob("*"))
         if path.is_file()
     }
+
+
+def _direct_action_behavior_value(action: object, action_type: str) -> object:
+    if action_type == "/Thread":
+        return str(action["/D"])
+    if action_type in {"/Movie", "/Hide"}:
+        return str(action["/T"])
+    if action_type == "/URI":
+        return str(action["/IsMap"])
+    if action_type == "/Sound":
+        return action["/Sound"].get_object().get_data()
+    if action_type == "/Named":
+        return str(action["/N"])
+    if action_type == "/SubmitForm":
+        return str(action["/CharSet"])
+    if action_type == "/ResetForm":
+        return str(action["/Fields"][0])
+    if action_type == "/Rendition":
+        return str(action["/JS"])
+    if action_type == "/Trans":
+        return str(action["/Trans"]["/S"])
+    if action_type == "/RichMediaExecute":
+        return str(action["/CMD"]["/C"])
+    raise AssertionError("unsupported direct action field")
 
 
 def _legacy_destination(reader: PdfReader, name: object):

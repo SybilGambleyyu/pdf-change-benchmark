@@ -53,6 +53,19 @@ _IMPORT_TARGET_A = "PDFCAB_IMPORT_A.fdf"
 _IMPORT_TARGET_B = "PDFCAB_IMPORT_B.fdf"
 _PASSWORD = "pdfcab-inert-password"
 _CHILD_DOCUMENT_NAME = "PDFCAB_CHILD.pdf"
+_DIRECT_ACTION_FIELD_ACTIONS = {
+    "thread_destination_rewritten": "/Thread",
+    "uri_is_map_rewritten": "/URI",
+    "sound_stream_rewritten": "/Sound",
+    "movie_title_rewritten": "/Movie",
+    "hide_target_rewritten": "/Hide",
+    "named_action_rewritten": "/Named",
+    "submit_form_charset_rewritten": "/SubmitForm",
+    "reset_form_fields_rewritten": "/ResetForm",
+    "rendition_javascript_rewritten": "/Rendition",
+    "transition_rewritten": "/Trans",
+    "rich_media_command_rewritten": "/RichMediaExecute",
+}
 
 
 @dataclass(frozen=True)
@@ -1119,6 +1132,130 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.thread_destination_rewritten",
+        "active_content",
+        (
+            "A document-open Thread destination changes while its action "
+            "inventory is fixed."
+        ),
+        "thread_destination_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.uri_is_map_rewritten",
+        "active_content",
+        "A document-open URI action changes its coordinate-appending behavior.",
+        "uri_is_map_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.sound_stream_rewritten",
+        "active_content",
+        "A document-open Sound action changes its stored sound stream.",
+        "sound_stream_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.movie_title_rewritten",
+        "active_content",
+        "A document-open Movie action changes its title selector.",
+        "movie_title_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.hide_target_rewritten",
+        "active_content",
+        "A document-open Hide action changes its field target.",
+        "hide_target_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.named_action_rewritten",
+        "active_content",
+        "A document-open Named action changes the viewer command it invokes.",
+        "named_action_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.submit_form_charset_rewritten",
+        "active_content",
+        "A document-open SubmitForm action changes its submission character set.",
+        "submit_form_charset_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.reset_form_fields_rewritten",
+        "active_content",
+        "A document-open ResetForm action changes its selected field set.",
+        "reset_form_fields_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.rendition_javascript_rewritten",
+        "active_content",
+        "A document-open Rendition action changes its JavaScript fallback.",
+        "rendition_javascript_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.transition_rewritten",
+        "active_content",
+        "A document-open transition action changes its display transition.",
+        "transition_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.rich_media_command_rewritten",
+        "active_content",
+        "A document-open RichMediaExecute action changes its command.",
+        "rich_media_command_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
         "active.javascript_trigger_rebound",
         "active_content",
         (
@@ -1580,7 +1717,11 @@ def _empty_destination(destination: str | Path) -> Path:
 
 
 def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
-    if mutation == "javascript_added":
+    if mutation in _DIRECT_ACTION_FIELD_ACTIONS:
+        action = _DIRECT_ACTION_FIELD_ACTIONS[mutation]
+        _write(_catalog_direct_action_field_writer(action, variant="A"), baseline)
+        _write(_catalog_direct_action_field_writer(action, variant="B"), candidate)
+    elif mutation == "javascript_added":
         _write(_writer(), baseline)
         _write(_writer(javascript=_MARKER_A), candidate)
     elif mutation == "uri_action_added":
@@ -3111,6 +3252,101 @@ def _writer(
 def _write(writer: PdfWriter, path: Path) -> None:
     with path.open("wb") as stream:
         writer.write(stream)
+
+
+def _catalog_direct_action_field_writer(
+    action_name: str,
+    *,
+    variant: str,
+) -> PdfWriter:
+    """Build one document-open action with a selected behavior field."""
+
+    if variant not in {"A", "B"}:
+        raise FixtureError("direct action field variant is unsupported")
+    writer = _writer()
+    payload = _MARKER_A if variant == "A" else _MARKER_B
+    action = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Action"),
+            NameObject("/S"): NameObject(action_name),
+        }
+    )
+    if action_name == "/Thread":
+        action[NameObject("/F")] = TextStringObject("PDFCAB_THREAD.pdf")
+        action[NameObject("/D")] = TextStringObject(payload)
+        action[NameObject("/B")] = NumberObject(0)
+    elif action_name == "/URI":
+        action[NameObject("/URI")] = TextStringObject(_URI)
+        action[NameObject("/IsMap")] = BooleanObject(variant == "B")
+    elif action_name == "/Sound":
+        sound = DecodedStreamObject()
+        sound[NameObject("/R")] = NumberObject(44_100)
+        sound[NameObject("/C")] = NumberObject(1)
+        sound[NameObject("/B")] = NumberObject(8)
+        sound[NameObject("/E")] = NameObject("/Raw")
+        sound.set_data(payload.encode("utf-8"))
+        action[NameObject("/Sound")] = writer._add_object(sound)
+        action[NameObject("/Volume")] = NumberObject(1)
+        action[NameObject("/Synchronous")] = BooleanObject(False)
+        action[NameObject("/Repeat")] = BooleanObject(False)
+        action[NameObject("/Mix")] = BooleanObject(False)
+    elif action_name == "/Movie":
+        action[NameObject("/T")] = TextStringObject(payload)
+        action[NameObject("/Operation")] = NameObject("/Play")
+    elif action_name == "/Hide":
+        action[NameObject("/T")] = TextStringObject(payload)
+        action[NameObject("/H")] = BooleanObject(True)
+    elif action_name == "/Named":
+        action[NameObject("/N")] = NameObject(
+            "/NextPage" if variant == "A" else "/PrevPage"
+        )
+    elif action_name == "/SubmitForm":
+        action[NameObject("/F")] = TextStringObject(_SUBMIT_TARGET_A)
+        action[NameObject("/CharSet")] = TextStringObject(
+            "UTF-8" if variant == "A" else "UTF-16"
+        )
+    elif action_name == "/ResetForm":
+        action[NameObject("/Fields")] = ArrayObject([TextStringObject(payload)])
+        action[NameObject("/Flags")] = NumberObject(0)
+    elif action_name == "/Rendition":
+        action[NameObject("/JS")] = TextStringObject(payload)
+    elif action_name == "/Trans":
+        action[NameObject("/Trans")] = DictionaryObject(
+            {
+                NameObject("/S"): NameObject(
+                    "/Dissolve" if variant == "A" else "/Split"
+                )
+            }
+        )
+    elif action_name == "/RichMediaExecute":
+        annotation = writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Annot"),
+                    NameObject("/Subtype"): NameObject("/RichMedia"),
+                    NameObject("/Rect"): ArrayObject(
+                        [
+                            NumberObject(0),
+                            NumberObject(0),
+                            NumberObject(10),
+                            NumberObject(10),
+                        ]
+                    ),
+                }
+            )
+        )
+        writer.pages[0][NameObject("/Annots")] = ArrayObject([annotation])
+        action[NameObject("/TA")] = annotation
+        action[NameObject("/CMD")] = DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/RichMediaCommand"),
+                NameObject("/C"): TextStringObject(payload),
+            }
+        )
+    else:
+        raise FixtureError("direct action field action is unsupported")
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(action)
+    return writer
 
 
 def _catalog_javascript_trigger_writer(

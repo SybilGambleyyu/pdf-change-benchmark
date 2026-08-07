@@ -9,6 +9,30 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.13.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.13.0 fixture candidate rebuilt and verified all 128
+fixture pairs with pypdf 6.15.0. Its 58 tests and Ruff checks passed. It scored
+the PDFFence 1.13.0 source candidate through its process-bound command-line
+executable: 128 of 128 pairs passed.
+
+The eleven direct document-action behavior-field cases retain the action type
+and public inventory while rewriting one of `/Thread` `/D`, `/URI` `/IsMap`,
+`/Sound` raw stream bytes, `/Movie` `/T`, `/Hide` `/T`, `/Named` `/N`,
+`/SubmitForm` `/CharSet`, `/ResetForm` `/Fields`, `/Rendition` `/JS`, `/Trans`
+`/Trans`, or `/RichMediaExecute` `/CMD`. Each requires generic
+active-content evidence and PFP001. The held PDFFence 1.12.0 source candidate
+scores 117 of 128, missing exactly these eleven rewrites while passing every
+existing pair. The Sound case is a decoder-free control for raw stored stream
+representation.
+
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed Twine metadata checks. Fresh wheel installs
+on Python 3.12 and 3.13, plus a clean Python 3.12 source-archive install,
+passed pip check, fixture verification, and the complete 128-pair score.
+Dependency auditing found no known vulnerabilities; the unpublished local
+distributions were correctly skipped because they are not on PyPI.
+
 ## 1.12.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.12.0 fixture candidate rebuilt and verified all 117

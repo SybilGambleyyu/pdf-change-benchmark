@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.13.0 (unreleased)
+
+- Add eleven direct document-action behavior-field regressions for `/Thread`,
+  `/URI`, `/Sound`, `/Movie`, `/Hide`, `/Named`, `/SubmitForm`, `/ResetForm`,
+  `/Rendition`, `/Trans`, and `/RichMediaExecute`. Each keeps the action type
+  and public inventory fixed while changing one standardized behavior-bearing
+  field, requiring `active_content_payload_changed` and PFP001.
+- Cover raw stored bytes for the top-level `/Sound` stream without requiring a
+  payload decoder. The fixtures increase the published suite from 117 to 128
+  deterministic pairs.
+
 ## 1.12.0 (unreleased)
 
 - Add four GoToE hierarchy-scope regressions for document-action roots and
