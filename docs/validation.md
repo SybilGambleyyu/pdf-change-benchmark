@@ -9,6 +9,23 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.8.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.8.0 fixture candidate rebuilt and verified all 83 fixture
+pairs with pypdf 6.15.0. Its 43 tests and Ruff checks passed. It scored the
+PDFFence 1.8.0 source candidate through its process-bound command-line
+executable: 83 of 83 pairs passed.
+
+The ten SetOCGState cases hold their document-action root or semantic chain
+position and public action inventory fixed. The positives rebind a selected
+catalog OCG, rewrite an ON/OFF state operation, or change PreserveRB; OCG
+metadata-only rewrites and omitted-versus-explicit true PreserveRB are
+stored-byte-only negatives. The held PDFFence 1.7.0 source candidate scores 78
+of 83: it misses all three root state rewrites and falsely flags the two
+semantic-chain negatives. This isolates ordered state-array semantics and the
+specified PreserveRB default from broad group metadata hashes and dictionary
+shape differences.
+
 ## 1.7.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.7.0 fixture candidate rebuilt and verified all 73 fixture

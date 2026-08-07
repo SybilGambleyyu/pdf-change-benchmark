@@ -1,0 +1,13 @@
+{
+  "category": "active_content",
+  "description": "A SetOCGState successor selects a different catalog optional content group while its action chain remains fixed.",
+  "expected_change_kinds": [
+    "active_content_action_sequence_changed",
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [
+    "PFP001"
+  ],
+  "id": "active.action_chain_set_ocg_state_group_rebound",
+  "schema_version": 1
+}

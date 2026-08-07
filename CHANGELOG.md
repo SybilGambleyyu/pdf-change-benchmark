@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.0 (unreleased)
+
+- Add ten SetOCGState regressions for document-action roots and semantic
+  action-chain members. Rebinding a selected catalog OCG, rewriting an ON/OFF
+  operation, or changing PreserveRB requires the appropriate generic
+  active-content signal and PFP001.
+- Keep OCG Name and Usage metadata fixed as byte-only negatives, and normalize
+  an omitted PreserveRB to its specified true default. These cases prevent an
+  adapter from recursively hashing group metadata or falsely treating an
+  explicit default as a semantic change.
+
 ## 1.7.0 (unreleased)
 
 - Add six PDF 2.0 GoToDp regressions covering a document-action root and a

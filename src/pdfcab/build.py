@@ -10,6 +10,7 @@ from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     ArrayObject,
+    BooleanObject,
     ByteStringObject,
     DecodedStreamObject,
     DictionaryObject,
@@ -327,6 +328,70 @@ FIXTURE_SPECS = (
         (),
     ),
     FixtureSpec(
+        "active.action_chain_set_ocg_state_group_rebound",
+        "active_content",
+        (
+            "A SetOCGState successor selects a different catalog optional "
+            "content group while its action chain remains fixed."
+        ),
+        "action_chain_set_ocg_state_group_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_set_ocg_state_operation_rewritten",
+        "active_content",
+        (
+            "A SetOCGState successor changes its stored group-state operation "
+            "while its action chain remains fixed."
+        ),
+        "action_chain_set_ocg_state_operation_rewritten",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_set_ocg_state_preserve_rb_rewritten",
+        "active_content",
+        (
+            "A SetOCGState successor changes its PreserveRB setting while its "
+            "action chain remains fixed."
+        ),
+        "action_chain_set_ocg_state_preserve_rb_rewritten",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_set_ocg_state_group_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a SetOCGState successor's fixed catalog group changes "
+            "without changing its action semantics."
+        ),
+        "action_chain_set_ocg_state_group_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_set_ocg_state_preserve_rb_explicit_default",
+        "active_content",
+        (
+            "A SetOCGState successor explicitly writes the PreserveRB=true "
+            "default without changing its action semantics."
+        ),
+        "action_chain_set_ocg_state_preserve_rb_explicit_default",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.action_chain_remote_goto_structure_destination_fallback_rewritten",
         "active_content",
         (
@@ -534,6 +599,70 @@ FIXTURE_SPECS = (
             "target changes without rebinding the destination."
         ),
         "goto_document_part_target_page_rotated",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.set_ocg_state_group_rebound",
+        "active_content",
+        (
+            "A document-open SetOCGState action selects a different catalog "
+            "optional content group while its public action inventory remains fixed."
+        ),
+        "set_ocg_state_group_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.set_ocg_state_operation_rewritten",
+        "active_content",
+        (
+            "A document-open SetOCGState action changes its stored group-state "
+            "operation while its public action inventory remains fixed."
+        ),
+        "set_ocg_state_operation_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.set_ocg_state_preserve_rb_rewritten",
+        "active_content",
+        (
+            "A document-open SetOCGState action changes its PreserveRB setting "
+            "while its public action inventory remains fixed."
+        ),
+        "set_ocg_state_preserve_rb_rewritten",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.set_ocg_state_group_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a document-open SetOCGState action's fixed catalog "
+            "group changes without changing its action semantics."
+        ),
+        "set_ocg_state_group_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.set_ocg_state_preserve_rb_explicit_default",
+        "active_content",
+        (
+            "A document-open SetOCGState action explicitly writes the "
+            "PreserveRB=true default without changing its action semantics."
+        ),
+        "set_ocg_state_preserve_rb_explicit_default",
         ("stored_pdf_bytes_changed",),
         (),
     ),
@@ -1248,6 +1377,75 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
             ),
             candidate,
         )
+    elif mutation == "action_chain_set_ocg_state_group_rebound":
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(group=0),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(group=1),
+            candidate,
+        )
+    elif mutation == "action_chain_set_ocg_state_operation_rewritten":
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                operation="/ON",
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                operation="/OFF",
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_set_ocg_state_preserve_rb_rewritten":
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                preserve_rb=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                preserve_rb=False,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_set_ocg_state_group_metadata_rewritten":
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                first_group_metadata=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                first_group_metadata=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_set_ocg_state_preserve_rb_explicit_default":
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                preserve_rb=None,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_action_chain_set_ocg_state_writer(
+                group=0,
+                preserve_rb=True,
+            ),
+            candidate,
+        )
     elif (
         mutation == "action_chain_remote_goto_structure_destination_fallback_rewritten"
     ):
@@ -1465,6 +1663,51 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
                 document_part_destination=0,
                 first_page_rotation=90,
             ),
+            candidate,
+        )
+    elif mutation == "set_ocg_state_group_rebound":
+        _write(_catalog_set_ocg_state_writer(group=0), baseline)
+        _write(_catalog_set_ocg_state_writer(group=1), candidate)
+    elif mutation == "set_ocg_state_operation_rewritten":
+        _write(
+            _catalog_set_ocg_state_writer(group=0, operation="/ON"),
+            baseline,
+        )
+        _write(
+            _catalog_set_ocg_state_writer(group=0, operation="/OFF"),
+            candidate,
+        )
+    elif mutation == "set_ocg_state_preserve_rb_rewritten":
+        _write(
+            _catalog_set_ocg_state_writer(group=0, preserve_rb=True),
+            baseline,
+        )
+        _write(
+            _catalog_set_ocg_state_writer(group=0, preserve_rb=False),
+            candidate,
+        )
+    elif mutation == "set_ocg_state_group_metadata_rewritten":
+        _write(
+            _catalog_set_ocg_state_writer(
+                group=0,
+                first_group_metadata=_MARKER_A,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_set_ocg_state_writer(
+                group=0,
+                first_group_metadata=_MARKER_B,
+            ),
+            candidate,
+        )
+    elif mutation == "set_ocg_state_preserve_rb_explicit_default":
+        _write(
+            _catalog_set_ocg_state_writer(group=0, preserve_rb=None),
+            baseline,
+        )
+        _write(
+            _catalog_set_ocg_state_writer(group=0, preserve_rb=True),
             candidate,
         )
     elif mutation == "uri_payload_rewritten":
@@ -2765,6 +3008,130 @@ def _catalog_action_chain_document_part_goto_writer(
                 NameObject("/S"): NameObject("/GoToDp"),
                 NameObject("/Dp"): targets[document_part_destination],
             }
+        )
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+                NameObject("/Next"): successor,
+            }
+        )
+    )
+    return writer
+
+
+def _set_ocg_state_writer_parts(
+    *,
+    first_group_metadata: str = _MARKER_A,
+) -> tuple[PdfWriter, tuple[IndirectObject, IndirectObject]]:
+    """Build two catalog OCGs with a radio-button relationship."""
+
+    writer = _writer()
+    first_group = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/OCG"),
+                NameObject("/Name"): TextStringObject(first_group_metadata),
+                NameObject("/Usage"): DictionaryObject(
+                    {
+                        NameObject("/CreatorInfo"): DictionaryObject(
+                            {NameObject("/Creator"): TextStringObject(_MARKER_A)}
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    second_group = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/OCG"),
+                NameObject("/Name"): TextStringObject(_MARKER_C),
+            }
+        )
+    )
+    writer._root_object[NameObject("/OCProperties")] = DictionaryObject(
+        {
+            NameObject("/OCGs"): ArrayObject([first_group, second_group]),
+            NameObject("/D"): DictionaryObject(
+                {
+                    NameObject("/RBGroups"): ArrayObject(
+                        [ArrayObject([first_group, second_group])]
+                    )
+                }
+            ),
+        }
+    )
+    return writer, (first_group, second_group)
+
+
+def _set_ocg_state_action(
+    groups: tuple[IndirectObject, IndirectObject],
+    *,
+    group: int,
+    operation: str,
+    preserve_rb: bool | None,
+) -> DictionaryObject:
+    """Build one SetOCGState action with a single catalog group target."""
+
+    action = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Action"),
+            NameObject("/S"): NameObject("/SetOCGState"),
+            NameObject("/State"): ArrayObject(
+                [NameObject(operation), groups[group]]
+            ),
+        }
+    )
+    if preserve_rb is not None:
+        action[NameObject("/PreserveRB")] = BooleanObject(preserve_rb)
+    return action
+
+
+def _catalog_set_ocg_state_writer(
+    *,
+    group: int,
+    operation: str = "/ON",
+    preserve_rb: bool | None = None,
+    first_group_metadata: str = _MARKER_A,
+) -> PdfWriter:
+    """Build a document-open SetOCGState action with catalog OCGs."""
+
+    writer, groups = _set_ocg_state_writer_parts(
+        first_group_metadata=first_group_metadata,
+    )
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        _set_ocg_state_action(
+            groups,
+            group=group,
+            operation=operation,
+            preserve_rb=preserve_rb,
+        )
+    )
+    return writer
+
+
+def _catalog_action_chain_set_ocg_state_writer(
+    *,
+    group: int,
+    operation: str = "/ON",
+    preserve_rb: bool | None = None,
+    first_group_metadata: str = _MARKER_A,
+) -> PdfWriter:
+    """Build a semantic SetOCGState successor with catalog OCGs."""
+
+    writer, groups = _set_ocg_state_writer_parts(
+        first_group_metadata=first_group_metadata,
+    )
+    successor = writer._add_object(
+        _set_ocg_state_action(
+            groups,
+            group=group,
+            operation=operation,
+            preserve_rb=preserve_rb,
         )
     )
     writer._root_object[NameObject("/OpenAction")] = writer._add_object(

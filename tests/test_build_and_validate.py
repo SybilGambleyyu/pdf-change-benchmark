@@ -188,6 +188,111 @@ def test_document_part_destination_pairs_are_semantic(tmp_path):
         assert int(candidate.pages[0]["/Rotate"]) == 90
 
 
+def test_set_ocg_state_pairs_are_semantic(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+
+    def action(reader: PdfReader, *, action_chain: bool):
+        root_action = reader.root_object["/OpenAction"].get_object()
+        if not action_chain:
+            return root_action
+        assert str(root_action["/S"]) == "/JavaScript"
+        return root_action["/Next"].get_object()
+
+    def groups(reader: PdfReader):
+        properties = reader.root_object["/OCProperties"]
+        catalog_groups = tuple(properties["/OCGs"])
+        radio_button_groups = properties["/D"]["/RBGroups"]
+        assert len(catalog_groups) == 2
+        assert len(radio_button_groups) == 1
+        assert tuple(radio_button_groups[0]) == catalog_groups
+        assert all(
+            str(group.get_object()["/Type"]) == "/OCG"
+            for group in catalog_groups
+        )
+        return catalog_groups
+
+    for fixture_id, action_chain in (
+        ("active.set_ocg_state_group_rebound", False),
+        ("active.action_chain_set_ocg_state_group_rebound", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_groups = groups(baseline)
+        candidate_groups = groups(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert str(baseline_action["/S"]) == "/SetOCGState"
+        assert str(candidate_action["/S"]) == "/SetOCGState"
+        assert str(baseline_action["/State"][0]) == "/ON"
+        assert str(candidate_action["/State"][0]) == "/ON"
+        assert baseline_action["/State"][1] == baseline_groups[0]
+        assert candidate_action["/State"][1] == candidate_groups[1]
+
+    for fixture_id, action_chain in (
+        ("active.set_ocg_state_operation_rewritten", False),
+        ("active.action_chain_set_ocg_state_operation_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_groups = groups(baseline)
+        candidate_groups = groups(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert str(baseline_action["/State"][0]) == "/ON"
+        assert str(candidate_action["/State"][0]) == "/OFF"
+        assert baseline_action["/State"][1] == baseline_groups[0]
+        assert candidate_action["/State"][1] == candidate_groups[0]
+
+    for fixture_id, action_chain in (
+        ("active.set_ocg_state_preserve_rb_rewritten", False),
+        ("active.action_chain_set_ocg_state_preserve_rb_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert str(baseline_action["/PreserveRB"]).lower() == "true"
+        assert str(candidate_action["/PreserveRB"]).lower() == "false"
+
+    for fixture_id, action_chain in (
+        ("active.set_ocg_state_group_metadata_rewritten", False),
+        ("active.action_chain_set_ocg_state_group_metadata_rewritten", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_groups = groups(baseline)
+        candidate_groups = groups(candidate)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert baseline_action["/State"][1] == baseline_groups[0]
+        assert candidate_action["/State"][1] == candidate_groups[0]
+        assert str(baseline_groups[0].get_object()["/Name"]) != str(
+            candidate_groups[0].get_object()["/Name"]
+        )
+
+    for fixture_id, action_chain in (
+        ("active.set_ocg_state_preserve_rb_explicit_default", False),
+        ("active.action_chain_set_ocg_state_preserve_rb_explicit_default", True),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+
+        assert "/PreserveRB" not in baseline_action
+        assert str(candidate_action["/PreserveRB"]).lower() == "true"
+
+
 def test_uri_payload_rewrite_pair_keeps_the_action_inventory_fixed(tmp_path):
     generated = tmp_path / "generated"
     build_fixture_tree(generated)

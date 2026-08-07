@@ -23,6 +23,16 @@ The optional-content fixture covers only catalog-declared groups and
 configuration topology. It does not claim that a viewer displays a particular
 layer state or that page content uses the declared groups.
 
+The SetOCGState fixtures use two catalog-declared optional-content groups and
+a default-configuration RBGroups entry. Root and semantic-chain positives
+either choose the other catalog group, change the ordered ON/OFF operation, or
+change PreserveRB. The paired negatives keep the selected group and operation
+fixed while changing only Name or Usage metadata, or add explicit
+PreserveRB=true where it was absent. Positives require the appropriate generic
+active-content signal and PFP001; negatives require only the stored-byte
+change. No truth record publishes a group identity, metadata value, operation,
+radio-button setting, action position, or private fingerprint.
+
 The GoTo-to-embedded-GoTo fixture keeps the action dictionary count fixed and
 retains an embedded child PDF in both files. Only the candidate action adds a
 structurally shaped target for that child while changing the fixed action type.
