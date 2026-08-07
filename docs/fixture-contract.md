@@ -118,6 +118,15 @@ stored stream representation; it does not require decoding the payload. Every
 truth record requires generic `active_content_payload_changed` and PFP001, and
 publishes no action value, stream bytes, target, command, or private digest.
 
+The paired PieceInfo controls place the same action-shaped dictionaries beneath
+a catalog `/PieceInfo` application's `/LastModified` and `/Private` data, not
+a standard action trigger. Their selected fields change exactly as in the
+direct-root positives, but all require `stored_pdf_bytes_changed` alone. They
+prevent an adapter from treating application-private data as an action simply
+because a dictionary happens to contain `/Type /Action` and `/S`. No truth
+record publishes a private application key, date, action value, stream bytes,
+or digest.
+
 The JavaScript trigger-rebinding fixture retains the same two inert script
 values and action inventory while exchanging their document-open and
 catalog-will-close bindings. Its generic truth distinguishes evidence of

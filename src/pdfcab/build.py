@@ -66,6 +66,19 @@ _DIRECT_ACTION_FIELD_ACTIONS = {
     "transition_rewritten": "/Trans",
     "rich_media_command_rewritten": "/RichMediaExecute",
 }
+_PASSIVE_PIECE_INFO_ACTIONS = {
+    "passive_piece_info_thread_destination_rewritten": "/Thread",
+    "passive_piece_info_uri_is_map_rewritten": "/URI",
+    "passive_piece_info_sound_stream_rewritten": "/Sound",
+    "passive_piece_info_movie_title_rewritten": "/Movie",
+    "passive_piece_info_hide_target_rewritten": "/Hide",
+    "passive_piece_info_named_action_rewritten": "/Named",
+    "passive_piece_info_submit_form_charset_rewritten": "/SubmitForm",
+    "passive_piece_info_reset_form_fields_rewritten": "/ResetForm",
+    "passive_piece_info_rendition_javascript_rewritten": "/Rendition",
+    "passive_piece_info_transition_rewritten": "/Trans",
+    "passive_piece_info_rich_media_command_rewritten": "/RichMediaExecute",
+}
 
 
 @dataclass(frozen=True)
@@ -1256,6 +1269,127 @@ FIXTURE_SPECS = (
         ("PFP001",),
     ),
     FixtureSpec(
+        "active.passive_piece_info_thread_destination_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a Thread action changes without "
+            "an action trigger."
+        ),
+        "passive_piece_info_thread_destination_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_uri_is_map_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a URI action changes without an "
+            "action trigger."
+        ),
+        "passive_piece_info_uri_is_map_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_sound_stream_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a Sound action changes without "
+            "an action trigger."
+        ),
+        "passive_piece_info_sound_stream_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_movie_title_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a Movie action changes without "
+            "an action trigger."
+        ),
+        "passive_piece_info_movie_title_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_hide_target_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a Hide action changes without an "
+            "action trigger."
+        ),
+        "passive_piece_info_hide_target_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_named_action_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a Named action changes without "
+            "an action trigger."
+        ),
+        "passive_piece_info_named_action_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_submit_form_charset_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a SubmitForm action changes "
+            "without an action trigger."
+        ),
+        "passive_piece_info_submit_form_charset_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_reset_form_fields_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a ResetForm action changes "
+            "without an action trigger."
+        ),
+        "passive_piece_info_reset_form_fields_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_rendition_javascript_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a Rendition action changes "
+            "without an action trigger."
+        ),
+        "passive_piece_info_rendition_javascript_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_transition_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a Trans action changes without "
+            "an action trigger."
+        ),
+        "passive_piece_info_transition_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.passive_piece_info_rich_media_command_rewritten",
+        "active_content",
+        (
+            "Private PieceInfo data shaped like a RichMediaExecute action "
+            "changes without an action trigger."
+        ),
+        "passive_piece_info_rich_media_command_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
         "active.javascript_trigger_rebound",
         "active_content",
         (
@@ -1721,6 +1855,24 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
         action = _DIRECT_ACTION_FIELD_ACTIONS[mutation]
         _write(_catalog_direct_action_field_writer(action, variant="A"), baseline)
         _write(_catalog_direct_action_field_writer(action, variant="B"), candidate)
+    elif mutation in _PASSIVE_PIECE_INFO_ACTIONS:
+        action = _PASSIVE_PIECE_INFO_ACTIONS[mutation]
+        _write(
+            _catalog_direct_action_field_writer(
+                action,
+                variant="A",
+                passive_piece_info=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_direct_action_field_writer(
+                action,
+                variant="B",
+                passive_piece_info=True,
+            ),
+            candidate,
+        )
     elif mutation == "javascript_added":
         _write(_writer(), baseline)
         _write(_writer(javascript=_MARKER_A), candidate)
@@ -3258,8 +3410,9 @@ def _catalog_direct_action_field_writer(
     action_name: str,
     *,
     variant: str,
+    passive_piece_info: bool = False,
 ) -> PdfWriter:
-    """Build one document-open action with a selected behavior field."""
+    """Build selected action data at a direct root or in passive PieceInfo."""
 
     if variant not in {"A", "B"}:
         raise FixtureError("direct action field variant is unsupported")
@@ -3345,7 +3498,24 @@ def _catalog_direct_action_field_writer(
         )
     else:
         raise FixtureError("direct action field action is unsupported")
-    writer._root_object[NameObject("/OpenAction")] = writer._add_object(action)
+    action_reference = writer._add_object(action)
+    if passive_piece_info:
+        writer._root_object[NameObject("/PieceInfo")] = DictionaryObject(
+            {
+                NameObject("/PDFCAB"): DictionaryObject(
+                    {
+                        NameObject("/LastModified"): TextStringObject(
+                            "D:20260806000000Z"
+                        ),
+                        NameObject("/Private"): DictionaryObject(
+                            {NameObject("/Action"): action_reference}
+                        ),
+                    }
+                )
+            }
+        )
+    else:
+        writer._root_object[NameObject("/OpenAction")] = action_reference
     return writer
 
 

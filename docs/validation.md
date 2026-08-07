@@ -9,6 +9,29 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.14.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.14.0 fixture candidate rebuilt and verified all 139
+fixture pairs with pypdf 6.15.0. Its 69 tests and Ruff checks passed. It scored
+the PDFFence 1.14.0 source candidate through its process-bound command-line
+executable: 139 of 139 pairs passed.
+
+The eleven new controls use a catalog PieceInfo application's required
+`/LastModified` and arbitrary `/Private` dictionary, where the private value is
+shaped like a standard action and changes one selected behavior field. No
+catalog OpenAction, direct action, additional-action event, JavaScript name
+tree entry, or `/Next` chain reaches that private dictionary. Each requires a
+stored-byte change alone. The held PDFFence 1.13.0 release scores 128 of 139,
+falsely adding active-content evidence in exactly those eleven controls. The
+Sound case remains a decoder-free raw-stream control.
+
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed Twine metadata checks. Fresh wheel installs
+on Python 3.12 and 3.13, plus a clean Python 3.12 source-archive install,
+passed pip check, fixture verification, and the complete 139-pair score.
+Dependency auditing found no known vulnerabilities; the unpublished local
+distributions were correctly skipped because they are not on PyPI.
+
 ## 1.13.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.13.0 fixture candidate rebuilt and verified all 128

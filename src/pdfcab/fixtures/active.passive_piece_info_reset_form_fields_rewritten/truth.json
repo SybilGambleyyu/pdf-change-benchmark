@@ -1,0 +1,10 @@
+{
+  "category": "active_content",
+  "description": "Private PieceInfo data shaped like a ResetForm action changes without an action trigger.",
+  "expected_change_kinds": [
+    "stored_pdf_bytes_changed"
+  ],
+  "expected_policy_rule_ids": [],
+  "id": "active.passive_piece_info_reset_form_fields_rewritten",
+  "schema_version": 1
+}

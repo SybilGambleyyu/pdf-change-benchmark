@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.14.0 (unreleased)
+
+- Add eleven standard-form catalog PieceInfo negatives whose private data is
+  shaped like Thread, URI, Sound, Movie, Hide, Named, SubmitForm, ResetForm,
+  Rendition, Trans, or RichMediaExecute actions. Each rewrites a selected
+  behavior-bearing field while no standard action root reaches it, requiring a
+  stored-byte change alone.
+- The controls increase the deterministic suite from 128 to 139 fixture pairs
+  and prevent adapters from treating private application data as executable
+  action behavior.
+
 ## 1.13.0 (unreleased)
 
 - Add eleven direct document-action behavior-field regressions for `/Thread`,

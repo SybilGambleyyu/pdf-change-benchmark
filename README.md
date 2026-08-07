@@ -20,16 +20,19 @@ surface. PDFCAB gives tools a small, versioned proof set for those boundaries.
 It is intended for static analysis, not for claiming visual equivalence,
 malware safety, signature validity, or viewer behavior.
 
-Version 1.13 contains 128 fixture pairs spanning active content, embedded
+Version 1.14 contains 139 fixture pairs spanning active content, embedded
 content, interactive features, optional-content topology, Associated Files,
 signature structure, metadata, encryption, and revision-chain evidence. It
-adds direct document-action behavior-field rewrites for `/Thread`, `/URI`,
-`/Sound`, `/Movie`, `/Hide`, `/Named`, `/SubmitForm`, `/ResetForm`,
-`/Rendition`, `/Trans`, and `/RichMediaExecute`; each retains its public action
-inventory and requires only generic active-content evidence. The release also
-retains GoToE hierarchy-scope negatives, catalog-named and FileAttachment
-GoToE cases, GoTo3DView, SetOCGState, PDF 2.0 GoToDp, remote-GoTo, local
-structure-destination, direct-navigation, and action-chain regressions.
+adds PieceInfo controls whose private data is shaped like each direct
+action-behavior case but has no standard action trigger. They require only a
+stored-byte change, preventing a static adapter from treating private
+application data as executable action behavior. The release retains direct
+document-action behavior rewrites for `/Thread`, `/URI`, `/Sound`, `/Movie`,
+`/Hide`, `/Named`, `/SubmitForm`, `/ResetForm`, `/Rendition`, `/Trans`, and
+`/RichMediaExecute`, GoToE hierarchy-scope negatives, catalog-named and
+FileAttachment GoToE cases, GoTo3DView, SetOCGState, PDF 2.0 GoToDp,
+remote-GoTo, local structure-destination, direct-navigation, and action-chain
+regressions.
 
 ## Install
 

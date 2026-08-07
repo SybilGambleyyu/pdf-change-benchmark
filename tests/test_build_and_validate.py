@@ -1593,6 +1593,52 @@ def test_direct_action_field_pairs_rewrite_selected_semantics(
 
 
 @pytest.mark.parametrize(
+    ("fixture_id", "action_type"),
+    (
+        ("active.passive_piece_info_thread_destination_rewritten", "/Thread"),
+        ("active.passive_piece_info_uri_is_map_rewritten", "/URI"),
+        ("active.passive_piece_info_sound_stream_rewritten", "/Sound"),
+        ("active.passive_piece_info_movie_title_rewritten", "/Movie"),
+        ("active.passive_piece_info_hide_target_rewritten", "/Hide"),
+        ("active.passive_piece_info_named_action_rewritten", "/Named"),
+        ("active.passive_piece_info_submit_form_charset_rewritten", "/SubmitForm"),
+        ("active.passive_piece_info_reset_form_fields_rewritten", "/ResetForm"),
+        ("active.passive_piece_info_rendition_javascript_rewritten", "/Rendition"),
+        ("active.passive_piece_info_transition_rewritten", "/Trans"),
+        (
+            "active.passive_piece_info_rich_media_command_rewritten",
+            "/RichMediaExecute",
+        ),
+    ),
+)
+def test_piece_info_action_field_pairs_keep_behavior_passive(
+    tmp_path,
+    fixture_id,
+    action_type,
+):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+    fixture = generated / fixture_id
+
+    baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+    candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+    assert "/OpenAction" not in baseline.root_object
+    assert "/OpenAction" not in candidate.root_object
+    baseline_action = baseline.root_object["/PieceInfo"]["/PDFCAB"]["/Private"][
+        "/Action"
+    ].get_object()
+    candidate_action = candidate.root_object["/PieceInfo"]["/PDFCAB"]["/Private"][
+        "/Action"
+    ].get_object()
+
+    assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == action_type
+    assert _direct_action_behavior_value(
+        baseline_action,
+        action_type,
+    ) != _direct_action_behavior_value(candidate_action, action_type)
+
+
+@pytest.mark.parametrize(
     ("fixture_id", "action_type", "as_file_specification"),
     (
         ("active.launch_target_rewritten", "/Launch", False),
