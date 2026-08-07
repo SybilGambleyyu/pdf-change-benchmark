@@ -9,6 +9,34 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.10.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.10.0 fixture candidate rebuilt and verified all 101
+fixture pairs with pypdf 6.15.0. Its 45 tests and Ruff checks passed. It scored
+the PDFFence 1.10.0 source candidate through its process-bound command-line
+executable: 101 of 101 pairs passed.
+
+The ten GoToE cases hold their document-action root or semantic-chain position
+and public action inventory fixed. Named-child positives rebind the matching
+catalog EmbeddedFiles value while both FileSpecs have the same filename and
+description; their inert embedded-file bytes differ. Direct FileSpec target
+rewrites provide separate root and chain positives. Selected/direct-description
+and unrelated-name-tree rewrites are stored-byte-only negatives. The held
+PDFFence 1.9.0 source candidate scores 96 of 101: it misses both named-child
+rebinds, falsely flags both direct-description negatives, and emits the wrong
+generic signal for the direct semantic-chain target rewrite. This isolates the
+selected FileSpec and stored embedded-file representation from recursive
+metadata or whole-name-tree hashing.
+
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed Twine metadata checks. Fresh wheel installs
+on Python 3.12 and 3.13, plus a clean Python 3.12 source-archive install,
+passed pip check, fixture verification, and the complete 101-pair score.
+Installed PDFFence JSON, Markdown, and SARIF policy reports for root and
+semantic-chain positives remained generic across all formats, reporting only
+PFP001 and the expected generic change kind; no inert marker, GoToE token,
+name, target, description, stream data, or private signature appeared.
+
 ## 1.9.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.9.0 fixture candidate rebuilt and verified all 91 fixture
