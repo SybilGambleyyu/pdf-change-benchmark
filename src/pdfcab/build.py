@@ -45,6 +45,8 @@ _EMBEDDED_GOTO_NAMED_TARGET_A = "PDFCAB_NAMED_EMBEDDED_A.pdf"
 _EMBEDDED_GOTO_NAMED_TARGET_B = "PDFCAB_NAMED_EMBEDDED_B.pdf"
 _EMBEDDED_GOTO_ROOT_TARGET_A = "PDFCAB_ROOT_EMBEDDED_A.pdf"
 _EMBEDDED_GOTO_ROOT_TARGET_B = "PDFCAB_ROOT_EMBEDDED_B.pdf"
+_EMBEDDED_GOTO_FILE_ATTACHMENT_NAME = "PDFCAB_FILE_ATTACHMENT_NAME"
+_EMBEDDED_GOTO_FILE_ATTACHMENT_PAGE = b"PDFCAB_FILE_ATTACHMENT_PAGE"
 _SUBMIT_TARGET_A = "https://example.invalid/pdfcab-submit-a"
 _SUBMIT_TARGET_B = "https://example.invalid/pdfcab-submit-b"
 _IMPORT_TARGET_A = "PDFCAB_IMPORT_A.fdf"
@@ -258,6 +260,162 @@ FIXTURE_SPECS = (
             "stored_pdf_bytes_changed",
         ),
         ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_file_attachment_index_target_rebound",
+        "active_content",
+        (
+            "A document-open embedded GoTo keeps its numeric FileAttachment "
+            "coordinates fixed while their selected file target is rebound."
+        ),
+        "embedded_goto_file_attachment_index_target_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_file_attachment_index_target_rebound",
+        "active_content",
+        (
+            "An embedded GoTo successor keeps numeric FileAttachment "
+            "coordinates fixed while their selected file target is rebound."
+        ),
+        "action_chain_embedded_goto_file_attachment_index_target_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_file_attachment_named_annotation_target_rebound",
+        "active_content",
+        (
+            "A document-open embedded GoTo keeps its numeric page and named "
+            "FileAttachment selector fixed while the selected file is rebound."
+        ),
+        "embedded_goto_file_attachment_named_annotation_target_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_file_attachment_named_annotation_target_rebound",
+        "active_content",
+        (
+            "An embedded GoTo successor keeps its numeric page and named "
+            "FileAttachment selector fixed while the selected file is rebound."
+        ),
+        "action_chain_embedded_goto_file_attachment_named_annotation_target_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_file_attachment_named_page_target_rebound",
+        "active_content",
+        (
+            "A document-open embedded GoTo keeps a named page and numeric "
+            "FileAttachment selector fixed while the selected file is rebound."
+        ),
+        "embedded_goto_file_attachment_named_page_target_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_file_attachment_named_page_target_rebound",
+        "active_content",
+        (
+            "An embedded GoTo successor keeps a named page and numeric "
+            "FileAttachment selector fixed while the selected file is rebound."
+        ),
+        "action_chain_embedded_goto_file_attachment_named_page_target_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_file_attachment_named_target_rebound",
+        "active_content",
+        (
+            "A document-open embedded GoTo keeps named FileAttachment page "
+            "and annotation selectors fixed while the selected file is rebound."
+        ),
+        "embedded_goto_file_attachment_named_target_rebound",
+        (
+            "active_content_payload_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_file_attachment_named_target_rebound",
+        "active_content",
+        (
+            "An embedded GoTo successor keeps named FileAttachment page and "
+            "annotation selectors fixed while the selected file is rebound."
+        ),
+        "action_chain_embedded_goto_file_attachment_named_target_rebound",
+        (
+            "active_content_action_sequence_changed",
+            "stored_pdf_bytes_changed",
+        ),
+        ("PFP001",),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_file_attachment_file_specification_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a document-open embedded GoTo's selected "
+            "FileAttachment file specification changes without retargeting it."
+        ),
+        "embedded_goto_file_attachment_file_specification_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_file_attachment_file_specification_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on an embedded GoTo successor's selected FileAttachment "
+            "file specification changes without retargeting it."
+        ),
+        "action_chain_embedded_goto_file_attachment_file_specification_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.embedded_goto_file_attachment_annotation_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on a document-open embedded GoTo's selected "
+            "FileAttachment annotation changes without retargeting it."
+        ),
+        "embedded_goto_file_attachment_annotation_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
+    ),
+    FixtureSpec(
+        "active.action_chain_embedded_goto_file_attachment_annotation_metadata_rewritten",
+        "active_content",
+        (
+            "Metadata on an embedded GoTo successor's selected FileAttachment "
+            "annotation changes without retargeting it."
+        ),
+        "action_chain_embedded_goto_file_attachment_annotation_metadata_rewritten",
+        ("stored_pdf_bytes_changed",),
+        (),
     ),
     FixtureSpec(
         "active.goto_root_named_destination_rebound",
@@ -1541,6 +1699,219 @@ def _build_pair(mutation: str, baseline: Path, candidate: Path) -> None:
         _write(
             _catalog_embedded_goto_named_target_writer(
                 root_file_name=_EMBEDDED_GOTO_ROOT_TARGET_B,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_file_attachment_index_target_rebound":
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_file_index=0
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_file_index=1
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_embedded_goto_file_attachment_index_target_rebound":
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_file_index=0,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_file_index=1,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_file_attachment_named_annotation_target_rebound":
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                annotation_selector="name",
+                numeric_page_target=1,
+                page_one_file_index=0,
+                page_one_named_annotation_position=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                annotation_selector="name",
+                numeric_page_target=1,
+                page_one_file_index=1,
+                page_one_named_annotation_position=1,
+            ),
+            candidate,
+        )
+    elif (
+        mutation
+        == "action_chain_embedded_goto_file_attachment_named_annotation_target_rebound"
+    ):
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                annotation_selector="name",
+                numeric_page_target=1,
+                page_one_file_index=0,
+                page_one_named_annotation_position=0,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                annotation_selector="name",
+                numeric_page_target=1,
+                page_one_file_index=1,
+                page_one_named_annotation_position=1,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_file_attachment_named_page_target_rebound":
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                named_page_target=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                named_page_target=1,
+            ),
+            candidate,
+        )
+    elif (
+        mutation
+        == "action_chain_embedded_goto_file_attachment_named_page_target_rebound"
+    ):
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                named_page_target=0,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                named_page_target=1,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_file_attachment_named_target_rebound":
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                annotation_selector="name",
+                named_page_target=0,
+                page_zero_named_annotation_position=0,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                annotation_selector="name",
+                named_page_target=1,
+                page_one_named_annotation_position=1,
+            ),
+            candidate,
+        )
+    elif mutation == "action_chain_embedded_goto_file_attachment_named_target_rebound":
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                annotation_selector="name",
+                named_page_target=0,
+                page_zero_named_annotation_position=0,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_selector="name",
+                annotation_selector="name",
+                named_page_target=1,
+                page_one_named_annotation_position=1,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == (
+        "embedded_goto_file_attachment_file_specification_metadata_rewritten"
+    ):
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                first_file_metadata=_MARKER_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                first_file_metadata=_MARKER_B
+            ),
+            candidate,
+        )
+    elif (
+        mutation
+        == (
+            "action_chain_embedded_goto_file_attachment_"
+            "file_specification_metadata_rewritten"
+        )
+    ):
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                first_file_metadata=_MARKER_A,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                first_file_metadata=_MARKER_B,
+                action_chain=True,
+            ),
+            candidate,
+        )
+    elif mutation == "embedded_goto_file_attachment_annotation_metadata_rewritten":
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_first_annotation_metadata=_MARKER_A
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_first_annotation_metadata=_MARKER_B
+            ),
+            candidate,
+        )
+    elif (
+        mutation
+        == "action_chain_embedded_goto_file_attachment_annotation_metadata_rewritten"
+    ):
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_first_annotation_metadata=_MARKER_A,
+                action_chain=True,
+            ),
+            baseline,
+        )
+        _write(
+            _catalog_embedded_goto_file_attachment_target_writer(
+                page_zero_first_annotation_metadata=_MARKER_B,
                 action_chain=True,
             ),
             candidate,
@@ -3705,6 +4076,201 @@ def _catalog_embedded_goto_named_target_writer(
                 NameObject("/Desc"): TextStringObject(root_file_metadata),
             }
         )
+    if not action_chain:
+        writer._root_object[NameObject("/OpenAction")] = writer._add_object(action)
+        return writer
+    successor = writer._add_object(action)
+    writer._root_object[NameObject("/OpenAction")] = writer._add_object(
+        DictionaryObject(
+            {
+                NameObject("/Type"): NameObject("/Action"),
+                NameObject("/S"): NameObject("/JavaScript"),
+                NameObject("/JS"): TextStringObject(_MARKER_A),
+                NameObject("/Next"): successor,
+            }
+        )
+    )
+    return writer
+
+
+def _catalog_embedded_goto_file_attachment_target_writer(
+    *,
+    page_selector: str = "index",
+    annotation_selector: str = "index",
+    numeric_page_target: int = 0,
+    named_page_target: int = 0,
+    page_zero_file_index: int = 0,
+    page_one_file_index: int = 1,
+    page_zero_named_annotation_position: int = 0,
+    page_one_named_annotation_position: int = 0,
+    first_file_metadata: str = _MARKER_A,
+    page_zero_first_annotation_metadata: str = _MARKER_A,
+    action_chain: bool = False,
+) -> PdfWriter:
+    """Build a GoToE action whose child is selected through /P and /A."""
+
+    if page_selector not in {"index", "name"}:
+        raise FixtureError("embedded GoTo FileAttachment page selector is invalid")
+    if annotation_selector not in {"index", "name"}:
+        raise FixtureError(
+            "embedded GoTo FileAttachment annotation selector is invalid"
+        )
+    if any(
+        value not in {0, 1}
+        for value in (
+            named_page_target,
+            numeric_page_target,
+            page_zero_file_index,
+            page_one_file_index,
+            page_zero_named_annotation_position,
+            page_one_named_annotation_position,
+        )
+    ):
+        raise FixtureError("embedded GoTo FileAttachment target index is invalid")
+
+    writer = PdfWriter()
+    writer._header = b"%PDF-1.7"
+    writer.add_metadata({"/Title": _MARKER_A})
+    pages = (
+        writer.add_blank_page(width=72, height=72),
+        writer.add_blank_page(width=72, height=72),
+    )
+
+    def file_specification(metadata: str, stream_data: bytes) -> IndirectObject:
+        stream = DecodedStreamObject()
+        stream[NameObject("/Type")] = NameObject("/EmbeddedFile")
+        stream[NameObject("/Subtype")] = NameObject("/application#2Fpdf")
+        stream.set_data(stream_data)
+        return writer._add_object(
+            DictionaryObject(
+                {
+                    NameObject("/Type"): NameObject("/Filespec"),
+                    NameObject("/F"): TextStringObject(
+                        "PDFCAB_FILE_ATTACHMENT.pdf"
+                    ),
+                    NameObject("/EF"): DictionaryObject(
+                        {NameObject("/F"): writer._add_object(stream)}
+                    ),
+                    NameObject("/Desc"): TextStringObject(metadata),
+                }
+            )
+        )
+
+    file_specifications = (
+        file_specification(
+            first_file_metadata,
+            b"PDFCAB_FILE_ATTACHMENT_STREAM_A",
+        ),
+        file_specification(
+            _MARKER_A,
+            b"PDFCAB_FILE_ATTACHMENT_STREAM_B",
+        ),
+    )
+
+    def add_annotations(
+        page: object,
+        *,
+        selected_file_index: int,
+        named_annotation_position: int,
+        first_annotation_metadata: str,
+    ) -> None:
+        annotations: list[IndirectObject] = []
+        for position in range(2):
+            is_named_target = position == named_annotation_position
+            is_target = (
+                is_named_target if annotation_selector == "name" else position == 0
+            )
+            file_index = (
+                selected_file_index if is_target else 1 - selected_file_index
+            )
+            annotations.append(
+                writer._add_object(
+                    DictionaryObject(
+                        {
+                            NameObject("/Type"): NameObject("/Annot"),
+                            NameObject("/Subtype"): NameObject("/FileAttachment"),
+                            NameObject("/Rect"): ArrayObject(
+                                [
+                                    NumberObject(position * 12),
+                                    NumberObject(0),
+                                    NumberObject(position * 12 + 10),
+                                    NumberObject(10),
+                                ]
+                            ),
+                            NameObject("/FS"): file_specifications[file_index],
+                            NameObject("/NM"): TextStringObject(
+                                _EMBEDDED_GOTO_FILE_ATTACHMENT_NAME
+                                if is_named_target
+                                else "PDFCAB_OTHER_FILE_ATTACHMENT"
+                            ),
+                            NameObject("/Contents"): TextStringObject(
+                                first_annotation_metadata
+                                if position == 0
+                                else _MARKER_A
+                            ),
+                        }
+                    )
+                )
+            )
+        page[NameObject("/Annots")] = ArrayObject(annotations)
+
+    add_annotations(
+        pages[0],
+        selected_file_index=page_zero_file_index,
+        named_annotation_position=page_zero_named_annotation_position,
+        first_annotation_metadata=page_zero_first_annotation_metadata,
+    )
+    add_annotations(
+        pages[1],
+        selected_file_index=page_one_file_index,
+        named_annotation_position=page_one_named_annotation_position,
+        first_annotation_metadata=_MARKER_A,
+    )
+
+    target = DictionaryObject({NameObject("/R"): NameObject("/C")})
+    if page_selector == "index":
+        target[NameObject("/P")] = NumberObject(numeric_page_target)
+    else:
+        target[NameObject("/P")] = ByteStringObject(
+            _EMBEDDED_GOTO_FILE_ATTACHMENT_PAGE
+        )
+        writer._root_object[NameObject("/Names")] = DictionaryObject(
+            {
+                NameObject("/Dests"): DictionaryObject(
+                    {
+                        NameObject("/Names"): ArrayObject(
+                            [
+                                ByteStringObject(
+                                    _EMBEDDED_GOTO_FILE_ATTACHMENT_PAGE
+                                ),
+                                ArrayObject(
+                                    [
+                                        pages[named_page_target].indirect_reference,
+                                        NameObject("/Fit"),
+                                    ]
+                                ),
+                            ]
+                        )
+                    }
+                )
+            }
+        )
+    if annotation_selector == "index":
+        target[NameObject("/A")] = NumberObject(0)
+    else:
+        target[NameObject("/A")] = TextStringObject(
+            _EMBEDDED_GOTO_FILE_ATTACHMENT_NAME
+        )
+    action = DictionaryObject(
+        {
+            NameObject("/Type"): NameObject("/Action"),
+            NameObject("/S"): NameObject("/GoToE"),
+            NameObject("/D"): ByteStringObject(
+                b"PDFCAB_FILE_ATTACHMENT_DESTINATION"
+            ),
+            NameObject("/T"): target,
+        }
+    )
     if not action_chain:
         writer._root_object[NameObject("/OpenAction")] = writer._add_object(action)
         return writer

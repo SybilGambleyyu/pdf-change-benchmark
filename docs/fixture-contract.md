@@ -50,6 +50,18 @@ signal and PFP001; negatives require only the stored-byte change. The fixtures
 do not publish a name, file target, stream value, description, position, or
 private fingerprint.
 
+The GoToE FileAttachment target fixtures use two page-attached FileAttachment
+annotations per page and a child Target dictionary with /R /C, /P, and /A but
+no /N. The eight positives hold /P and /A fixed while rebinding the selected
+attachment through each standard selector combination: zero-based page/index,
+zero-based page/NM, named page/index, and named page/NM. Both selected
+FileSpecs retain the same filename and description while their inert embedded
+stream bytes differ. The four negatives hold the selected attachment fixed and
+change only its FileSpec description or annotation Contents. Positives require
+the corresponding generic active-content signal and PFP001; negatives require
+only the stored-byte change. No truth record publishes a selector, page,
+annotation, file target, stream value, description, or private fingerprint.
+
 The GoTo3DView-to-GoToDp fixture keeps a page-attached 3D annotation and a
 catalog document-part hierarchy on both sides. The baseline action references
 the 3D annotation; the candidate action references the document part. It tests

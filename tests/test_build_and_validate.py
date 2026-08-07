@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 from pypdf import PdfReader
-from pypdf.generic import ArrayObject, IndirectObject, NameObject
+from pypdf.generic import ArrayObject, IndirectObject, NameObject, NumberObject
 
 from pdfcab.build import FIXTURE_SPECS, build_fixture_tree
 from pdfcab.errors import FixtureError
@@ -417,6 +417,163 @@ def test_embedded_goto_named_target_pairs_are_semantic(tmp_path):
 
         assert str(baseline_file["/F"]) != str(candidate_file["/F"])
         assert str(baseline_file["/Desc"]) == str(candidate_file["/Desc"])
+
+
+def test_embedded_goto_file_attachment_target_pairs_are_semantic(tmp_path):
+    generated = tmp_path / "generated"
+    build_fixture_tree(generated)
+
+    def action(reader: PdfReader, *, action_chain: bool):
+        root_action = reader.root_object["/OpenAction"].get_object()
+        if not action_chain:
+            return root_action
+        assert str(root_action["/S"]) == "/JavaScript"
+        return root_action["/Next"].get_object()
+
+    def selected_annotation(reader: PdfReader, goto: object) -> object:
+        target = goto["/T"]
+        page_selector = target["/P"]
+        if isinstance(page_selector, NumberObject):
+            page = reader.pages[int(page_selector)]
+        else:
+            entries = reader.root_object["/Names"]["/Dests"]["/Names"]
+            destinations = {
+                str(entries[index]): entries[index + 1]
+                for index in range(0, len(entries), 2)
+            }
+            destination = destinations[str(page_selector)]
+            page = destination[0].get_object()
+        annotation_selector = target["/A"]
+        annotations = page["/Annots"]
+        if isinstance(annotation_selector, NumberObject):
+            return annotations[int(annotation_selector)].get_object()
+        matches = [
+            candidate.get_object()
+            for candidate in annotations
+            if str(candidate.get_object()["/NM"]) == str(annotation_selector)
+        ]
+        assert len(matches) == 1
+        return matches[0]
+
+    def stored_embedded_file_data(annotation: object) -> bytes:
+        file_specification = annotation["/FS"]
+        stream = file_specification["/EF"]["/F"]
+        if isinstance(stream, IndirectObject):
+            stream = stream.get_object()
+        return bytes(stream._data)
+
+    for fixture_id, action_chain in (
+        ("active.embedded_goto_file_attachment_index_target_rebound", False),
+        (
+            "active.action_chain_embedded_goto_file_attachment_index_target_rebound",
+            True,
+        ),
+        (
+            "active.embedded_goto_file_attachment_named_annotation_target_rebound",
+            False,
+        ),
+        (
+            "active.action_chain_embedded_goto_file_attachment_named_annotation_target_rebound",
+            True,
+        ),
+        ("active.embedded_goto_file_attachment_named_page_target_rebound", False),
+        (
+            "active.action_chain_embedded_goto_file_attachment_named_page_target_rebound",
+            True,
+        ),
+        ("active.embedded_goto_file_attachment_named_target_rebound", False),
+        (
+            "active.action_chain_embedded_goto_file_attachment_named_target_rebound",
+            True,
+        ),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_action = action(baseline, action_chain=action_chain)
+        candidate_action = action(candidate, action_chain=action_chain)
+        baseline_target = baseline_action["/T"]
+        candidate_target = candidate_action["/T"]
+
+        assert str(baseline_action["/S"]) == str(candidate_action["/S"]) == "/GoToE"
+        assert str(baseline_action["/D"]) == str(candidate_action["/D"])
+        assert str(baseline_target["/R"]) == str(candidate_target["/R"]) == "/C"
+        assert NameObject("/N") not in baseline_target
+        assert NameObject("/N") not in candidate_target
+        assert str(baseline_target["/P"]) == str(candidate_target["/P"])
+        assert str(baseline_target["/A"]) == str(candidate_target["/A"])
+
+        baseline_annotation = selected_annotation(baseline, baseline_action)
+        candidate_annotation = selected_annotation(candidate, candidate_action)
+        assert str(baseline_annotation["/Subtype"]) == "/FileAttachment"
+        assert str(candidate_annotation["/Subtype"]) == "/FileAttachment"
+        assert str(baseline_annotation["/FS"]["/F"]) == str(
+            candidate_annotation["/FS"]["/F"]
+        )
+        assert str(baseline_annotation["/FS"]["/Desc"]) == str(
+            candidate_annotation["/FS"]["/Desc"]
+        )
+        assert stored_embedded_file_data(
+            baseline_annotation
+        ) != stored_embedded_file_data(candidate_annotation)
+
+    for fixture_id, action_chain in (
+        (
+            "active.embedded_goto_file_attachment_file_specification_metadata_rewritten",
+            False,
+        ),
+        (
+            "active.action_chain_embedded_goto_file_attachment_file_specification_metadata_rewritten",
+            True,
+        ),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_annotation = selected_annotation(
+            baseline,
+            action(baseline, action_chain=action_chain),
+        )
+        candidate_annotation = selected_annotation(
+            candidate,
+            action(candidate, action_chain=action_chain),
+        )
+
+        assert str(baseline_annotation["/FS"]["/F"]) == str(
+            candidate_annotation["/FS"]["/F"]
+        )
+        assert str(baseline_annotation["/FS"]["/Desc"]) != str(
+            candidate_annotation["/FS"]["/Desc"]
+        )
+
+    for fixture_id, action_chain in (
+        (
+            "active.embedded_goto_file_attachment_annotation_metadata_rewritten",
+            False,
+        ),
+        (
+            "active.action_chain_embedded_goto_file_attachment_annotation_metadata_rewritten",
+            True,
+        ),
+    ):
+        fixture = generated / fixture_id
+        baseline = PdfReader(fixture / "baseline.pdf", strict=True)
+        candidate = PdfReader(fixture / "candidate.pdf", strict=True)
+        baseline_annotation = selected_annotation(
+            baseline,
+            action(baseline, action_chain=action_chain),
+        )
+        candidate_annotation = selected_annotation(
+            candidate,
+            action(candidate, action_chain=action_chain),
+        )
+
+        assert str(baseline_annotation["/Contents"]) != str(
+            candidate_annotation["/Contents"]
+        )
+        assert stored_embedded_file_data(
+            baseline_annotation
+        ) == stored_embedded_file_data(candidate_annotation)
 
 
 def test_set_ocg_state_pairs_are_semantic(tmp_path):

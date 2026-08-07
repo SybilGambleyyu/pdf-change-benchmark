@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.11.0 (unreleased)
+
+- Add twelve GoToE FileAttachment-target regressions for document-action roots
+  and semantic action-chain members. Eight positives cover numeric and named
+  /P page selectors paired with numeric and NM /A annotation selectors. They
+  keep the stored Target dictionary and public action inventory fixed while the
+  selected attachment FileSpec is rebound, requiring the appropriate generic
+  active-content signal and PFP001.
+- Add selected FileSpec-description and annotation-Contents negatives at both
+  roots. They require stored_pdf_bytes_changed alone, preventing adapters from
+  passing via recursive hashes of descriptive FileSpec fields, FileAttachment
+  metadata, or unrelated page annotations.
+
 ## 1.10.0 (unreleased)
 
 - Add ten GoToE target-semantics regressions for document-action roots and

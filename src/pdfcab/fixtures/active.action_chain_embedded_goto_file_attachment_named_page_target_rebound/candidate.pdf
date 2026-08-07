@@ -1,0 +1,174 @@
+%PDF-1.7
+%‚„œ”
+1 0 obj
+<<
+/Producer (pypdf)
+/Title (PDFCAB\137INERT\137A)
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Count 2
+/Kids [ 4 0 R 5 0 R ]
+>>
+endobj
+3 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+/Names <<
+/Dests <<
+/Names [ <5044464341425f46494c455f4154544143484d454e545f50414745> [ 5 0 R /Fit ] ]
+>>
+>>
+/OpenAction 15 0 R
+>>
+endobj
+4 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 72 72 ]
+/Parent 2 0 R
+/Annots [ 10 0 R 11 0 R ]
+>>
+endobj
+5 0 obj
+<<
+/Type /Page
+/Resources <<
+>>
+/MediaBox [ 0.0 0.0 72 72 ]
+/Parent 2 0 R
+/Annots [ 12 0 R 13 0 R ]
+>>
+endobj
+6 0 obj
+<<
+/Type /EmbeddedFile
+/Subtype /application#232Fpdf
+/Length 31
+>>
+stream
+PDFCAB_FILE_ATTACHMENT_STREAM_A
+endstream
+endobj
+7 0 obj
+<<
+/Type /Filespec
+/F (PDFCAB\137FILE\137ATTACHMENT\056pdf)
+/EF <<
+/F 6 0 R
+>>
+/Desc (PDFCAB\137INERT\137A)
+>>
+endobj
+8 0 obj
+<<
+/Type /EmbeddedFile
+/Subtype /application#232Fpdf
+/Length 31
+>>
+stream
+PDFCAB_FILE_ATTACHMENT_STREAM_B
+endstream
+endobj
+9 0 obj
+<<
+/Type /Filespec
+/F (PDFCAB\137FILE\137ATTACHMENT\056pdf)
+/EF <<
+/F 8 0 R
+>>
+/Desc (PDFCAB\137INERT\137A)
+>>
+endobj
+10 0 obj
+<<
+/Type /Annot
+/Subtype /FileAttachment
+/Rect [ 0 0 10 10 ]
+/FS 7 0 R
+/NM (PDFCAB\137FILE\137ATTACHMENT\137NAME)
+/Contents (PDFCAB\137INERT\137A)
+>>
+endobj
+11 0 obj
+<<
+/Type /Annot
+/Subtype /FileAttachment
+/Rect [ 12 0 22 10 ]
+/FS 9 0 R
+/NM (PDFCAB\137OTHER\137FILE\137ATTACHMENT)
+/Contents (PDFCAB\137INERT\137A)
+>>
+endobj
+12 0 obj
+<<
+/Type /Annot
+/Subtype /FileAttachment
+/Rect [ 0 0 10 10 ]
+/FS 9 0 R
+/NM (PDFCAB\137FILE\137ATTACHMENT\137NAME)
+/Contents (PDFCAB\137INERT\137A)
+>>
+endobj
+13 0 obj
+<<
+/Type /Annot
+/Subtype /FileAttachment
+/Rect [ 12 0 22 10 ]
+/FS 7 0 R
+/NM (PDFCAB\137OTHER\137FILE\137ATTACHMENT)
+/Contents (PDFCAB\137INERT\137A)
+>>
+endobj
+14 0 obj
+<<
+/Type /Action
+/S /GoToE
+/D <5044464341425f46494c455f4154544143484d454e545f44455354494e4154494f4e>
+/T <<
+/R /C
+/P <5044464341425f46494c455f4154544143484d454e545f50414745>
+/A 0
+>>
+>>
+endobj
+15 0 obj
+<<
+/Type /Action
+/S /JavaScript
+/JS (PDFCAB\137INERT\137A)
+/Next 14 0 R
+>>
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000015 00000 n 
+0000000084 00000 n 
+0000000149 00000 n 
+0000000326 00000 n 
+0000000444 00000 n 
+0000000562 00000 n 
+0000000693 00000 n 
+0000000819 00000 n 
+0000000950 00000 n 
+0000001076 00000 n 
+0000001242 00000 n 
+0000001410 00000 n 
+0000001576 00000 n 
+0000001744 00000 n 
+0000001944 00000 n 
+trailer
+<<
+/Size 16
+/Root 3 0 R
+/Info 1 0 R
+>>
+startxref
+2035
+%%EOF

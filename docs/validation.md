@@ -9,6 +9,29 @@ The PDFFence adapter is intentionally process-bound. It does not import
 PDFFence internal modules, so changes to the CLI report contract are visible as
 benchmark failures.
 
+## 1.11.0 source-candidate integration evidence
+
+On 2026-08-06, the 1.11.0 fixture candidate rebuilt and verified all 113
+fixture pairs with pypdf 6.15.0. Its 46 tests and Ruff checks passed. It scored
+the PDFFence 1.11.0 source candidate through its process-bound command-line
+executable: 113 of 113 pairs passed.
+
+The twelve GoToE FileAttachment cases keep their document-action root or
+semantic-chain position and public action inventory fixed. Eight positives
+hold their /P and /A selectors fixed while changing the selected attachment
+through numeric and named page/annotation forms; the selected FileSpecs retain
+the same filename and description while their inert embedded stream bytes
+differ. Four negatives change only selected FileSpec description or annotation
+Contents. The held PDFFence 1.10.0 source candidate scores 105 of 113: it
+misses the eight selector-rebind positives while preserving all four negatives.
+This isolates source-document FileAttachment target resolution from recursive
+annotation or page hashing.
+
+Two fixed-timestamp builds produced byte-identical wheel and source-archive
+files, and all four artifacts passed Twine metadata checks. Fresh wheel installs
+on Python 3.12 and 3.13, plus a clean Python 3.12 source-archive install,
+passed pip check, fixture verification, and the complete 113-pair score.
+
 ## 1.10.0 source-candidate integration evidence
 
 On 2026-08-06, the 1.10.0 fixture candidate rebuilt and verified all 101
